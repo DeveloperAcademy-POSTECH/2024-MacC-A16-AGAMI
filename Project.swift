@@ -13,12 +13,15 @@ let project = Project(
                 with: [
                     "UILaunchScreen": [
                         "UIColorName": "",
-                        "UIImageName": "",
-                    ],
+                        "UIImageName": ""
+                    ]
                 ]
             ),
             sources: ["AGAMI/Sources/**"],
             resources: ["AGAMI/Resources/**"],
+            scripts: [
+                .swiftLintShell
+            ],
             dependencies: []
         ),
         .target(
@@ -30,6 +33,14 @@ let project = Project(
             sources: ["AGAMI/Tests/**"],
             resources: [],
             dependencies: [.target(name: "AGAMI")]
-        ),
+        )
     ]
 )
+
+extension TargetScript {
+    static let swiftLintShell = TargetScript.pre(
+        path: .relativeToRoot("Scripts/SwiftLintRunScript.sh"),
+        name: "swiftLintShell",
+        basedOnDependencyAnalysis: false
+    )
+}

@@ -1,0 +1,17 @@
+disabled_rules:
+  - line_length
+  - trailing_whitespace
+  - force_cast
+  - force_unwrapping
+
+opt_in_rules:
+  - empty_count
+  - first_where
+
+included:
+  - Sources
+
+excluded:
+  - Tests
+  - Carthage
+  - Pods

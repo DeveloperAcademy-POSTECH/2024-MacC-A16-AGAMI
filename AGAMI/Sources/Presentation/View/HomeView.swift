@@ -10,9 +10,6 @@ import SwiftUI
 struct HomeView: View {
     @State private var selectedTab: TabSelection = .music
     var body: some View {
-        Button("shazam") {
-            selectedTab = .shazam
-        }
         if #available(iOS 18.0, *) {
             TabView(selection: $selectedTab) {
                 Tab("Music", systemImage: "music.note", value: .music) {

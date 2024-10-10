@@ -20,6 +20,7 @@ let project = Project(
                     "NSPhotoLibraryUsageDescription": "플레이리스트 사진 추가를 위해 사진 라이브러리에 접근합니다.",
                     "NSCameraUsageDescription": "플레이리스트 사진 추가를 위해 카메라에 접근합니다.",
                     "NSLocationUsageDescription": "근처 장소 탐색을 위해 사용자의 위치 정보에 접근합니다.",
+                    "NSLocationWhenInUseUsageDescription": "근처 장소 탐색을 위해 사용자의 위치 정보에 접근합니다.",
                     "UISupportedInterfaceOrientations": [
                         "UIInterfaceOrientationPortrait",
                         "UIInterfaceOrientationPortraitUpsideDown"
@@ -27,7 +28,8 @@ let project = Project(
                     "UISupportedInterfaceOrientations~ipad": [
                         "UIInterfaceOrientationPortrait",
                         "UIInterfaceOrientationPortraitUpsideDown"
-                    ]
+                    ],
+                    "UIRequiresFullScreen": true
                 ]
             ),
             sources: ["AGAMI/Sources/**"],

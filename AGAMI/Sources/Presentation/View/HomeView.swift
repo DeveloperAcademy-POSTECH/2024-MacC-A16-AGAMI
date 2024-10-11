@@ -19,7 +19,6 @@ struct HomeView: View {
                 Tab("Shazam", systemImage: "shazam.logo", value: .shazam) {
                     ShazamHomeView()
                 }
-
             }
         } else {
             TabView {
@@ -31,6 +30,7 @@ struct HomeView: View {
                         }
                     }
                     .tag(TabSelection.music)
+
                 ShazamHomeView()
                     .tabItem {
                         VStack {

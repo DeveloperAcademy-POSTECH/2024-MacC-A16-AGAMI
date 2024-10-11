@@ -16,7 +16,7 @@ final class MusicService {
         let status = MusicAuthorization.currentStatus
         switch status {
         case .authorized:
-            break
+            return
         case .notDetermined:
             let newStatus = await MusicAuthorization.request()
             if newStatus != .authorized {
@@ -31,10 +31,14 @@ final class MusicService {
         try await requestAuthorization()
         
         let library = MusicLibrary.shared
-        let playlist = try await library.createPlaylist(name: name, description: description)
-        self.playlist = playlist
+        let newPlaylist = try await library.createPlaylist(name: name, description: description)
+        self.playlist = newPlaylist
         
-        return playlist
+        return newPlaylist
+    }
+    
+    func getCurrentPlaylistUrl() -> String? {
+        return playlist?.url?.absoluteString
     }
     
     func searchAndAddSong(songTitle: String) async throws {

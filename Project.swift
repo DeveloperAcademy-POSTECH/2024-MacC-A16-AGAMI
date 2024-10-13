@@ -39,7 +39,11 @@ let project = Project(
             scripts: [
                 .swiftLintShell
             ],
-            dependencies: []
+            dependencies: [
+                .external(name: "FirebaseAnalytics"),
+                .external(name: "FirebaseAuth"),
+                .external(name: "FirebaseFirestore")
+            ]
         ),
         .target(
             name: "AGAMITests",

@@ -2,13 +2,14 @@ disabled_rules:
   - line_length
   - trailing_whitespace
   - trailing_newline
-
+#  - type_name
+  
 opt_in_rules:
   - empty_count
   - first_where
 
 included:
-  - Sources
+  - AGAMI/Sources
 
 excluded:
   - Tests

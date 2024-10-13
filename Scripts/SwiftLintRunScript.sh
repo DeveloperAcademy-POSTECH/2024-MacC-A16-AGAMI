@@ -7,9 +7,7 @@ fi
 export PATH
 
 if which swiftlint > /dev/null; then
-#    swiftlint lint --path "${SRCROOT}"
     swiftlint
 else
-  echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
+    echo "warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint"
 fi
-

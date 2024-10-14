@@ -4,8 +4,7 @@ import SwiftUI
 struct AGAMIApp: App {
     var body: some Scene {
         WindowGroup {
-//            HomeView()
-            ArchiveListView()
+            HomeView()
         }
     }
 }

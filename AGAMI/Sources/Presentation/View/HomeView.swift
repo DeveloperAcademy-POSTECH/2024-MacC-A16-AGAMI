@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var selectedTab: TabSelection = .music
+    @State var archiveCoord: ArchiveCoordinator = .init()
     var body: some View {
         if #available(iOS 18.0, *) {
             TabView(selection: $selectedTab) {
@@ -17,7 +18,19 @@ struct HomeView: View {
                 }
 
                 Tab("Archive", systemImage: "archivebox.fill", value: .shazam) {
-                    ShazamHomeView()
+                    NavigationStack(path: $archiveCoord.path) {
+                        archiveCoord.build(view: .listView)
+                            .navigationDestination(for: ArchiveView.self) { view in
+                                archiveCoord.build(view: view)
+                            }
+                            .sheet(item: $archiveCoord.sheet) { sheet in
+                                archiveCoord.buildSheet(sheet: sheet)
+                            }
+                            .fullScreenCover(item: $archiveCoord.fullScreenCover) { cover in
+                                archiveCoord.buildFullScreenCover(cover: cover)
+                            }
+                    }
+                    .environment(archiveCoord)
                 }
                 
                 Tab("Map View", systemImage: "map.fill", value: .map) {

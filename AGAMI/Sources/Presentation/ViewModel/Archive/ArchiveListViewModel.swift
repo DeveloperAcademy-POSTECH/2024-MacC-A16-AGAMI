@@ -9,10 +9,12 @@ import Foundation
 
 @Observable
 final class ArchiveListViewModel {
-    let dummyURL: URL? = .init(string: "https://dummyimage.com/400x400/000/fff")
+    let dummyURL: URL? = .init(string: "https://dummyimage.com/400x400/fff/000")
 
     var selectedCard: Int?
     var currentId: Int?
+
+    var searchText: String = ""
 
     func isCurrent(_ index: Int) -> Bool {
         currentId == index
@@ -27,6 +29,6 @@ final class ArchiveListViewModel {
     }
 
     func getCardsPadding(_ index: Int, size: CGSize) -> CGFloat {
-        currentId == index ? size.width * 0.4 : -size.width * 0.3
+        currentId == index ? size.width * 0.7 : 0
     }
 }

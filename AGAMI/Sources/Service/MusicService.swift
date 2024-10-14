@@ -41,21 +41,41 @@ final class MusicService {
         return playlist?.url?.absoluteString
     }
     
-    func searchAndAddSong(songTitle: String) async throws {
+    func searchSongByTitle(songTitle: String) async throws -> Song {
+        try await requestAuthorization()
+
+        var searchRequest = MusicCatalogSearchRequest(term: songTitle, types: [Song.self])
+        searchRequest.limit = 1
+
+        let searchResponse = try await searchRequest.response()
+
+        guard let song = searchResponse.songs.first else {
+            throw MusicServiceError.songNotFound
+        }
+        
+        return song
+    }
+
+    func searchSongById(songId: String) async throws -> Song {
+        try await requestAuthorization()
+
+        let resourceRequest = MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: MusicItemID(songId))
+        let searchResponse = try await resourceRequest.response()
+
+        guard let song = searchResponse.items.first else {
+            throw MusicServiceError.songNotFound
+        }
+        
+        return song
+    }
+    
+    func addSongToPlaylist(song: Song) async throws {
         try await requestAuthorization()
         
         guard let playlist = playlist else {
             throw MusicServiceError.playlistNotFound
         }
-        
-        var searchRequest = MusicCatalogSearchRequest(term: songTitle, types: [Song.self])
-        searchRequest.limit = 1
-        
-        let searchResponse = try await searchRequest.response()
-        guard let song = searchResponse.songs.first else {
-            throw MusicServiceError.songNotFound
-        }
-        
+
         try await MusicLibrary.shared.add(song, to: playlist)
     }
 }

@@ -48,14 +48,26 @@ struct HomeView: View {
                     }
                     .tag(TabSelection.music)
 
-                ShazamHomeView()
-                    .tabItem {
-                        VStack {
-                            Text("Archive")
-                            Image(systemName: "archivebox.fill")
+                NavigationStack(path: $archiveCoord.path) {
+                    archiveCoord.build(view: .listView)
+                        .navigationDestination(for: ArchiveView.self) { view in
+                            archiveCoord.build(view: view)
                         }
+                        .sheet(item: $archiveCoord.sheet) { sheet in
+                            archiveCoord.buildSheet(sheet: sheet)
+                        }
+                        .fullScreenCover(item: $archiveCoord.fullScreenCover) { cover in
+                            archiveCoord.buildFullScreenCover(cover: cover)
+                        }
+                }
+                .environment(archiveCoord)
+                .tabItem {
+                    VStack {
+                        Text("Archive")
+                        Image(systemName: "archivebox.fill")
                     }
-                    .tag(TabSelection.shazam)
+                }
+                .tag(TabSelection.shazam)
                 
                 MapView()
                     .tabItem {

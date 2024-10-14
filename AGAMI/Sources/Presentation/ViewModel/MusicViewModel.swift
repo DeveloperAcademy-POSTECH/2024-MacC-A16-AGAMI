@@ -46,10 +46,6 @@ final class MusicViewModel {
                 let song = try await musicService.searchSongById(songId: songId)
                 try await musicService.addSongToPlaylist(song: song)
                 statusMessage = "'\(songId)' ID 플레이리스트에 추가되었습니다."
-                
-                if let playlistUrl = musicService.getCurrentPlaylistUrl() {
-                    openPlaylist(playlistUrl: playlistUrl)
-                }
             } catch {
                 statusMessage = "곡 추가 오류: \(error.localizedDescription)"
             }

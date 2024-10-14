@@ -13,7 +13,7 @@ import MusicKit
 final class MusicViewModel {
     var playlistName: String = ""
     var playlistDescription: String = ""
-    var songTitle: String = ""
+    var songId: String = ""
     var statusMessage: String = ""
     
     private let musicService = MusicService()
@@ -43,8 +43,9 @@ final class MusicViewModel {
     func searchAndAddSong() {
         Task {
             do {
-                try await musicService.searchAndAddSong(songTitle: songTitle)
-                statusMessage = "'\(songTitle)' 곡이 플레이리스트에 추가되었습니다."
+                let song = try await musicService.searchSongById(songId: songId)
+                try await musicService.addSongToPlaylist(song: song)
+                statusMessage = "'\(songId)' ID 플레이리스트에 추가되었습니다."
                 
                 if let playlistUrl = musicService.getCurrentPlaylistUrl() {
                     openPlaylist(playlistUrl: playlistUrl)

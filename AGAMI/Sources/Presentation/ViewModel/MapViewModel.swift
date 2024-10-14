@@ -8,7 +8,7 @@
 import Foundation
 import MapKit
 
-struct Place : Identifiable {
+struct Place: Identifiable {
     var id: UUID = UUID()
     var location: CLLocationCoordinate2D
 }

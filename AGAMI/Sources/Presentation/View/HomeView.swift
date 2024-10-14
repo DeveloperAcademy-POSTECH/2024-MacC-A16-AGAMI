@@ -12,12 +12,16 @@ struct HomeView: View {
     var body: some View {
         if #available(iOS 18.0, *) {
             TabView(selection: $selectedTab) {
-                Tab("Music", systemImage: "music.note", value: .music) {
+                Tab("Search", systemImage: "headphones", value: .music) {
                     MusicKitPlaylistView()
                 }
 
-                Tab("Shazam", systemImage: "shazam.logo", value: .shazam) {
+                Tab("Archive", systemImage: "archivebox.fill", value: .shazam) {
                     ShazamHomeView()
+                }
+                
+                Tab("Map View", systemImage: "map.fill", value: .map) {
+                    MapView()
                 }
             }
         } else {
@@ -25,8 +29,8 @@ struct HomeView: View {
                 MusicKitPlaylistView()
                     .tabItem {
                         VStack {
-                            Text("Music")
-                            Image(systemName: "music.note")
+                            Text("Search")
+                            Image(systemName: "headphones")
                         }
                     }
                     .tag(TabSelection.music)
@@ -34,11 +38,20 @@ struct HomeView: View {
                 ShazamHomeView()
                     .tabItem {
                         VStack {
-                            Text("Shazam")
-                            Image(systemName: "shazam.logo")
+                            Text("Archive")
+                            Image(systemName: "archivebox.fill")
                         }
                     }
                     .tag(TabSelection.shazam)
+                
+                MapView()
+                    .tabItem {
+                        VStack {
+                            Text("Map View")
+                            Image(systemName: "map.fill")
+                        }
+                    }
+                    .tag(TabSelection.map)
             }
         }
     }
@@ -48,6 +61,7 @@ extension HomeView {
     enum TabSelection: Hashable {
         case music
         case shazam
+        case map
     }
 }
 

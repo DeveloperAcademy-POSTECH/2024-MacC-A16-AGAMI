@@ -30,7 +30,7 @@ final class MusicViewModel {
     }
     
     func createPlaylist() {
-        Task {
+        Task { @MainActor in
             do {
                 _ = try await musicService.createPlaylist(name: playlistName, description: playlistDescription)
                 statusMessage = "플레이리스트 '\(playlistName)' 생성 완료."
@@ -41,7 +41,7 @@ final class MusicViewModel {
     }
     
     func searchAndAddSong() {
-        Task {
+        Task { @MainActor in
             do {
                 let song = try await musicService.searchSongById(songId: songId)
                 try await musicService.addSongToPlaylist(song: song)

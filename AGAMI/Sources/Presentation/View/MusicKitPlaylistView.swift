@@ -40,7 +40,7 @@ struct MusicKitPlaylistView: View {
                     Text("곡 검색 및 추가")
                         .font(.headline)
                     
-                    TextField("곡 제목 입력", text: $viewModel.songTitle)
+                    TextField("곡 아이디 입력", text: $viewModel.songId)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                     
                     Button {

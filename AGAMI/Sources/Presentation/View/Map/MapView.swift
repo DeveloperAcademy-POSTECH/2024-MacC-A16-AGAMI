@@ -13,7 +13,7 @@ struct MapView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            Map() {
+            Map {
                 ForEach(viewModel.places) { place in
                     Annotation("", coordinate: place.location) {
                         PlaceMarkerView()

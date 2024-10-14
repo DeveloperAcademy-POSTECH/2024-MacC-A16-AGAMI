@@ -39,9 +39,12 @@ final class LocationService: NSObject {
     }
     
     func requestCurrentLocation() {
-        if self.locationManager.authorizationStatus == .authorizedWhenInUse || self.locationManager.authorizationStatus == .authorizedAlways {
+        let status = self.locationManager.authorizationStatus
+        
+        switch status {
+        case .authorizedWhenInUse, .authorizedAlways:
             self.locationManager.requestLocation()
-        } else {
+        default:
             self.locationManager.requestWhenInUseAuthorization()
         }
     }
@@ -49,7 +52,6 @@ final class LocationService: NSObject {
     func getCurrentLocation() -> CLLocationCoordinate2D? {
         return currentLocation
     }
-    
 }
 
 extension LocationService: CLLocationManagerDelegate {
@@ -58,6 +60,7 @@ extension LocationService: CLLocationManagerDelegate {
             currentLocation = location.coordinate
         }
     }
+    
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         dump("Failed to get user's location: \(error.localizedDescription)")
     }

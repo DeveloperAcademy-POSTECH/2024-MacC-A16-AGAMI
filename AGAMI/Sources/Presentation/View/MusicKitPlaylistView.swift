@@ -62,7 +62,7 @@ struct MusicKitPlaylistView: View {
             .navigationTitle("MusicKit 플레이리스트")
         }
         .onAppear {
-            viewModel.requestAuthrization()
+            viewModel.requestAuthorization()
         }
     }
 }

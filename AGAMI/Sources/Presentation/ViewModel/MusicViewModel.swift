@@ -18,8 +18,8 @@ final class MusicViewModel {
     
     private let musicService = MusicService()
     
-    func requestAuthrization() {
-        Task {
+    func requestAuthorization() {
+        Task { @MainActor in
             do {
                 try await musicService.requestAuthorization()
                 statusMessage = "Authorization granted"

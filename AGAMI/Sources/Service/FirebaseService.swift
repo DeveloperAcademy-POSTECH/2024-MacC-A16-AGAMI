@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Firebase
-import FirebaseFirestoreSwift
+import FirebaseFirestore
 import FirebaseStorage
 
 final class FirebaseService: ObservableObject {

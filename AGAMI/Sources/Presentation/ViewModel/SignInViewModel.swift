@@ -13,8 +13,6 @@ final class SignInViewModel {
     func handleSuccessfulLogin(with authorization: ASAuthorization) {
         if let userCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
             dump(userCredential.user)
-            dump(userCredential.email)
-            dump(userCredential.fullName)
             if userCredential.authorizedScopes.contains(.fullName) {
                 dump(userCredential.fullName?.givenName ?? "No given name")
             }

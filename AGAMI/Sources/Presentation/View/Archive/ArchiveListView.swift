@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ArchiveListView: View {
-    @State var viewModel: ArchiveListViewModel = .init()
+    @State var viewModel: ArchiveListViewModel = ArchiveListViewModel()
     @Namespace private var animationID
 
     var body: some View {
@@ -16,7 +16,6 @@ struct ArchiveListView: View {
             let size = $0.size
 
             ZStack(alignment: .top) {
-
                 ArchiveList(
                     viewModel: viewModel,
                     size: size,
@@ -28,7 +27,6 @@ struct ArchiveListView: View {
                     size: size,
                     animationID: animationID
                 )
-
             }
             .animation(.default, value: viewModel.currentId)
         }
@@ -96,7 +94,6 @@ private struct ArchiveListCell: View {
             }
         }
     }
-
 }
 
 private struct PopupView: View {
@@ -108,9 +105,7 @@ private struct PopupView: View {
 
     var body: some View {
         if let selected = viewModel.selectedCard {
-
             ZStack {
-
                 Color.black.opacity(0.4)
                     .ignoresSafeArea()
                     .onTapGesture {
@@ -132,12 +127,9 @@ private struct PopupView: View {
                     .padding(.top, 50)
                     Spacer()
                 }
-
             }
-
         }
     }
-
 }
 
 #Preview {

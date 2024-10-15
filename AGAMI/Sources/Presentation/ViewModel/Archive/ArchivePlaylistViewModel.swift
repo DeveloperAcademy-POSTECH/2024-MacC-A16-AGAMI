@@ -23,9 +23,9 @@ final class ArchivePlaylistViewModel {
 
     var dummyPlaylist: [DummySongModel] = Array(repeating: .init(), count: 10)
 
-    func deleteMusic(idxSet: IndexSet) {
-        for idx in idxSet {
-            dummyPlaylist.remove(at: idx)
+    func deleteMusic(indexSet: IndexSet) {
+        for index in indexSet {
+            dummyPlaylist.remove(at: index)
         }
     }
 

@@ -1,5 +1,5 @@
 import SwiftUI
-import FirebaseCore
+import Firebase
 
 @main
 struct AGAMIApp: App {

@@ -4,93 +4,99 @@
 //
 //  Created by taehun on 10/12/24.
 //
+
+import SwiftUI
 import Firebase
-import FirebaseFirestore
+import FirebaseFirestoreSwift
+import FirebaseStorage
 
 final class FirebaseService: ObservableObject {
     private let firestore = Firestore.firestore()
+    private let storage = Storage.storage()
+    @State var image: UIImage?
+    @State var imageUrl: String?
     
-    func savePlaylistToFirebase(_ playlist: PlaylistModel) {
-        let geoPoint = GeoPoint(latitude: playlist.latitude, longitude: playlist.longitude)
-        let playlistData: [String: Any] = [
-            "playlistName": playlist.playlistName,
-            "authorID": playlist.authorID.uuidString,
-            "mainPhotoURL": playlist.mainPhotoURL,
-            "photoURL": playlist.photoURL,
-            "location": geoPoint,
-            "musicID": playlist.musicID,
-            "generationTime": Timestamp(date: playlist.generationTime)
-        ]
-        
-        firestore.collection("PlaylistData")
-            .document(playlist.id.uuidString)
-            .setData(playlistData) { error in
-                if let error = error {
-                    print("Error saving playlist to Firestore: \(error.localizedDescription)")
-                } else {
-                    print("Playlist successfully saved to Firestore!")
+    init() {
+            print("FirebaseService initialized")
+        }
+    
+    func savePlaylistToFirebase(userID: String, playlist: PlaylistModel) {
+        do {
+            try firestore.collection("UserID")
+                .document(userID)
+                .collection("PlaylistID")
+                .document(playlist.playlistID.uuidString)
+                .setData(from: playlist) { error in
+                    if let error = error {
+                        print("Error saving playlist to Firestore: \(error.localizedDescription)")
+                    } else {
+                        print("Playlist successfully saved to Firestore!")
+                    }
                 }
-            }
+        } catch let error {
+            print("Error serializing playlist: \(error.localizedDescription)")
+        }
     }
     
-    func fetchPlaylistsIDByAuthorID(authorID: String, completion: @escaping (Result<[String], Error>) -> Void) {
-        firestore.collection("PlaylistData")
-            .whereField("authorID", isEqualTo: authorID)
+    func fetchPlaylistsByUserID(userID: String, completion: @escaping (Result<[PlaylistModel], Error>) -> Void) {
+        firestore.collection("UserID")
+            .document(userID)
+            .collection("PlaylistID")
             .getDocuments { (querySnapshot, error) in
                 if let error = error {
                     completion(.failure(error))
                     return
                 }
                 
-                var playlistIDs: [String] = []
+                var playlists: [PlaylistModel] = []
                 
-                for document in querySnapshot?.documents ?? [] {
-                    playlistIDs.append(document.documentID)
+                querySnapshot?.documents.forEach { document in
+                    do {
+                        let playlist = try document.data(as: PlaylistModel.self)
+                        playlists.append(playlist)
+                    } catch {
+                        print("Error decoding playlist: \(error.localizedDescription)")
+                    }
                 }
-                completion(.success(playlistIDs))
+                
+                completion(.success(playlists))
             }
     }
     
-    func fetchPlaylistByID(playlistID: String, completion: @escaping (Result<PlaylistModel, Error>) -> Void) {
-        firestore.collection("PlaylistData")
-            .document(playlistID)
-            .getDocument { (document, error) in
+    func saveImageToFirebaseStorage(image: UIImage) {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
+        
+        let storageRef = storage.reference().child("images/\(UUID().uuidString).jpg")
+        
+        storageRef.putData(imageData, metadata: nil) { (metadata, error) in
+            if let error = error {
+                print("Error uploading image: \(error.localizedDescription)")
+                return
+            }
+            
+            storageRef.downloadURL { (url, error) in
                 if let error = error {
-                    completion(.failure(error))
+                    print("Error getting download URL: \(error.localizedDescription)")
                     return
                 }
                 
-                if let document = document, document.exists {
-                    let data = document.data()
-                    
-                    let id = UUID(uuidString: document.documentID) ?? UUID()
-                    let playlistName = data?["playlistName"] as? String ?? ""
-                    let authorIDString = data?["authorID"] as? String ?? ""
-                    let authorID = UUID(uuidString: authorIDString) ?? UUID()
-                    let mainPhotoURL = data?["mainPhotoURL"] as? String ?? ""
-                    let photoURL = data?["photoURL"] as? [String] ?? []
-                    let latitude = (data?["location"] as? GeoPoint)?.latitude ?? 0.0
-                    let longitude = (data?["location"] as? GeoPoint)?.longitude ?? 0.0
-                    let musicID = data?["musicID"] as? [String] ?? []
-                    let generationTime = (data?["generationTime"] as? Timestamp)?.dateValue() ?? Date()
-                    
-                    let playlist = PlaylistModel(
-                        id: id,
-                        playlistName: playlistName,
-                        authorID: authorID,
-                        mainPhotoURL: mainPhotoURL,
-                        photoURL: photoURL,
-                        latitude: latitude,
-                        longitude: longitude,
-                        musicID: musicID,
-                        generationTime: generationTime
-                    )
-                    
-                    completion(.success(playlist))
-                    return
+                if let downloadURL = url?.absoluteString {
+                    DispatchQueue.main.async {
+                        self.imageUrl = downloadURL
+                    }
+                    self.saveImageUrlToFirestore(imageUrl: downloadURL)
                 }
-                print("Playlist does not exist.")
-                completion(.failure(NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "Playlist does not exist"])))
             }
+        }
+    }
+    
+    func saveImageUrlToFirestore(imageUrl: String) {
+        firestore.collection("images").addDocument(data: ["imageUrl": imageUrl]) { error in
+            if let error = error {
+                print("Error saving image URL to Firestore: \(error)")
+            } else {
+                print("Image URL successfully saved to Firestore")
+            }
+        }
     }
 }

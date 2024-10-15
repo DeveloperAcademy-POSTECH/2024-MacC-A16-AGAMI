@@ -15,9 +15,7 @@ struct PlayList: Identifiable, Hashable {
 }
 
 @Observable
-final class CollectionPlaceViewModel {
-    private let collectionPlaceService = CollectionPlaceService()
-    
+final class CollectionPlaceViewModel {    
     var playList: [PlayList] = [
         PlayList(address: "포항시", date: "2024-03-02", time: "17:00"),
         PlayList(address: "천안시", date: "2023-03-01", time: "13:00"),

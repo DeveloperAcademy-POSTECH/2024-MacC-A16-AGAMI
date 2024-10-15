@@ -10,16 +10,20 @@ import SwiftUI
 struct CollectionPlaceListView: View {
     @Binding var playList: [PlayList]
     
-    let columns = [
-        GridItem(.flexible(minimum: 176), spacing: 12),
-        GridItem(.flexible(minimum: 176))
-    ]
+    private let columnWidth: CGFloat = 176
+    private let columnSpacing: CGFloat = 12
+    private var columns: [GridItem] {
+        [
+            GridItem(.flexible(minimum: columnWidth), spacing: columnSpacing),
+            GridItem(.flexible(minimum: columnWidth))
+        ]
+    }
     
     var body: some View {
         VStack {
             HStack {
                 Text("울산 울주군 상북면 명촌길천로 23")
-                    .font(.title2)
+                    .font(.system(size: 16, weight: .regular))
                 
                 Spacer()
             }
@@ -28,7 +32,7 @@ struct CollectionPlaceListView: View {
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(playList, id: \.self) { place in
                     ZStack {
-                        Image("bear")
+                        Image(.bear)
                             .resizable()
                             .aspectRatio(1.0, contentMode: .fit)
                             .clipShape(RoundedRectangle(cornerRadius: 10))

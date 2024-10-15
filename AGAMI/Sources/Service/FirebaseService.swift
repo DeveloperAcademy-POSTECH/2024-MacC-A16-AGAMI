@@ -58,7 +58,7 @@ final class FirebaseService: ObservableObject {
     }
 
     func uploadImageToFirebase(userID: String, playlistID: String, image: UIImage, completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+        guard let imageData = image.jpegData(compressionQuality: 1.0) else {
             completion(.failure(NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])))
             return
         }

@@ -14,7 +14,7 @@ struct CollectionPlaceView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                CollectionPlaceListView(playList: $viewModel.playList)                
+                CollectionPlaceListView()
             }
         }
         .navigationTitle("수집 장소")

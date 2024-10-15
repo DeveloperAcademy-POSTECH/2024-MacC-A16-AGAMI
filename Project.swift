@@ -35,6 +35,7 @@ let project = Project(
             ),
             sources: ["AGAMI/Sources/**"],
             resources: ["AGAMI/Resources/**"],
+            entitlements: "Entitlements/AGAMI.entitlements",
             scripts: [
                 .swiftLintShell
             ],

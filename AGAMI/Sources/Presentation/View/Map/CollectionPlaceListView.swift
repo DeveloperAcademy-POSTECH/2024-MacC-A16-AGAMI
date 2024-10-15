@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct CollectionPlaceListView: View {
-    @Binding var playList: [PlayList]
-    
+    @State private var viewModel = CollectionPlaceViewModel()
+
     private let columnWidth: CGFloat = 176
     private let columnSpacing: CGFloat = 12
     private var columns: [GridItem] {
@@ -30,7 +30,7 @@ struct CollectionPlaceListView: View {
             .padding(.leading, 12)
             
             LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(playList, id: \.self) { place in
+                ForEach(viewModel.playList, id: \.self) { place in
                     ZStack {
                         Image(.bear)
                             .resizable()
@@ -56,9 +56,5 @@ struct CollectionPlaceListView: View {
 }
 
 #Preview {
-    CollectionPlaceListView(playList: .constant([
-        PlayList(address: "포항시", date: "2024-03-02", time: "17:00"),
-        PlayList(address: "천안시", date: "2023-03-01", time: "13:00"),
-        PlayList(address: "서울시", date: "2020-05-05", time: "10:00")
-    ]))
+    CollectionPlaceListView()
 }

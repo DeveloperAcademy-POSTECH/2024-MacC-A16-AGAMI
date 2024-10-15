@@ -16,7 +16,6 @@ struct ArchivePlaylistView: View {
                 PlaylistImageCellView(viewModel: viewModel)
                 TitleAndDescriptionView(viewModel: viewModel)
                 PlaylistView(viewModel: viewModel)
-                    .scrollDisabled(true)
             }
             .toolbar { EditButton() }
         }

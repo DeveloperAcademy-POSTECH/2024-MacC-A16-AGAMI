@@ -14,7 +14,7 @@ struct HomeView: View {
         if #available(iOS 18.0, *) {
             TabView(selection: $selectedTab) {
                 Tab("Search", systemImage: "headphones", value: .music) {
-                    MusicKitPlaylistView()
+                    SearchView()
                 }
 
                 Tab("Archive", systemImage: "archivebox.fill", value: .archive) {

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-import FirebaseFirestoreSwift
+import FirebaseFirestore
 
 struct PlaylistModel: Codable, Identifiable {
     @DocumentID var id: String?

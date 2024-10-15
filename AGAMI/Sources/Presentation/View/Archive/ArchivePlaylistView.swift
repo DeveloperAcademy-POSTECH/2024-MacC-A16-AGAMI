@@ -8,17 +8,19 @@
 import SwiftUI
 
 struct ArchivePlaylistView: View {
-    @State var viewModel: ArchivePlaylistViewModel = .init()
+    @State var viewModel: ArchivePlaylistViewModel = ArchivePlaylistViewModel()
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 0) {
+            VStack(spacing: 0) {
                 PlaylistImageCellView(viewModel: viewModel)
                 TitleAndDescriptionView(viewModel: viewModel)
                 PlaylistView(viewModel: viewModel)
+                    .scrollDisabled(true)
             }
+            .toolbar { EditButton() }
         }
-        .toolbar { EditButton() }
+
     }
 }
 
@@ -111,7 +113,6 @@ private struct PlaylistView: View {
             .onMove(perform: viewModel.moveMusic)
         }
         .listStyle(.plain)
-        .scrollDisabled(true)
         .scaledToFit()
     }
 }

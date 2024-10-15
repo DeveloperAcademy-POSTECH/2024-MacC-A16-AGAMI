@@ -9,13 +9,6 @@ import Foundation
 
 @Observable
 final class ArchivePlaylistViewModel {
-    struct DummySongModel: Identifiable {
-        let id = UUID()
-        let imageURL: URL? = .init(string: "https://dummyimage.com/400x400/000/fff")
-        let title: String = "Under The Influence"
-        let artist: String = "Chris Brown"
-    }
-
     let dummyURL: URL? = .init(string: "https://dummyimage.com/400x400/fff/000")
 
     var playlistTitle: String = "플레이리스트 타이틀"
@@ -32,4 +25,11 @@ final class ArchivePlaylistViewModel {
     func moveMusic(from source: IndexSet, to destination: Int) {
         dummyPlaylist.move(fromOffsets: source, toOffset: destination)
     }
+}
+
+struct DummySongModel: Identifiable {
+    let id = UUID()
+    let imageURL: URL? = .init(string: "https://dummyimage.com/400x400/000/fff")
+    let title: String = "Under The Influence"
+    let artist: String = "Chris Brown"
 }

@@ -34,13 +34,13 @@ private struct PlaylistImageCellView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .aspectRatio(1, contentMode: .fit)
                 .padding(.horizontal, 20)
-                .shadow(radius: 10)
+                .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
         } placeholder: {
             RoundedRectangle(cornerRadius: 16)
                 .fill(.white)
                 .aspectRatio(1, contentMode: .fit)
                 .padding(.horizontal, 20)
-                .shadow(radius: 10)
+                .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
         }
         .padding(.top, 20)
     }

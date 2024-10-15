@@ -12,14 +12,8 @@ import FirebaseStorage
 
 final class FirebaseService: ObservableObject {
     private let firestore = Firestore.firestore()
-    private let storage = Storage.storage()
-    @State var image: UIImage?
-    @State var imageUrl: String?
-    
-    init() {
-            print("FirebaseService initialized")
-        }
-    
+    private let firestorage = Storage.storage()
+
     func savePlaylistToFirebase(userID: String, playlist: PlaylistModel) {
         do {
             try firestore.collection("UserID")
@@ -37,7 +31,7 @@ final class FirebaseService: ObservableObject {
             print("Error serializing playlist: \(error.localizedDescription)")
         }
     }
-    
+
     func fetchPlaylistsByUserID(userID: String, completion: @escaping (Result<[PlaylistModel], Error>) -> Void) {
         firestore.collection("UserID")
             .document(userID)
@@ -47,7 +41,7 @@ final class FirebaseService: ObservableObject {
                     completion(.failure(error))
                     return
                 }
-                
+
                 var playlists: [PlaylistModel] = []
                 
                 querySnapshot?.documents.forEach { document in
@@ -62,40 +56,47 @@ final class FirebaseService: ObservableObject {
                 completion(.success(playlists))
             }
     }
-    
-    func saveImageToFirebaseStorage(image: UIImage) {
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else { return }
+
+    func uploadImageToFirebase(userID: String, playlistID: String, image: UIImage, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
+            completion(.failure(NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])))
+            return
+        }
         
-        let storageRef = storage.reference().child("images/\(UUID().uuidString).jpg")
+        let storageRef = firestorage.reference()
+            .child("\(userID)/\(playlistID)/image.jpg")
         
-        storageRef.putData(imageData, metadata: nil) { (metadata, error) in
+        storageRef.putData(imageData, metadata: nil) { metadata, error in
             if let error = error {
-                print("Error uploading image: \(error.localizedDescription)")
+                completion(.failure(error))
                 return
             }
             
-            storageRef.downloadURL { (url, error) in
+            storageRef.downloadURL { url, error in
                 if let error = error {
-                    print("Error getting download URL: \(error.localizedDescription)")
+                    completion(.failure(error))
                     return
                 }
                 
                 if let downloadURL = url?.absoluteString {
-                    DispatchQueue.main.async {
-                        self.imageUrl = downloadURL
+                    let playlistRef = self.firestore.collection("UserID")
+                        .document(userID)
+                        .collection("PlaylistID")
+                        .document(playlistID)
+                    
+                    playlistRef.updateData([
+                        "photoURL": downloadURL
+                    ]) { error in
+                        if let error = error {
+                            completion(.failure(error))
+                        } else {
+                            print("Firestore에 사진 URL이 성공적으로 업데이트되었습니다!")
+                            completion(.success(()))
+                        }
                     }
-                    self.saveImageUrlToFirestore(imageUrl: downloadURL)
+                } else {
+                    completion(.failure(NSError(domain: "URLError", code: -1, userInfo: [NSLocalizedDescriptionKey: "다운로드 URL을 가져오는 데 실패했습니다."])))
                 }
-            }
-        }
-    }
-    
-    func saveImageUrlToFirestore(imageUrl: String) {
-        firestore.collection("images").addDocument(data: ["imageUrl": imageUrl]) { error in
-            if let error = error {
-                print("Error saving image URL to Firestore: \(error)")
-            } else {
-                print("Image URL successfully saved to Firestore")
             }
         }
     }

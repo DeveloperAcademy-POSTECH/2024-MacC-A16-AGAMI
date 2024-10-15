@@ -44,7 +44,6 @@ let project = Project(
                 .external(name: "FirebaseAuth"),
                 .external(name: "FirebaseFirestore"),
                 .external(name: "FirebaseStorage")
-//                .external(name: "FirebaseFirestoreSwift")
             ]
         ),
         .target(

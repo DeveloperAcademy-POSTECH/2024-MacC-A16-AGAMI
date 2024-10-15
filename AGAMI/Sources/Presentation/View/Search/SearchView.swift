@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct SearchView: View {
+    @State private var isFind: Bool = false
+    
     var body: some View {
         VStack(spacing: 0) {
-            SearchTopView()
-                .padding(.bottom, 28)
+            SearchTopView(isFind: $isFind)
             SearchPlaylistView()
         }
         .toolbar {
@@ -31,21 +32,50 @@ struct SearchView: View {
     }
     
     struct SearchTopView: View {
+        @Binding var isFind: Bool
+        
         var body: some View {
-            VStack {
+            VStack(spacing: 0) {
                 Circle()
                     .frame(width: 226, height: 226)
                     .foregroundStyle(.secondary)
                     .overlay {
                         Circle()
                             .frame(width: 74, height: 74)
-                            .foregroundStyle(.placeholder)
+                            .foregroundStyle(isFind ? Color.gray : Color.white )
+                            .overlay {
+                                if isFind {
+                                    Image(systemName: "arrow.trianglehead.counterclockwise")
+                                        .foregroundStyle(.white)
+                                }
+                            }
+                            .onTapGesture {
+                                isFind.toggle()
+                            }
                     }
-                    .padding(.bottom, 15)
+                    .background {
+                        if isFind {
+                            AsyncImage(url: URL(string: "https://i.pinimg.com/564x/6a/4f/45/6a4f45fc425ea299727b0a16d07da75e.jpg")) { image in
+                                image
+                                    .resizable()
+                                    .frame(width: 226, height: 226)
+                                    .clipShape(Circle())
+                            }
+                            placeholder: {
+                                ProgressView()
+                            }
+                        }
+                    }
+                    .padding(.bottom, 20)
                 
-                Text("Listening ...")
+                Text(isFind ? "Under The Influence" : "Listening ...")
                     .font(.system(size: 24, weight: .semibold))
                     .foregroundStyle(.black)
+                
+                Text("Chris Brown")
+                    .font(.system(size: 20, weight: .medium))
+                    .foregroundStyle(isFind ? .gray.opacity(0.5) : .white)
+                    .padding(.top, 4)
             }
         }
     }

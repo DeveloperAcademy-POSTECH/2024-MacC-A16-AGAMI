@@ -12,33 +12,35 @@ struct MapView: View {
     @State private var viewModel = MapViewModel()
     
     var body: some View {
-        ZStack(alignment: .bottom) {
-            Map {
-                ForEach(viewModel.places) { place in
-                    Annotation("", coordinate: place.location) {
-                        PlaceMarkerView()
+        NavigationStack {
+            ZStack(alignment: .bottom) {
+                Map {
+                    ForEach(viewModel.places) { place in
+                        Annotation("", coordinate: place.location) {
+                            NavigationLink(destination: CollectionPlaceView()) {
+                                PlaceMarkerView()
+                            }
+                        }
                     }
+                    
+                    UserAnnotation()
                 }
+                .mapStyle(.standard)
                 
-                UserAnnotation()
+                Button {
+                    viewModel.addCurrentLocation()
+
+                } label: {
+                    Text("좌표찍기")
+                        .padding()
+                        .background(.white)
+                        .foregroundStyle(.black)
+                        .cornerRadius(10)
+                }
             }
-            .mapStyle(.standard)
-            .edgesIgnoringSafeArea(.all)
-            
-            Button {
-                viewModel.addCurrentLocation()
-                print(viewModel.places.count)
-                
-            } label: {
-                Text("좌표찍기")
-                    .padding()
-                    .background(.white)
-                    .foregroundStyle(.black)
-                    .cornerRadius(10)
+            .onAppear {
+                viewModel.requestCurrentLocation()
             }
-        }
-        .onAppear {
-            viewModel.requestCurrentLocation()
         }
     }
 }

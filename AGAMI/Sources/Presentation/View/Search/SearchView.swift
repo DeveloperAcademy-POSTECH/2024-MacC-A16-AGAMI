@@ -12,21 +12,15 @@ struct SearchView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            SearchTopView(isFind: $isFind)
-            SearchPlaylistView()
-        }
-        .toolbar {
-            ToolbarItem(placement: .principal, content: {
-                Text("수집하기")
-                    .font(.system(size: 20, weight: .medium))
-                    .foregroundStyle(.black)
-                    .kerning(-0.4)
-            })
-            
-            ToolbarItem(placement: .topBarTrailing, content: {
-                Text("다음")
-                    .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(.blue)
+            Button(action: {
+                isFind.toggle()
+            }, label: {
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundStyle(.gray.opacity(0.3))
+                    .overlay {
+                        Text(isFind ? "서치 중" : "서치 시작")
+                    }
+                    .frame(width: 260, height: 100)
             })
         }
     }

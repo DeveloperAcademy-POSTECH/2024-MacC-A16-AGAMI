@@ -14,7 +14,7 @@ final class FirebaseService {
     private let firestore = Firestore.firestore()
     private let firestorage = Storage.storage()
     
-    func savePlaylistToFirebase(userID: String, playlist: PlaylistModel) async throws {
+    func savePlaylistToFirebase(userID: String, playlist: Playlist) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             do {
                 try firestore.collection("UserID")
@@ -35,17 +35,17 @@ final class FirebaseService {
         }
     }
     
-    func fetchPlaylistsByUserID(userID: String) async throws -> [PlaylistModel] {
+    func fetchPlaylistsByUserID(userID: String) async throws -> [Playlist] {
         let snapshot = try await firestore.collection("UserID")
             .document(userID)
             .collection("PlaylistID")
             .getDocuments()
         
-        var playlists: [PlaylistModel] = []
+        var playlists: [Playlist] = []
         
         for document in snapshot.documents {
             do {
-                let playlist = try document.data(as: PlaylistModel.self)
+                let playlist = try document.data(as: Playlist.self)
                 playlists.append(playlist)
             } catch {
                 dump("Error decoding playlist: \(error.localizedDescription)")

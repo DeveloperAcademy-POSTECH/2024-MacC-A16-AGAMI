@@ -8,13 +8,13 @@
 import SwiftUI
 import FirebaseFirestore
 
-struct PlaylistModel: Codable, Identifiable {
+struct Playlist: Codable, Identifiable {
     @DocumentID var id: String?
     var playlistID: UUID
     var playlistName: String
     var description: String
     var photoURL: String
-    var songs: [SongModel]
+    var songs: [Song]
     var latitude: Double
     var longitude: Double
     var generationTime: Date
@@ -26,7 +26,7 @@ struct PlaylistModel: Codable, Identifiable {
         photoURL: String = "",
         latitude: Double = 36.0126,
         longitude: Double = 129.3235,
-        songs: [SongModel] = [],
+        songs: [Song] = [],
         generationTime: Date = Date()
     ) {
         self.playlistID = playlistID

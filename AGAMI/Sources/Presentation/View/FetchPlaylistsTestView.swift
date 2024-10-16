@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct FetchPlaylistsTestView: View {
-    @State var firebaseService = FirebaseService()
+    var firebaseService = FirebaseService()
     @State private var userID: String = ""
-    @State private var playlists: [PlaylistModel] = []
+    @State private var playlists: [Playlist] = []
     @State private var errorMessage: String = ""
     @State private var isLoading: Bool = false
     

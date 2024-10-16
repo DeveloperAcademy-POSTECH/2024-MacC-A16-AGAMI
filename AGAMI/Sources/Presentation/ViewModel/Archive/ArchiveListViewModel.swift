@@ -27,8 +27,4 @@ final class ArchiveListViewModel {
     func setCurrentId(_ index: Int?) {
         currentId = index
     }
-
-    func getCardsPadding(_ index: Int, size: CGSize) -> CGFloat {
-        currentId == index ? size.width * 0.7 : 0
-    }
 }

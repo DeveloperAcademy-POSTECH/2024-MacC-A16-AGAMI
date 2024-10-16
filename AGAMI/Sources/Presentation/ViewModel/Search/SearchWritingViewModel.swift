@@ -10,6 +10,7 @@ import Foundation
 @Observable
 final class SearchWritingViewModel {
     var showPlaylistModal: Bool = false
+    var userTitle: String = ""
     var userDescription: String = ""
     
     func showPlaylistButtonTapped() {

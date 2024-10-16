@@ -48,6 +48,9 @@ struct SearchWritingView: View {
                     .frame(width: 260, height: 100)
             })
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
         .sheet(isPresented: $viewModel.showPlaylistModal, content: {
             coordinator.buildSheet(sheet: .diggingModalView)
         })

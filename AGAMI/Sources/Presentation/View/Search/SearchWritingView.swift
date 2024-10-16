@@ -9,10 +9,8 @@ import SwiftUI
 
 struct SearchWritingView: View {
     @Environment(SearchCoordinator.self) var coordinator
-    
-    @State private var userDescription: String = ""
-    @State private var showPlaylist: Bool = false
-    
+    @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
+
     var body: some View {
         VStack(spacing: 0) {
             RoundedRectangle(cornerRadius: 10)
@@ -30,7 +28,7 @@ struct SearchWritingView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.2))
                     .overlay(alignment: .topLeading) {
-                        TextField("텍스트 기록 남기기", text: $userDescription, axis: .vertical)
+                        TextField("텍스트 기록 남기기", text: $viewModel.userDescription, axis: .vertical)
                             .background(.clear)
                             .padding()
                     }
@@ -40,7 +38,7 @@ struct SearchWritingView: View {
             }
             
             Button(action: {
-                showPlaylist.toggle()
+                viewModel.showPlaylistButtonTapped()
             }, label: {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.3))
@@ -50,7 +48,7 @@ struct SearchWritingView: View {
                     .frame(width: 260, height: 100)
             })
         }
-        .sheet(isPresented: $showPlaylist, content: {
+        .sheet(isPresented: $viewModel.showPlaylistModal, content: {
             coordinator.buildSheet(sheet: .diggingModalView)
         })
         .navigationTitle("타이틀")

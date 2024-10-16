@@ -77,8 +77,10 @@ final class SearchCoordinator {
         switch sheet {
         case .playlistModalView:
             SearchPlaylistModalView(navigationTitle: "플레이리스트")
+                .presentationDragIndicator(.visible)
         case .diggingModalView:
             SearchPlaylistModalView(navigationTitle: "내가 디깅한 플리목록")
+                .presentationDragIndicator(.visible)
         }
     }
 

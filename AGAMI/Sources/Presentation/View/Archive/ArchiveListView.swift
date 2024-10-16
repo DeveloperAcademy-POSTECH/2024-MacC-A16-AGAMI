@@ -30,7 +30,7 @@ struct ArchiveListView: View {
             }
             .animation(.default, value: viewModel.currentId)
         }
-        .safeAreaPadding(.horizontal, 40)
+        .safeAreaPadding(.horizontal, 16)
         .searchable(
             text: $viewModel.searchText,
             placement: .navigationBarDrawer(displayMode: .always),
@@ -39,14 +39,42 @@ struct ArchiveListView: View {
     }
 }
 
+//private struct ArchiveList: View {
+//    @Bindable var viewModel: ArchiveListViewModel
+//    let size: CGSize
+//    let animationID: Namespace.ID
+//
+//    var body: some View {
+//        ScrollView(showsIndicators: false) {
+//            LazyVStack(spacing: -size.width / 2) {
+//                ForEach(0..<100, id: \.self) { index in
+//                    ArchiveListCell(
+//                        viewModel: viewModel,
+//                        index: index,
+//                        size: size,
+//                        animationID: animationID
+//                    )
+//                }
+//            }
+//            .scrollTargetLayout()
+//        }
+//        .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
+//        .scrollPosition(id: $viewModel.currentId)
+//        .safeAreaPadding(.vertical, (size.height - size.width) / 2)
+//        .blur(radius: viewModel.selectedCard != nil ? 2 : 0)
+//    }
+//}
+
 private struct ArchiveList: View {
     @Bindable var viewModel: ArchiveListViewModel
     let size: CGSize
     let animationID: Namespace.ID
+    var verticalSpacing: CGFloat { size.width / 3 }
 
     var body: some View {
+
         ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: -size.width / 2) {
+            LazyVStack(spacing: verticalSpacing) {
                 ForEach(0..<100, id: \.self) { index in
                     ArchiveListCell(
                         viewModel: viewModel,
@@ -70,6 +98,7 @@ private struct ArchiveListCell: View {
     let index: Int
     let size: CGSize
     let animationID: Namespace.ID
+    var verticalSize: CGFloat { size.width / 2 }
 
     var body: some View {
         AsyncImage(url: viewModel.dummyURL) { image in
@@ -81,17 +110,16 @@ private struct ArchiveListCell: View {
                 .fill(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
-        .frame(width: size.width, height: size.width)
+        .frame(width: size.width, height: verticalSize)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .shadow(radius: 10)
         .matchedGeometryEffect(id: index, in: animationID)
-        .padding(.bottom, viewModel.getCardsPadding(index, size: size))
         .onTapGesture {
-            if viewModel.isCurrent(index) {
+//            if viewModel.isCurrent(index) {
                 withAnimation {
                     viewModel.setSelectedCard(index)
                 }
-            }
+//            }
         }
     }
 }

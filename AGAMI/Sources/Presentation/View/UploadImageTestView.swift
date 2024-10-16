@@ -9,9 +9,9 @@ import SwiftUI
 import PhotosUI
 
 struct UploadImageTestView: View {
-    @StateObject private var firebaseService = FirebaseService()
-    @State private var selectedItem: PhotosPickerItem? = nil
-    @State private var selectedImage: UIImage? = nil
+    @State private var firebaseService = FirebaseService()
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var selectedImage: UIImage?
     @State private var isUploading = false
     @State private var uploadResultMessage: String = ""
     
@@ -38,7 +38,7 @@ struct UploadImageTestView: View {
             PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
                 Text("Choose Image")
             }
-            .onChange(of: selectedItem) { newItem in
+            .onChange(of: selectedItem) { oldItem, newItem in
                 Task {
                     if let newItem = newItem {
                         if let data = try? await newItem.loadTransferable(type: Data.self),
@@ -52,7 +52,9 @@ struct UploadImageTestView: View {
             
             Button("Upload Image") {
                 if let image = selectedImage {
-                    uploadImage(image: image)
+                    Task {
+                        await uploadImage(image: image)
+                    }
                 } else {
                     uploadResultMessage = "No image selected."
                 }
@@ -66,19 +68,20 @@ struct UploadImageTestView: View {
         .padding()
     }
     
-    private func uploadImage(image: UIImage) {
+    func uploadImage(image: UIImage) async {
         isUploading = true
         uploadResultMessage = "Uploading..."
         
-        firebaseService.uploadImageToFirebase(userID: userID, playlistID: playlistID, image: image) { result in
+        do {
+            try await firebaseService.uploadImageToFirebase(userID: userID, playlistID: playlistID, image: image)
             DispatchQueue.main.async {
                 self.isUploading = false
-                switch result {
-                case .success:
-                    self.uploadResultMessage = "Image uploaded and photoURL updated successfully!"
-                case .failure(let error):
-                    self.uploadResultMessage = "Error: \(error.localizedDescription)"
-                }
+                self.uploadResultMessage = "Image uploaded and photoURL updated successfully!"
+            }
+        } catch {
+            DispatchQueue.main.async {
+                self.isUploading = false
+                self.uploadResultMessage = "Error: \(error.localizedDescription)"
             }
         }
     }

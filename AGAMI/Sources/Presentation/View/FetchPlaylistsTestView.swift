@@ -8,23 +8,27 @@
 import SwiftUI
 
 struct FetchPlaylistsTestView: View {
-    @StateObject var firebaseService = FirebaseService()
+    @State var firebaseService = FirebaseService()
     @State private var userID: String = ""
     @State private var playlists: [PlaylistModel] = []
     @State private var errorMessage: String = ""
     @State private var isLoading: Bool = false
-
+    
     var body: some View {
         VStack(spacing: 20) {
             Text("Fetch Playlists by User ID")
                 .font(.title)
                 .padding()
-
+            
             TextField("Enter User ID", text: $userID)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-
-            Button(action: fetchPlaylists) {
+            
+            Button {
+                Task {
+                    await fetchPlaylists()
+                }
+            } label: {
                 Text("Fetch Playlists")
                     .font(.headline)
                     .foregroundColor(.white)
@@ -33,12 +37,12 @@ struct FetchPlaylistsTestView: View {
                     .background(Color.blue)
                     .cornerRadius(10)
             }
-
+            
             if isLoading {
                 ProgressView("Loading Playlists...")
                     .padding()
             }
-
+            
             if !playlists.isEmpty {
                 List(playlists, id: \.playlistID) { playlist in
                     VStack(alignment: .leading) {
@@ -48,7 +52,7 @@ struct FetchPlaylistsTestView: View {
                         Text("Latitude: \(playlist.latitude)")
                         Text("Longitude: \(playlist.longitude)")
                         Text("Generation Time: \(playlist.generationTime, style: .date)")
-
+                        
                         ForEach(playlist.songs, id: \.songID) { song in
                             Text("Song: \(song.title) by \(song.artist.joined(separator: ", "))")
                         }
@@ -56,37 +60,38 @@ struct FetchPlaylistsTestView: View {
                     .padding(.vertical, 10)
                 }
             }
-
+            
             if !errorMessage.isEmpty {
                 Text(errorMessage)
                     .foregroundColor(.red)
                     .padding()
             }
-
+            
             Spacer()
         }
         .padding()
     }
-
-    func fetchPlaylists() {
+    
+    func fetchPlaylists() async {
         guard !userID.isEmpty else {
             errorMessage = "Please enter a valid User ID."
             return
         }
-
+        
         isLoading = true
-        firebaseService.fetchPlaylistsByUserID(userID: userID) { result in
-            isLoading = false
-            switch result {
-            case .success(let fetchedPlaylists):
-                self.playlists = fetchedPlaylists
-                self.errorMessage = ""
-            case .failure(let error):
-                self.errorMessage = "Error fetching playlists: \(error.localizedDescription)"
-                self.playlists = []
-            }
+        
+        do {
+            let fetchedPlaylists = try await firebaseService.fetchPlaylistsByUserID(userID: userID)
+            self.playlists = fetchedPlaylists
+            self.errorMessage = ""
+        } catch {
+            self.errorMessage = "Error fetching playlists: \(error.localizedDescription)"
+            self.playlists = []
         }
+        
+        isLoading = false
     }
+    
 }
 
 #Preview {

@@ -17,7 +17,7 @@ struct HomeView: View {
                     MusicKitPlaylistView()
                 }
 
-                Tab("Archive", systemImage: "archivebox.fill", value: .shazam) {
+                Tab("Archive", systemImage: "archivebox.fill", value: .archive) {
                     NavigationStack(path: $archiveCoord.path) {
                         archiveCoord.build(view: .listView)
                             .navigationDestination(for: ArchiveView.self) { view in
@@ -67,8 +67,8 @@ struct HomeView: View {
                         Image(systemName: "archivebox.fill")
                     }
                 }
-                .tag(TabSelection.shazam)
-                
+                .tag(TabSelection.archive)
+
                 MapView()
                     .tabItem {
                         VStack {
@@ -85,7 +85,7 @@ struct HomeView: View {
 extension HomeView {
     enum TabSelection: Hashable {
         case music
-        case shazam
+        case archive
         case map
     }
 }

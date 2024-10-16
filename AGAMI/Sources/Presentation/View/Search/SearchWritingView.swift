@@ -20,16 +20,17 @@ struct SearchWritingView: View {
                 .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 4)
             
             VStack(alignment: .leading, spacing: 0) {
-                Text("타이틀을 입력하세요")
+                TextField("타이틀을 입력하세요", text: $viewModel.userTitle)
                     .font(.system(size: 32, weight: .bold))
                     .foregroundStyle(.black)
-                    .padding(.leading, 24)
+                    .padding(.horizontal, 24)
                 
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.2))
                     .overlay(alignment: .topLeading) {
                         TextField("텍스트 기록 남기기", text: $viewModel.userDescription, axis: .vertical)
                             .background(.clear)
+                            .foregroundStyle(.black)
                             .padding()
                     }
                     .frame(height: 168)

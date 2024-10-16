@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct UploadImageTestView: View {
-    @State private var firebaseService = FirebaseService()
+    private var firebaseService = FirebaseService()
     @State private var selectedItem: PhotosPickerItem?
     @State private var selectedImage: UIImage?
     @State private var isUploading = false

@@ -52,8 +52,7 @@ private struct ArchiveList: View {
         }
         .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
         .scrollPosition(id: $viewModel.currentId)
-        .safeAreaPadding(.vertical, 10)
-
+        .safeAreaPadding(.vertical, size.height / 10)
     }
 }
 

@@ -9,22 +9,22 @@ import SwiftUI
 
 struct SearchStartView: View {
     @Environment(SearchCoordinator.self) var coordinator
-    @State private var isFind: Bool = false
+    @State var viewModel: SearchStartViewModel = SearchStartViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
             Button(action: {
-                isFind.toggle()
+                viewModel.searchButtonTapped()
             }, label: {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.3))
                     .overlay {
-                        Text(isFind ? "서치 중" : "서치 시작")
+                        Text("서치 시작")
                     }
                     .frame(width: 260, height: 100)
             })
         }
-        .sheet(isPresented: $isFind, content: {
+        .sheet(isPresented: $viewModel.searchButtonToggle, content: {
             coordinator.buildSheet(sheet: .playlistModalView)
         })
         .toolbar {

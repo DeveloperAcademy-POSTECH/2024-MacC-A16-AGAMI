@@ -14,7 +14,7 @@ struct CollectionPlaceView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
-                CollectionPlaceListView()
+                CollectionPlaceListView(viewModel: viewModel)
             }
         }
         .navigationTitle("수집 장소")
@@ -37,6 +37,6 @@ struct CollectionPlaceView: View {
     }
 }
 
-#Preview {
-    CollectionPlaceView()
-}
+//#Preview {
+//    CollectionPlaceView()
+//}

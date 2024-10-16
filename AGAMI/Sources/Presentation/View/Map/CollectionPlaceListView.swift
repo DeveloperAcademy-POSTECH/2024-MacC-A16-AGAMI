@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CollectionPlaceListView: View {
-    @State private var viewModel = CollectionPlaceViewModel()
+    let viewModel: CollectionPlaceViewModel
 
     private let columnWidth: CGFloat = 176
     private let columnSpacing: CGFloat = 12
@@ -55,6 +55,6 @@ struct CollectionPlaceListView: View {
     }
 }
 
-#Preview {
-    CollectionPlaceListView()
-}
+//#Preview {
+//    CollectionPlaceListView()
+//}

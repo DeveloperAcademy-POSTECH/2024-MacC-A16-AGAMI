@@ -5,7 +5,7 @@
 //  Created by taehun on 10/14/24.
 //
 
-struct Song: Codable, Identifiable {
+struct SongModel: Codable, Identifiable {
     var id: String { songID }
     var songID: String
     var title: String

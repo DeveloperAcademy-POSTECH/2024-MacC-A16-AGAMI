@@ -9,26 +9,15 @@ import SwiftUI
 
 struct ArchiveListView: View {
     @State var viewModel: ArchiveListViewModel = ArchiveListViewModel()
-    @Namespace private var animationID
 
     var body: some View {
         GeometryReader {
             let size = $0.size
-
-            ZStack(alignment: .top) {
-                ArchiveList(
-                    viewModel: viewModel,
-                    size: size,
-                    animationID: animationID
-                )
-
-                PopupView(
-                    viewModel: viewModel,
-                    size: size,
-                    animationID: animationID
-                )
-            }
-            .animation(.default, value: viewModel.currentId)
+            
+            ArchiveList(
+                viewModel: viewModel,
+                size: size
+            )
         }
         .safeAreaPadding(.horizontal, 16)
         .searchable(
@@ -39,65 +28,41 @@ struct ArchiveListView: View {
     }
 }
 
-//private struct ArchiveList: View {
-//    @Bindable var viewModel: ArchiveListViewModel
-//    let size: CGSize
-//    let animationID: Namespace.ID
-//
-//    var body: some View {
-//        ScrollView(showsIndicators: false) {
-//            LazyVStack(spacing: -size.width / 2) {
-//                ForEach(0..<100, id: \.self) { index in
-//                    ArchiveListCell(
-//                        viewModel: viewModel,
-//                        index: index,
-//                        size: size,
-//                        animationID: animationID
-//                    )
-//                }
-//            }
-//            .scrollTargetLayout()
-//        }
-//        .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
-//        .scrollPosition(id: $viewModel.currentId)
-//        .safeAreaPadding(.vertical, (size.height - size.width) / 2)
-//        .blur(radius: viewModel.selectedCard != nil ? 2 : 0)
-//    }
-//}
-
 private struct ArchiveList: View {
     @Bindable var viewModel: ArchiveListViewModel
     let size: CGSize
-    let animationID: Namespace.ID
-    var verticalSpacing: CGFloat { size.width / 3 }
 
     var body: some View {
-
         ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: verticalSpacing) {
+            LazyVStack(spacing: 12) {
                 ForEach(0..<100, id: \.self) { index in
                     ArchiveListCell(
                         viewModel: viewModel,
                         index: index,
-                        size: size,
-                        animationID: animationID
+                        size: size
                     )
+                }
+                .scrollTransition(.animated, axis: .vertical) { content, phase in
+                    content
+                        .scaleEffect(phase.isIdentity ? 1 : 0.8)
+                        .opacity(phase.isIdentity ? 1 : 0.5)
                 }
             }
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
         .scrollPosition(id: $viewModel.currentId)
-        .safeAreaPadding(.vertical, (size.height - size.width) / 2)
-        .blur(radius: viewModel.selectedCard != nil ? 2 : 0)
+        .safeAreaPadding(.vertical, 10)
+
     }
 }
 
 private struct ArchiveListCell: View {
+    @Environment(ArchiveCoordinator.self) private var coord
+
     let viewModel: ArchiveListViewModel
     let index: Int
     let size: CGSize
-    let animationID: Namespace.ID
     var verticalSize: CGFloat { size.width / 2 }
 
     var body: some View {
@@ -111,49 +76,13 @@ private struct ArchiveListCell: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .frame(width: size.width, height: verticalSize)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(radius: 10)
-        .matchedGeometryEffect(id: index, in: animationID)
+        .shadow(radius: 10, x: 2, y: 4)
         .onTapGesture {
-//            if viewModel.isCurrent(index) {
-                withAnimation {
-                    viewModel.setSelectedCard(index)
-                }
-//            }
-        }
-    }
-}
-
-private struct PopupView: View {
-    @Environment(ArchiveCoordinator.self) var coord
-
-    let viewModel: ArchiveListViewModel
-    let size: CGSize
-    let animationID: Namespace.ID
-
-    var body: some View {
-        if let selected = viewModel.selectedCard {
-            ZStack {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                    .onTapGesture {
-                        viewModel.selectedCard = nil
-                    }
-
-                VStack(spacing: 0) {
-                    AsyncImage(url: viewModel.dummyURL) { image in
-                        image.resizable()
-                    } placeholder: {
-                        ProgressView()
-                    }
-                    .frame(width: size.width, height: size.width)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .matchedGeometryEffect(id: selected, in: animationID)
-                    .onTapGesture {
-                        coord.push(view: .playlistView)
-                    }
-                    .padding(.top, 50)
-                    Spacer()
+            withAnimation {
+                if viewModel.isCurrent(index) {
+                    coord.push(view: .playlistView)
+                } else {
+                    viewModel.setCurrentId(index)
                 }
             }
         }

@@ -55,6 +55,6 @@ struct CollectionPlaceListView: View {
     }
 }
 
-//#Preview {
-//    CollectionPlaceListView()
-//}
+// #Preview {
+//     CollectionPlaceListView()
+// }

@@ -38,7 +38,7 @@ struct UploadImageTestView: View {
             PhotosPicker(selection: $selectedItem, matching: .images, photoLibrary: .shared()) {
                 Text("Choose Image")
             }
-            .onChange(of: selectedItem) { oldItem, newItem in
+            .onChange(of: selectedItem) { _, newItem in
                 Task {
                     if let newItem = newItem {
                         if let data = try? await newItem.loadTransferable(type: Data.self),

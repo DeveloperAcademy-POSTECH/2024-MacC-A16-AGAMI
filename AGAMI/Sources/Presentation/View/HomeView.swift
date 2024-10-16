@@ -8,13 +8,27 @@
 import SwiftUI
 
 struct HomeView: View {
-    @State private var selectedTab: TabSelection = .music
+    @State private var selectedTab: TabSelection = .search
     @State var archiveCoord: ArchiveCoordinator = .init()
+    @State var searchCoordinator: SearchCoordinator = .init()
+    
     var body: some View {
         if #available(iOS 18.0, *) {
             TabView(selection: $selectedTab) {
-                Tab("Search", systemImage: "headphones", value: .music) {
-                    SearchView()
+                Tab("Search", systemImage: "headphones", value: .search) {
+                    NavigationStack(path: $searchCoordinator.path) {
+                        searchCoordinator.build(view: .startView)
+                            .navigationDestination(for: SearchView.self) { view in
+                                searchCoordinator.build(view: view)
+                            }
+                            .sheet(item: $searchCoordinator.sheet) { sheet in
+                                searchCoordinator.buildSheet(sheet: sheet)
+                            }
+                            .fullScreenCover(item: $searchCoordinator.fullScreenCover) { cover in
+                                searchCoordinator.buildFullScreenCover(cover: cover)
+                            }
+                    }
+                    .environment(searchCoordinator)
                 }
 
                 Tab("Archive", systemImage: "archivebox.fill", value: .archive) {
@@ -39,15 +53,27 @@ struct HomeView: View {
             }
         } else {
             TabView {
-                MusicKitPlaylistView()
-                    .tabItem {
-                        VStack {
-                            Text("Search")
-                            Image(systemName: "headphones")
+                NavigationStack(path: $searchCoordinator.path) {
+                    searchCoordinator.build(view: .startView)
+                        .navigationDestination(for: SearchView.self) { view in
+                            searchCoordinator.build(view: view)
                         }
+                        .sheet(item: $searchCoordinator.sheet) { sheet in
+                            searchCoordinator.buildSheet(sheet: sheet)
+                        }
+                        .fullScreenCover(item: $searchCoordinator.fullScreenCover) { cover in
+                            searchCoordinator.buildFullScreenCover(cover: cover)
+                        }
+                }
+                .environment(searchCoordinator)
+                .tabItem {
+                    VStack {
+                        Text("Search")
+                        Image(systemName: "headphones")
                     }
-                    .tag(TabSelection.music)
-
+                }
+                .tag(TabSelection.search)
+                
                 NavigationStack(path: $archiveCoord.path) {
                     archiveCoord.build(view: .listView)
                         .navigationDestination(for: ArchiveView.self) { view in
@@ -84,7 +110,7 @@ struct HomeView: View {
 
 extension HomeView {
     enum TabSelection: Hashable {
-        case music
+        case search
         case archive
         case map
     }

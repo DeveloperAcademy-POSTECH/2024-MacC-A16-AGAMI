@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct SearchWritingView: View {
-    @State private var placeHolder: String = "텍스트 기록 남기기"
+    @Environment(SearchCoordinator.self) var coordinator
+    
     @State private var userDescription: String = ""
     @State private var showPlaylist: Bool = false
     
@@ -50,14 +51,14 @@ struct SearchWritingView: View {
             })
         }
         .sheet(isPresented: $showPlaylist, content: {
-            SearchPlaylistModalView(navigationTitle: "내가 디깅한 플리목록")
+            coordinator.buildSheet(sheet: .diggingModalView)
         })
         .navigationTitle("타이틀")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
-                NavigationLink(destination: {
-                    
+                Button(action: {
+                    coordinator.push(view: .cameraView)
                 }, label: {
                     Text("완료")
                 })

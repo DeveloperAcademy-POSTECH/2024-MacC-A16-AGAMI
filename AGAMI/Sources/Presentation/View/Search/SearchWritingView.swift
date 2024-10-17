@@ -52,19 +52,19 @@ struct SearchWritingView: View {
         .onTapGesture {
             hideKeyboard()
         }
-        .sheet(isPresented: $viewModel.showPlaylistModal, content: {
+        .sheet(isPresented: $viewModel.showPlaylistModal) {
             coordinator.buildSheet(sheet: .diggingModalView)
-        })
+        }
         .navigationTitle("타이틀")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing, content: {
+            ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     coordinator.push(view: .cameraView)
                 } label: {
                     Text("완료")
                 }
-            })
+            }
         }
     }
 }

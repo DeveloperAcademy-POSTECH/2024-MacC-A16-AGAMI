@@ -24,9 +24,9 @@ struct SearchStartView: View {
                     .frame(width: 260, height: 100)
             }
         }
-        .sheet(isPresented: $viewModel.searchButtonToggle, content: {
+        .sheet(isPresented: $viewModel.searchButtonToggle) {
             coordinator.buildSheet(sheet: .playlistModalView)
-        })
+        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
                 Button {

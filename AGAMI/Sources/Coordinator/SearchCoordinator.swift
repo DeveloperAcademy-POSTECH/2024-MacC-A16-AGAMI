@@ -28,6 +28,7 @@ enum SearchFullScreenCover: String, Identifiable {
 
 @Observable
 final class SearchCoordinator {
+    var searchStartViewModel: SearchStartViewModel = .init()
     var path: NavigationPath = .init()
     var sheet: SearchSheet?
     var fullScreenCover: SearchFullScreenCover?
@@ -64,7 +65,7 @@ final class SearchCoordinator {
     func build(view: SearchView) -> some View {
         switch view {
         case .startView:
-            SearchStartView()
+            SearchStartView(viewModel: searchStartViewModel)
         case .writingView:
             SearchWritingView()
         case .cameraView:
@@ -73,13 +74,13 @@ final class SearchCoordinator {
     }
 
     @ViewBuilder
-    func buildSheet(sheet: SearchSheet, diggingList: [SongModel]?) -> some View {
+    func buildSheet(sheet: SearchSheet) -> some View {
         switch sheet {
         case .playlistModalView:
-            SearchPlaylistModalView(navigationTitle: "플레이리스트", diggingList: diggingList)
+            SearchPlaylistModalView(viewModel: searchStartViewModel, navigationTitle: "플레이크 리스트")
                 .presentationDragIndicator(.visible)
         case .diggingModalView:
-            SearchPlaylistModalView(navigationTitle: "내가 디깅한 플리목록", diggingList: diggingList)
+            SearchPlaylistModalView(viewModel: searchStartViewModel, navigationTitle: "플레이크 리스트")
                 .presentationDragIndicator(.visible)
         }
     }

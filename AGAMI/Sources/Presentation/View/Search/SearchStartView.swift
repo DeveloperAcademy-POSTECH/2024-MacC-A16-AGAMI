@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SearchStartView: View {
     @Environment(SearchCoordinator.self) var coordinator
-    @State var viewModel: SearchStartViewModel = SearchStartViewModel()
+    @Bindable var viewModel: SearchStartViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -25,7 +25,7 @@ struct SearchStartView: View {
             }
         }
         .sheet(isPresented: $viewModel.searchButtonToggle) {
-            coordinator.buildSheet(sheet: .playlistModalView, diggingList: viewModel.diggingList)
+            coordinator.buildSheet(sheet: .playlistModalView)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
@@ -41,6 +41,6 @@ struct SearchStartView: View {
 }
 
 #Preview {
-    SearchStartView()
+    SearchStartView(viewModel: SearchStartViewModel())
         .environment(SearchCoordinator())
 }

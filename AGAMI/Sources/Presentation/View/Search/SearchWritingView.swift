@@ -53,7 +53,7 @@ struct SearchWritingView: View {
             hideKeyboard()
         }
         .sheet(isPresented: $viewModel.showPlaylistModal) {
-            coordinator.buildSheet(sheet: .diggingModalView, diggingList: [])
+            coordinator.buildSheet(sheet: .diggingModalView)
         }
         .navigationTitle("타이틀")
         .navigationBarTitleDisplayMode(.inline)

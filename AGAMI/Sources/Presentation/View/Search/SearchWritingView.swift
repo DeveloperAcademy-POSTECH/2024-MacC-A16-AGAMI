@@ -10,7 +10,7 @@ import SwiftUI
 struct SearchWritingView: View {
     @Environment(SearchCoordinator.self) var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
-
+    
     var body: some View {
         VStack(spacing: 0) {
             RoundedRectangle(cornerRadius: 10)
@@ -38,16 +38,16 @@ struct SearchWritingView: View {
                     .padding(.vertical, 13)
             }
             
-            Button(action: {
+            Button {
                 viewModel.showPlaylistButtonTapped()
-            }, label: {
+            } label: {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.3))
                     .overlay {
                         Text("플리 목록 보기")
                     }
                     .frame(width: 260, height: 100)
-            })
+            }
         }
         .onTapGesture {
             hideKeyboard()
@@ -59,11 +59,11 @@ struct SearchWritingView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
-                Button(action: {
+                Button {
                     coordinator.push(view: .cameraView)
-                }, label: {
+                } label: {
                     Text("완료")
-                })
+                }
             })
         }
     }

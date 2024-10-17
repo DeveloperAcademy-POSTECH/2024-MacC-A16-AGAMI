@@ -27,7 +27,7 @@ final class SearchStartViewModel: NSObject {
         shazamService.startRecognition()
     }
     
-    private func stopRecognition() {
+    func stopRecognition() {
         shazaming = false
         shazamService.stopRecognition()
     }
@@ -49,6 +49,16 @@ final class SearchStartViewModel: NSObject {
         
         currentItem = nil
         startRecognition()
+    }
+    
+    func deleteSong(indexSet: IndexSet) {
+        for index in indexSet {
+            diggingList.remove(at: index)
+        }
+    }
+
+    func moveSong(from source: IndexSet, to destination: Int) {
+        diggingList.move(fromOffsets: source, toOffset: destination)
     }
 }
 

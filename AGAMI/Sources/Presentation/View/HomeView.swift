@@ -22,7 +22,7 @@ struct HomeView: View {
                                 searchCoordinator.build(view: view)
                             }
                             .sheet(item: $searchCoordinator.sheet) { sheet in
-                                searchCoordinator.buildSheet(sheet: sheet, diggingList: [])
+                                searchCoordinator.buildSheet(sheet: sheet)
                             }
                             .fullScreenCover(item: $searchCoordinator.fullScreenCover) { cover in
                                 searchCoordinator.buildFullScreenCover(cover: cover)
@@ -59,7 +59,7 @@ struct HomeView: View {
                             searchCoordinator.build(view: view)
                         }
                         .sheet(item: $searchCoordinator.sheet) { sheet in
-                            searchCoordinator.buildSheet(sheet: sheet, diggingList: [])
+                            searchCoordinator.buildSheet(sheet: sheet)
                         }
                         .fullScreenCover(item: $searchCoordinator.fullScreenCover) { cover in
                             searchCoordinator.buildFullScreenCover(cover: cover)

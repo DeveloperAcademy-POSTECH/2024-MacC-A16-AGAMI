@@ -73,13 +73,13 @@ final class SearchCoordinator {
     }
 
     @ViewBuilder
-    func buildSheet(sheet: SearchSheet) -> some View {
+    func buildSheet(sheet: SearchSheet, diggingList: [SongModel]?) -> some View {
         switch sheet {
         case .playlistModalView:
-            SearchPlaylistModalView(navigationTitle: "플레이리스트")
+            SearchPlaylistModalView(navigationTitle: "플레이리스트", diggingList: diggingList)
                 .presentationDragIndicator(.visible)
         case .diggingModalView:
-            SearchPlaylistModalView(navigationTitle: "내가 디깅한 플리목록")
+            SearchPlaylistModalView(navigationTitle: "내가 디깅한 플리목록", diggingList: diggingList)
                 .presentationDragIndicator(.visible)
         }
     }

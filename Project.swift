@@ -5,7 +5,7 @@ let project = Project(
     targets: [
         .target(
             name: "AGAMI",
-            destinations: [.iPhone, .iPad],
+            destinations: [.iPhone],
             product: .app,
             bundleId: "io.tuist.AGAMI",
             deploymentTargets: .iOS("17.0"),
@@ -25,12 +25,7 @@ let project = Project(
                     "UISupportedInterfaceOrientations": [
                         "UIInterfaceOrientationPortrait",
                         "UIInterfaceOrientationPortraitUpsideDown"
-                    ],
-                    "UISupportedInterfaceOrientations~ipad": [
-                        "UIInterfaceOrientationPortrait",
-                        "UIInterfaceOrientationPortraitUpsideDown"
-                    ],
-                    "UIRequiresFullScreen": true
+                    ]
                 ]
             ),
             sources: ["AGAMI/Sources/**"],
@@ -48,7 +43,7 @@ let project = Project(
         ),
         .target(
             name: "AGAMITests",
-            destinations: [.iPhone, .iPad],
+            destinations: [.iPhone],
             product: .unitTests,
             bundleId: "io.tuist.AGAMITests",
             infoPlist: .default,

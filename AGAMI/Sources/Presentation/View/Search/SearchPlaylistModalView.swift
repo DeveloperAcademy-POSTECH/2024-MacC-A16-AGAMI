@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct SearchPlaylistModalView: View {
-    var dummyPlaylist: [DummySongModel] = Array(repeating: .init(), count: 10)
     var navigationTitle: String
+    var diggingList: [SongModel]?
     
     var body: some View {
         NavigationStack {
             VStack {
                 List {
-                    ForEach(dummyPlaylist) { song in
-                        PlaylistRow(song: song)
+                    if let diggingList = diggingList {
+                        ForEach(diggingList) { song in
+                            PlaylistRow(song: song)
+                        }
                     }
                 }
                 .listStyle(PlainListStyle())
@@ -28,5 +30,5 @@ struct SearchPlaylistModalView: View {
 }
 
 #Preview {
-    SearchPlaylistModalView(navigationTitle: "구리스")
+    SearchPlaylistModalView(navigationTitle: "구리스", diggingList: [])
 }

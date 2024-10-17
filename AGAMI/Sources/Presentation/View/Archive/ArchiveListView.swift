@@ -51,7 +51,6 @@ private struct ArchiveList: View {
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
-        .scrollPosition(id: $viewModel.currentId)
         .safeAreaPadding(.vertical, size.height / 10)
     }
 }
@@ -65,25 +64,20 @@ private struct ArchiveListCell: View {
     var verticalSize: CGFloat { size.width / 2 }
 
     var body: some View {
-        AsyncImage(url: viewModel.dummyURL) { image in
-            image
-                .resizable()
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-        } placeholder: {
-            Rectangle()
-                .fill(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-        }
-        .frame(width: size.width, height: verticalSize)
-        .shadow(radius: 10, x: 2, y: 4)
-        .onTapGesture {
-            withAnimation {
-                if viewModel.isCurrent(index) {
-                    coord.push(view: .playlistView)
-                } else {
-                    viewModel.setCurrentId(index)
-                }
+        Button {
+            coord.push(view: .playlistView)
+        } label: {
+            AsyncImage(url: viewModel.dummyURL) { image in
+                image
+                    .resizable()
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            } placeholder: {
+                Rectangle()
+                    .fill(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
+            .frame(width: size.width, height: verticalSize)
+            .shadow(radius: 10, x: 2, y: 4)
         }
     }
 }

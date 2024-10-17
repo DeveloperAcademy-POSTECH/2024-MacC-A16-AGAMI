@@ -11,15 +11,5 @@ import Foundation
 final class ArchiveListViewModel {
     let dummyURL: URL? = .init(string: "https://dummyimage.com/400x400/fff/000")
 
-    var currentId: Int?
-
     var searchText: String = ""
-
-    func isCurrent(_ index: Int) -> Bool {
-        currentId == index
-    }
-
-    func setCurrentId(_ index: Int) {
-        currentId = index
-    }
 }

@@ -9,25 +9,21 @@ import SwiftUI
 
 struct ArchivePlaylistView: View {
     @State var viewModel: ArchivePlaylistViewModel = ArchivePlaylistViewModel()
-
+    
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                PlaylistImageCellView(viewModel: viewModel)
-                TitleAndDescriptionView(viewModel: viewModel)
-                PlaylistView(viewModel: viewModel)
-            }
-            .toolbar { EditButton() }
+        VStack(spacing: 0) {
+            PlaylistImageCellView(viewModel: viewModel)
+            PlaylistContentsView(viewModel: viewModel)
         }
-
+        .toolbarVisibilityForVersion(.hidden, for: .tabBar)
     }
 }
 
 private struct PlaylistImageCellView: View {
     let viewModel: ArchivePlaylistViewModel
-
+    
     var body: some View {
-        AsyncImage(url: viewModel.dummyURL) { image in
+        AsyncImage(url: URL(string: viewModel.dummyURL)) { image in
             image
                 .resizable()
                 .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -45,56 +41,41 @@ private struct PlaylistImageCellView: View {
     }
 }
 
-private struct TitleAndDescriptionView: View {
-    let viewModel: ArchivePlaylistViewModel
-
-    var body: some View {
-        HStack {
-            Text(viewModel.playlistTitle)
-                .font(.system(size: 32, weight: .bold))
-            Spacer()
-        }
-        .padding(.horizontal, 24)
-        .padding(.top, 40)
-
-        Text(viewModel.playlistDescription)
-            .font(.system(size: 15))
-            .foregroundStyle(.gray)
-            .padding(10)
-            .background(.ultraThinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .padding(.horizontal, 16)
-            .padding(.top, 16)
-    }
-}
-
-private struct PlaylistView: View {
+private struct PlaylistContentsView: View {
+    @Environment(ArchiveCoordinator.self) private var coord
     @Bindable var viewModel: ArchivePlaylistViewModel
 
     var body: some View {
         HStack {
-            Text("플레이리스트")
-                .font(.system(size: 20, weight: .semibold))
+            Text(viewModel.playlistTitle)
+                .font(.system(size: 24, weight: .semibold))
             Spacer()
         }
         .padding(.horizontal, 24)
-        .padding(.top, 28)
+        .padding(.top, 32)
 
-        Divider()
-            .padding(.top, 10)
+        TextEditor(text: $viewModel.playlistDescription)
+            .font(.system(size: 17))
+            .scrollContentBackground(.hidden)
+            .foregroundStyle(.black)
+            .padding(12)
+            .background(.ultraThinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .padding(.horizontal, 24)
+            .padding(.vertical, 22)
 
-        List {
-            ForEach(viewModel.dummyPlaylist) { song in
-               // PlaylistRow(song: song)
-            }
-            .onDelete(perform: viewModel.deleteMusic)
-            .onMove(perform: viewModel.moveMusic)
+        Button {
+            coord.push(view: .detailView(viewModel: viewModel))
+        } label: {
+            Text("플레이크 리스트 보기")
+                .font(.system(size: 17))
+                .padding(.vertical, 10)
         }
-        .listStyle(.plain)
-        .scaledToFit()
+        .frame(maxWidth: .infinity)
+        .background(.ultraThinMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .padding(.horizontal, 24)
+        .padding(.bottom, 40)
+        Spacer()
     }
-}
-
-#Preview {
-    ArchivePlaylistView()
 }

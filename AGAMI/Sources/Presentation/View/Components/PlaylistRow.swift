@@ -8,20 +8,18 @@
 import SwiftUI
 
 struct PlaylistRow: View {
-    let song: DummySongModel
+    let song: SongModel
     
     var body: some View {
         HStack {
-            AsyncImage(url: song.imageURL) { image in
+            AsyncImage(url: URL(string: song.albumCoverURL)) { image in
                 image
                     .resizable()
                     .frame(width: 60, height: 60)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
 
             } placeholder: {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.black)
-                    .frame(width: 60, height: 60)
+                ProgressView()
             }
             .padding(.trailing, 10)
 
@@ -34,8 +32,4 @@ struct PlaylistRow: View {
             }
         }
     }
-}
-
-#Preview {
-    PlaylistRow(song: DummySongModel())
 }

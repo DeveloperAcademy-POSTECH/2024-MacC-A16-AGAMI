@@ -11,6 +11,7 @@ import SwiftUI
 enum ArchiveView: Hashable {
     case listView
     case playlistView
+    case detailView(viewModel: ArchivePlaylistViewModel)
 }
 
 enum ArchiveSheet: String, Identifiable {
@@ -66,6 +67,8 @@ final class ArchiveCoordinator {
             ArchiveListView()
         case .playlistView:
             ArchivePlaylistView()
+        case let .detailView(viewModel):
+            ArchivePlaylistDetailView(viewModel: viewModel)
         }
     }
 

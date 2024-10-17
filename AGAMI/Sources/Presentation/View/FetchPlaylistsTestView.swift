@@ -42,17 +42,17 @@ struct FetchPlaylistsTestView: View {
                 ProgressView("Loading Playlists...")
                     .padding()
             }
-            
+
             if !playlists.isEmpty {
-                List(playlists, id: \.playlistID) { playlist in
+                List($playlists, id: \.playlistID) { playlist in
                     VStack(alignment: .leading) {
                         Text("Playlist Name: \(playlist.playlistName)")
                             .font(.headline)
                         Text("Description: \(playlist.description)")
                         Text("Latitude: \(playlist.latitude)")
                         Text("Longitude: \(playlist.longitude)")
-                        Text("Generation Time: \(playlist.generationTime, style: .date)")
-                        
+                        Text("Generation Time: \(playlist.generationTime.wrappedValue, style: .date)")
+
                         ForEach(playlist.songs, id: \.songID) { song in
                             Text("Song: \(song.title) by \(song.artist)")
                         }

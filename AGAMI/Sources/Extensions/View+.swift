@@ -8,7 +8,16 @@
 import SwiftUI
 
 extension View {
-  func hideKeyboard() {
-    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-  }
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+
+    @ViewBuilder
+    func toolbarVisibilityForVersion(_ visibility: Visibility, for bar: ToolbarPlacement) -> some View {
+        if #available(iOS 18.0, *) {
+            self.toolbarVisibility(visibility, for: bar)
+        } else {
+            self.toolbar(visibility, for: bar)
+        }
+    }
 }

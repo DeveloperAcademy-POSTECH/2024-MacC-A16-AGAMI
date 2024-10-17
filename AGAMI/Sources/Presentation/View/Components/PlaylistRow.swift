@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PlaylistRow: View {
     let song: SongModel
-    
+
     var body: some View {
         HStack(spacing: 0) {
             AsyncImage(url: URL(string: song.albumCoverURL)) { image in
@@ -26,15 +26,13 @@ struct PlaylistRow: View {
                 Text(song.title)
                     .font(.system(size: 17, weight: .semibold))
                     .kerning(-0.43)
-                
+
                 Text(song.artist)
                     .font(.system(size: 15, weight: .regular))
                     .kerning(-0.23)
                     .foregroundStyle(.gray)
             }
-            
             Spacer()
-            
             Image(systemName: "line.3.horizontal")
                 .foregroundStyle(.gray)
                 .font(.system(size: 16, weight: .regular))

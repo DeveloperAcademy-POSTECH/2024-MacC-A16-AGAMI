@@ -85,7 +85,7 @@ private struct PlaylistView: View {
 
         List {
             ForEach(viewModel.dummyPlaylist) { song in
-                PlaylistRow(song: song)
+               // PlaylistRow(song: song)
             }
             .onDelete(perform: viewModel.deleteMusic)
             .onMove(perform: viewModel.moveMusic)

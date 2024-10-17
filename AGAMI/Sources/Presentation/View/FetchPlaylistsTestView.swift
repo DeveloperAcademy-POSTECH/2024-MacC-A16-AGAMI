@@ -54,7 +54,7 @@ struct FetchPlaylistsTestView: View {
                         Text("Generation Time: \(playlist.generationTime, style: .date)")
                         
                         ForEach(playlist.songs, id: \.songID) { song in
-                            Text("Song: \(song.title) by \(song.artist.joined(separator: ", "))")
+                            Text("Song: \(song.title) by \(song.artist)")
                         }
                     }
                     .padding(.vertical, 10)

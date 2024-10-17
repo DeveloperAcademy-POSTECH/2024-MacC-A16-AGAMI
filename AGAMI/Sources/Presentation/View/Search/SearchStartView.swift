@@ -13,27 +13,27 @@ struct SearchStartView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Button(action: {
+            Button {
                 viewModel.searchButtonTapped()
-            }, label: {
+            } label: {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.3))
                     .overlay {
                         Text("서치 시작")
                     }
                     .frame(width: 260, height: 100)
-            })
+            }
         }
         .sheet(isPresented: $viewModel.searchButtonToggle, content: {
             coordinator.buildSheet(sheet: .playlistModalView)
         })
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {
-                Button(action: {
+                Button {
                     coordinator.push(view: .writingView)
-                }, label: {
+                } label: {
                     Text("다음")
-                })
+                }
             })
         }
         .navigationTitle("Search")

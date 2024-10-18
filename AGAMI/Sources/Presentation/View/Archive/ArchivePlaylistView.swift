@@ -51,8 +51,7 @@ private struct PlaylistContentsView: View {
                 .font(.system(size: 24, weight: .semibold))
             Spacer()
         }
-        .padding(.horizontal, 24)
-        .padding(.top, 32)
+        .padding(EdgeInsets(top: 32, leading: 24, bottom: 0, trailing: 24))
 
         TextEditor(text: $viewModel.playlistDescription)
             .font(.system(size: 17))
@@ -61,8 +60,7 @@ private struct PlaylistContentsView: View {
             .padding(12)
             .background(.ultraThinMaterial)
             .clipShape(RoundedRectangle(cornerRadius: 10))
-            .padding(.horizontal, 24)
-            .padding(.vertical, 22)
+            .padding(EdgeInsets(top: 22, leading: 24, bottom: 22, trailing: 24))
 
         Button {
             coord.push(view: .detailView(viewModel: viewModel))
@@ -74,8 +72,7 @@ private struct PlaylistContentsView: View {
         .frame(maxWidth: .infinity)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .padding(.horizontal, 24)
-        .padding(.bottom, 40)
+        .padding(EdgeInsets(top: 0, leading: 24, bottom: 40, trailing: 24))
         Spacer()
     }
 }

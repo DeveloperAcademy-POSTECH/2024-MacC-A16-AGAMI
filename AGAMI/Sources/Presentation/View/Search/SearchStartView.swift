@@ -9,11 +9,12 @@ import SwiftUI
 
 struct SearchStartView: View {
     @Environment(SearchCoordinator.self) var coordinator
-    @Bindable var viewModel: SearchStartViewModel
+    var viewModel: SearchStartViewModel
     
     var body: some View {
         VStack(spacing: 0) {
             Button {
+                coordinator.presentSheet(.playlistModalView)
                 viewModel.searchButtonTapped()
             } label: {
                 RoundedRectangle(cornerRadius: 10)
@@ -23,9 +24,6 @@ struct SearchStartView: View {
                     }
                     .frame(width: 260, height: 100)
             }
-        }
-        .sheet(isPresented: $viewModel.searchButtonToggle) {
-            coordinator.buildSheet(sheet: .playlistModalView)
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing, content: {

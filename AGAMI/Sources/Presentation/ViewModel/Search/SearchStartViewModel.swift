@@ -8,14 +8,12 @@
 import Foundation
 import ShazamKit
 
-@MainActor
 @Observable
 final class SearchStartViewModel: NSObject {
     private let shazamService = ShazamService()
     
     var currentItem: SHMediaItem?
     var diggingList: [SongModel] = []
-    var searchButtonToggle: Bool = false
     var shazaming = false
     
     override init() {
@@ -46,8 +44,6 @@ final class SearchStartViewModel: NSObject {
     }
     
     func searchButtonTapped() {
-        searchButtonToggle.toggle()
-        
         currentItem = nil
         startRecognition()
     }

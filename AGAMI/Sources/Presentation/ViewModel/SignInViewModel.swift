@@ -10,28 +10,23 @@ import AuthenticationServices
 
 @Observable
 class SignInViewModel {
-    
-    var currentNonce: String?
-    
+        
     private let firebaseAuthService = FirebaseAuthService()
 
     func signInRequest(request: ASAuthorizationAppleIDRequest) {
-        generateNonce()
+        firebaseAuthService.generateNonce()
         request.requestedScopes = [.fullName, .email]
-        if let nonce = currentNonce {
+        if let nonce = firebaseAuthService.currentNonce {
             request.nonce = firebaseAuthService.sha256(nonce)
         }
     }
     
-    func generateNonce() {
-        currentNonce = firebaseAuthService.randomNonceString()
-    }
     
     func handleSuccessfulLogin(with authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
             let idToken = appleIDCredential.identityToken
             
-            guard let nonce = currentNonce else {
+            guard let nonce = firebaseAuthService.currentNonce else {
                 dump("Nonce가 존재하지 않습니다.")
                 return
             }

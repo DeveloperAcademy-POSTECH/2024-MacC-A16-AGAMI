@@ -83,11 +83,15 @@ struct SavePlaylistTestView: View {
             return
         }
         
-        let dummySongs: [SongModel] = [
-            SongModel(songID: "1", title: "Song 1", artist: "Artist 1", albumCoverURL: "https://example.com/song1.jpg"),
-            SongModel(songID: "2", title: "Song 2", artist: "Artist 2", albumCoverURL: "https://example.com/song2.jpg"),
-            SongModel(songID: "3", title: "Song 3", artist: "Artist 3", albumCoverURL: "https://example.com/song3.jpg")
-        ]
+        let dummySongs: [SongModel] =
+        (1...3).map { index in
+            SongModel(
+                songID: "\(index)",
+                title: "Song \(index)",
+                artist: "Artist \(index)",
+                albumCoverURL: "https://example.com/song\(index).jpg"
+            )
+        }
         
         let newPlaylist = PlaylistModel(
             playlistName: playlistName,

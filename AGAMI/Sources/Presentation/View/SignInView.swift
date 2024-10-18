@@ -18,7 +18,7 @@ struct SignInView: View {
             Spacer()
             
             SignInWithAppleButton(.continue) { request in
-                viewModel.SignInRequest(request: request)
+                viewModel.signInRequest(request: request)
             } onCompletion: { result in
                 switch result {
                 case .success(let authorization):

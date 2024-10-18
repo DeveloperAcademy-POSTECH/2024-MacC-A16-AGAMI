@@ -39,7 +39,7 @@ struct SearchWritingView: View {
             }
             
             Button {
-                viewModel.showPlaylistButtonTapped()
+                // diggingModal present
             } label: {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.3))
@@ -51,9 +51,6 @@ struct SearchWritingView: View {
         }
         .onTapGesture {
             hideKeyboard()
-        }
-        .sheet(isPresented: $viewModel.showPlaylistModal) {
-            coordinator.buildSheet(sheet: .diggingModalView)
         }
         .navigationTitle("타이틀")
         .navigationBarTitleDisplayMode(.inline)

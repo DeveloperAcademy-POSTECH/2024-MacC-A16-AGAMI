@@ -9,12 +9,12 @@ import SwiftUI
 
 struct SearchStartView: View {
     @Environment(SearchCoordinator.self) var coordinator
-    var viewModel: SearchStartViewModel
+    @State var viewModel: SearchStartViewModel = SearchStartViewModel()
     
     var body: some View {
         VStack(spacing: 0) {
             Button {
-                coordinator.presentSheet(.playlistModalView)
+                coordinator.presentSheet(.playlistModalView(viewModel: viewModel))
                 viewModel.searchButtonTapped()
             } label: {
                 RoundedRectangle(cornerRadius: 10)

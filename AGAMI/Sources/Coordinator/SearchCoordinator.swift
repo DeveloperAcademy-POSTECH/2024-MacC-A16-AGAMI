@@ -35,7 +35,6 @@ enum SearchFullScreenCover: String, Identifiable {
 
 @Observable
 final class SearchCoordinator {
-    var searchStartViewModel: SearchStartViewModel = .init()
     var path: NavigationPath = .init()
     var sheet: SearchSheet?
     var fullScreenCover: SearchFullScreenCover?

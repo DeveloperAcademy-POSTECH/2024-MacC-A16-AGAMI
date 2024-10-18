@@ -8,6 +8,7 @@
 import Foundation
 import ShazamKit
 
+@MainActor
 @Observable
 final class SearchStartViewModel: NSObject {
     private let shazamService = ShazamService()

@@ -7,16 +7,18 @@
 
 import SwiftUI
 import AuthenticationServices
+import FirebaseAuth
+import CryptoKit
 
 struct SignInView: View {
-    @State private var viewModel: SignInViewModel = SignInViewModel()
-
+        @State private var viewModel: SignInViewModel = SignInViewModel()
+    
     var body: some View {
         VStack {
             Spacer()
-
+            
             SignInWithAppleButton(.continue) { request in
-                request.requestedScopes = [.fullName, .email]
+                viewModel.SignInRequest(request: request)
             } onCompletion: { result in
                 switch result {
                 case .success(let authorization):

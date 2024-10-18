@@ -11,7 +11,13 @@ import FirebaseAuth
 
 final class FirebaseAuthService {
     
-    func randomNonceString(length: Int = 32) -> String {
+    var currentNonce: String?
+
+    func generateNonce() {
+        currentNonce = randomNonceString()
+    }
+    
+    private func randomNonceString(length: Int = 32) -> String {
         precondition(length > 0)
         let charset: [Character] =
         Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")

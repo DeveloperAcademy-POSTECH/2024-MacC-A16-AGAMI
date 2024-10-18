@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct SearchPlaylistModalView: View {
-    @Bindable var viewModel: SearchStartViewModel
-    var navigationTitle: String
+    var viewModel: SearchStartViewModel
     
     var body: some View {
         NavigationStack {
@@ -32,7 +31,7 @@ struct SearchPlaylistModalView: View {
                     .scrollIndicators(.hidden)
                 }
             }
-            .navigationTitle(navigationTitle)
+            .navigationTitle("플레이크 리스트")
         }
         .onDisappear {
             viewModel.stopRecognition()
@@ -41,5 +40,5 @@ struct SearchPlaylistModalView: View {
 }
 
 #Preview {
-    SearchPlaylistModalView(viewModel: SearchStartViewModel(), navigationTitle: "구리스")
+    SearchPlaylistModalView(viewModel: SearchStartViewModel())
 }

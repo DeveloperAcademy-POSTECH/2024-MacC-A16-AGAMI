@@ -15,7 +15,7 @@ class SignInViewModel {
     
     private let firebaseAuthService = FirebaseAuthService()
 
-    func SignInRequest(request: ASAuthorizationAppleIDRequest) {
+    func signInRequest(request: ASAuthorizationAppleIDRequest) {
         generateNonce()
         request.requestedScopes = [.fullName, .email]
         if let nonce = currentNonce {

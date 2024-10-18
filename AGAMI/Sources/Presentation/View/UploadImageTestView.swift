@@ -16,7 +16,7 @@ struct UploadImageTestView: View {
     @State private var uploadResultMessage: String = ""
     
     private let userID = "123456"
-    private let playlistID = "08AEDA20-460A-403C-A04A-A411F6109DFC"
+    private let playlistID = "C7B36178-B1BC-4B90-B08E-69B4130C4376"
     
     var body: some View {
         VStack {

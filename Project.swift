@@ -2,6 +2,7 @@ import ProjectDescription
 
 let project = Project(
     name: "AGAMI",
+    settings: Settings.settings(base: ["OTHER_LDFLAGS":["-all_load -Objc"]]),
     targets: [
         .target(
             name: "AGAMI",

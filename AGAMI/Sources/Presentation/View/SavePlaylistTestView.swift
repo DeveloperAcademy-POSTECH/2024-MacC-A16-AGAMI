@@ -83,7 +83,7 @@ struct SavePlaylistTestView: View {
             return
         }
         
-        let dummySongs: [FirestoreSongModel] =
+        let dummySongs: [SongModel] =
         (1...3).map { index in
             FirestoreSongModel(
                 songID: "\(index)",
@@ -93,17 +93,17 @@ struct SavePlaylistTestView: View {
             )
         }
         
-        let newPlaylist = FirestorePlaylistModel(
+        let newPlaylist: PlaylistModel = FirestorePlaylistModel(
             playlistName: playlistName,
             playlistDescription: description,
             photoURL: photoURL,
             latitude: latitude,
             longitude: longitude,
-            firestoreSongs: dummySongs
+            firestoreSongs: dummySongs.map { FirestoreSongModel(from: $0) }
         )
         
         do {
-            try await firebaseService.savePlaylistToFirebase(userID: userID, playlist: newPlaylist)
+            try await firebaseService.savePlaylistToFirebase(userID: userID, playlist: FirestorePlaylistModel(from: newPlaylist))
         } catch {
             dump("플레이 리스트 저장 중 에러")
         }

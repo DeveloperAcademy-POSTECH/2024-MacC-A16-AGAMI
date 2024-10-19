@@ -14,7 +14,7 @@ final class SearchStartViewModel: NSObject {
     private let shazamService = ShazamService()
     
     var currentItem: SHMediaItem?
-    var diggingList: [FirestoreSongModel] = []
+    var diggingList: [SongModel] = []
     var shazaming = false
     
     override init() {
@@ -32,16 +32,18 @@ final class SearchStartViewModel: NSObject {
         shazamService.stopRecognition()
     }
 
-    private func transform(_ item: SHMediaItem) -> FirestoreSongModel {
+    private func transform(_ item: SHMediaItem) -> SongModel {
         var artworkURL: String = ""
         if let url = item.artworkURL {
             artworkURL = url.absoluteString
         }
         
-        return FirestoreSongModel(songID: item.appleMusicID ?? "",
-                         title: item.title ?? "",
-                         artist: item.artist ?? "",
-                         albumCoverURL: artworkURL)
+        return SwiftDataSongModel(
+            songID: item.appleMusicID ?? "",
+            title: item.title ?? "",
+            artist: item.artist ?? "",
+            albumCoverURL: artworkURL
+        )
     }
     
     func searchButtonTapped() {

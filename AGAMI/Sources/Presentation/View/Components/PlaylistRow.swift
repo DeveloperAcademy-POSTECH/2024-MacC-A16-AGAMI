@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct PlaylistRow: View {
-    let song: FirestoreSongModel
+    let song: SongModel
 
     var body: some View {
         HStack(spacing: 0) {

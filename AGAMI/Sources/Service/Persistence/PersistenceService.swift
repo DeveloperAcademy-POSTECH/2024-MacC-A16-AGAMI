@@ -12,10 +12,10 @@ final class PersistenceService {
     let modelContainer: ModelContainer
     let modelContext: ModelContext
 
-    init() {
-        let schema = Schema([
-            SwiftDataPlaylistModel.self,
-        ])
+    static let shared: PersistenceService = .init()
+
+    private init() {
+        let schema = Schema([SwiftDataPlaylistModel.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
         do {
             modelContainer = try ModelContainer(for: schema, configurations: [modelConfiguration])
@@ -26,11 +26,11 @@ final class PersistenceService {
     }
 
     func createPlaylist(
-        playlistName: String?,
-        playlistDescription: String?,
-        photoURL: String?,
-        latitude: Double?,
-        longitude: Double?
+        playlistName: String,
+        playlistDescription: String,
+        photoURL: String,
+        latitude: Double,
+        longitude: Double
     ) throws {
         let item = SwiftDataPlaylistModel(
             playlistName: playlistName,

@@ -83,9 +83,9 @@ struct SavePlaylistTestView: View {
             return
         }
         
-        let dummySongs: [SongModel] =
+        let dummySongs: [FirestoreSongModel] =
         (1...3).map { index in
-            SongModel(
+            FirestoreSongModel(
                 songID: "\(index)",
                 title: "Song \(index)",
                 artist: "Artist \(index)",
@@ -93,13 +93,13 @@ struct SavePlaylistTestView: View {
             )
         }
         
-        let newPlaylist = PlaylistModel(
+        let newPlaylist = FirestorePlaylistModel(
             playlistName: playlistName,
-            description: description,
+            playlistDescription: description,
             photoURL: photoURL,
             latitude: latitude,
             longitude: longitude,
-            songs: dummySongs
+            firestoreSongs: dummySongs
         )
         
         do {

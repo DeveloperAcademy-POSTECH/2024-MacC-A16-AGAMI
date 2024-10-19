@@ -9,16 +9,16 @@ import Foundation
 import SwiftData
 
 @Model
-final class SwiftDataSongModel {
+final class SwiftDataSongModel: SongModel {
     @Attribute(.unique) var songID: String
     var title: String
-    var artist: [String]
+    var artist: String
     var albumCoverURL: String
 
     init(
         songID: String = "",
         title: String = "",
-        artist: [String] = [],
+        artist: String = "",
         albumCoverURL: String = ""
     ) {
         self.songID = songID

@@ -5,13 +5,16 @@
 //  Created by taehun on 10/14/24.
 //
 
-struct SongModel: Codable, Identifiable {
+import SwiftUI
+import FirebaseFirestore
+
+struct FirestoreSongModel: SongModel, Codable, Identifiable {
     var id: String { songID }
     var songID: String
     var title: String
     var artist: String
     var albumCoverURL: String
-    
+
     init(
         songID: String = "",
         title: String = "",

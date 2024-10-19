@@ -10,7 +10,7 @@ import SwiftUI
 struct FetchPlaylistsTestView: View {
     var firebaseService = FirebaseService()
     @State private var userID: String = ""
-    @State private var playlists: [PlaylistModel] = []
+    @State private var playlists: [FirestorePlaylistModel] = []
     @State private var errorMessage: String = ""
     @State private var isLoading: Bool = false
     
@@ -48,7 +48,7 @@ struct FetchPlaylistsTestView: View {
                     VStack(alignment: .leading) {
                         Text("Playlist Name: \(playlist.playlistName)")
                             .font(.headline)
-                        Text("Description: \(playlist.description)")
+                        Text("Description: \(playlist.playlistDescription)")
                         Text("Latitude: \(playlist.latitude)")
                         Text("Longitude: \(playlist.longitude)")
                         Text("Generation Time: \(playlist.generationTime.wrappedValue, style: .date)")

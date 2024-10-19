@@ -11,7 +11,7 @@ import FirebaseAuth
 import CryptoKit
 
 struct SignInView: View {
-        @State private var viewModel: SignInViewModel = SignInViewModel()
+    @State private var viewModel: SignInViewModel = SignInViewModel()
     
     var body: some View {
         VStack {

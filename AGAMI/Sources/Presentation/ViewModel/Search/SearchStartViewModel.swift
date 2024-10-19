@@ -15,7 +15,8 @@ final class SearchStartViewModel: NSObject {
     
     var currentItem: SHMediaItem?
     var diggingList: [SongModel] = []
-    var shazaming = false
+    var shazaming: Bool = false
+    var isFound: Bool = false
     
     override init() {
         super.init()
@@ -24,6 +25,7 @@ final class SearchStartViewModel: NSObject {
     
     private func startRecognition() {
         shazaming = true
+        isFound = false
         shazamService.startRecognition()
     }
     
@@ -68,13 +70,12 @@ extension SearchStartViewModel: ShazamServiceDelegate {
         guard let mediaItem = match.mediaItems.first else { return }
         dump("title: \(mediaItem.title ?? "")")
         stopRecognition()
+        isFound = true
         currentItem = mediaItem
-        
         if let item = currentItem {
             let diggingData = transform(item)
             diggingList.append(diggingData)
         }
-        print("diggingList: \(diggingList)")
     }
     
     nonisolated func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {

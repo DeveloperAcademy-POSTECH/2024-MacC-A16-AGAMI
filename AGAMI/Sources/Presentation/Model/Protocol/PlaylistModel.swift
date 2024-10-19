@@ -14,5 +14,5 @@ protocol PlaylistModel {
     var latitude: Double { get set }
     var longitude: Double { get set }
     var generationTime: Date { get set }
-    var songs: [any SongModel] { get set }
+    var songs: [SongModel] { get set }
 }

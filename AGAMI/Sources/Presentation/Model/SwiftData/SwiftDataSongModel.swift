@@ -26,4 +26,11 @@ final class SwiftDataSongModel: SongModel {
         self.artist = artist
         self.albumCoverURL = albumCoverURL
     }
+
+    init(from songModel: SongModel) {
+        self.songID = songModel.songID
+        self.title = songModel.title
+        self.artist = songModel.artist
+        self.albumCoverURL = songModel.albumCoverURL
+    }
 }

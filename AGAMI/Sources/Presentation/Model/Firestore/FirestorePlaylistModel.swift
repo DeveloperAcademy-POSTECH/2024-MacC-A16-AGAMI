@@ -5,7 +5,7 @@
 //  Created by taehun on 10/13/24.
 //
 
-import SwiftUI
+import Foundation
 import FirebaseFirestore
 
 struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
@@ -19,9 +19,9 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
     var generationTime: Date
     var firestoreSongs: [FirestoreSongModel]
 
-    var songs: [any SongModel] {
+    var songs: [SongModel] {
         get { firestoreSongs }
-        set { firestoreSongs = newValue.compactMap { $0 as? FirestoreSongModel } }
+        set { firestoreSongs = newValue.map { FirestoreSongModel(from: $0) } }
     }
 
     var id: String { playlistID }
@@ -44,5 +44,16 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
         self.longitude = longitude
         self.firestoreSongs = firestoreSongs
         self.generationTime = generationTime
+    }
+
+    init(from playlistModel: PlaylistModel) {
+        self.playlistID = playlistModel.playlistID
+        self.playlistName = playlistModel.playlistName
+        self.playlistDescription = playlistModel.playlistDescription
+        self.photoURL = playlistModel.photoURL
+        self.latitude = playlistModel.latitude
+        self.longitude = playlistModel.longitude
+        self.generationTime = playlistModel.generationTime
+        self.firestoreSongs = playlistModel.songs.map { FirestoreSongModel(from: $0) }
     }
 }

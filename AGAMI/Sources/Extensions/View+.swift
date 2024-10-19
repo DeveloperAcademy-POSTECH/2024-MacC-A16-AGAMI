@@ -19,5 +19,5 @@ extension View {
         } else {
             self.toolbar(visibility, for: bar)
         }
-    }g
+    }
 }

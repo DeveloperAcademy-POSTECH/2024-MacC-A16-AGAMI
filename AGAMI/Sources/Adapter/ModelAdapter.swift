@@ -8,19 +8,19 @@
 import Foundation
 
 struct ModelAdapter {
-    static func toSwiftDataPlaylist(from firestoreModel: FirestorePlaylistModel) -> SwiftDataPlaylistModel {
-        return SwiftDataPlaylistModel(from: firestoreModel)
+    static func toSwiftDataPlaylist(from playlistModel: PlaylistModel) -> SwiftDataPlaylistModel {
+        return SwiftDataPlaylistModel(from: playlistModel)
     }
 
-    static func toSwiftDataSong(from firestoreModel: FirestoreSongModel) -> SwiftDataSongModel {
-        return SwiftDataSongModel(from: firestoreModel)
+    static func toSwiftDataSong(from songModel: SongModel) -> SwiftDataSongModel {
+        return SwiftDataSongModel(from: songModel)
     }
 
-    static func toFirestorePlaylist(from swiftDataModel: SwiftDataPlaylistModel) -> FirestorePlaylistModel {
-        return FirestorePlaylistModel(from: swiftDataModel)
+    static func toFirestorePlaylist(from playlistModel: PlaylistModel) -> FirestorePlaylistModel {
+        return FirestorePlaylistModel(from: playlistModel)
     }
 
-    static func toFirestoreSong(from swiftDataModel: SwiftDataSongModel) -> FirestoreSongModel {
-        return FirestoreSongModel(from: swiftDataModel)
+    static func toFirestoreSong(from songModel: SongModel) -> FirestoreSongModel {
+        return FirestoreSongModel(from: songModel)
     }
 }

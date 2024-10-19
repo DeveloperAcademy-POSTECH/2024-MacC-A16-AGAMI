@@ -9,7 +9,7 @@ import Foundation
 import AuthenticationServices
 
 @Observable
-class SignInViewModel {
+final class SignInViewModel {
         
     private let firebaseAuthService = FirebaseAuthService()
 
@@ -20,7 +20,6 @@ class SignInViewModel {
             request.nonce = firebaseAuthService.sha256(nonce)
         }
     }
-    
     
     func handleSuccessfulLogin(with authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {

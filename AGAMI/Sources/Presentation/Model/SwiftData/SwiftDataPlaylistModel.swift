@@ -16,13 +16,13 @@ final class SwiftDataPlaylistModel: PlaylistModel {
     var photoURL: String
     var latitude: Double
     var longitude: Double
-    var generationTime: Date = Date()
+    var generationTime: Date
 
     @Relationship var swiftDataSongs: [SwiftDataSongModel] = []
 
-    var songs: [any SongModel] {
+    var songs: [SongModel] {
         get { swiftDataSongs }
-        set { swiftDataSongs = newValue.compactMap { $0 as? SwiftDataSongModel } }
+        set { swiftDataSongs = newValue.map { SwiftDataSongModel(from: $0) } }
     }
 
     init(
@@ -30,12 +30,25 @@ final class SwiftDataPlaylistModel: PlaylistModel {
         playlistDescription: String = "",
         photoURL: String = "",
         latitude: Double = 0.0,
-        longitude: Double = 0.0
+        longitude: Double = 0.0,
+        generationTime: Date = Date()
     ) {
         self.playlistName = playlistName
         self.playlistDescription = playlistDescription
         self.photoURL = photoURL
         self.latitude = latitude
         self.longitude = longitude
+        self.generationTime = generationTime
+    }
+
+    init(from playlistModel: PlaylistModel) {
+        self.playlistID = playlistModel.playlistID
+        self.playlistName = playlistModel.playlistName
+        self.playlistDescription = playlistModel.playlistDescription
+        self.photoURL = playlistModel.photoURL
+        self.latitude = playlistModel.latitude
+        self.longitude = playlistModel.longitude
+        self.generationTime = playlistModel.generationTime
+        self.swiftDataSongs = playlistModel.songs.map { SwiftDataSongModel(from: $0) }
     }
 }

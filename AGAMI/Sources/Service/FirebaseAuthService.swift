@@ -14,12 +14,12 @@ final class FirebaseAuthService {
     var currentNonce: String?
 
     static var currentUID: String? {
-            if let uid = Auth.auth().currentUser?.uid {
-                return uid
-            }
-            return nil
+        if let uid = Auth.auth().currentUser?.uid {
+            return uid
         }
-    
+        return nil
+    }
+
     func generateNonce() {
         currentNonce = randomNonceString()
     }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ArchivePlaylistView: View {
-    @State var viewModel: ArchivePlaylistViewModel = ArchivePlaylistViewModel()
+    @State var viewModel: ArchivePlaylistViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +23,7 @@ private struct PlaylistImageCellView: View {
     let viewModel: ArchivePlaylistViewModel
     
     var body: some View {
-        AsyncImage(url: URL(string: viewModel.dummyURL)) { image in
+        AsyncImage(url: URL(string: viewModel.playlist.photoURL)) { image in
             image
                 .resizable()
                 .clipShape(RoundedRectangle(cornerRadius: 16))
@@ -47,13 +47,13 @@ private struct PlaylistContentsView: View {
 
     var body: some View {
         HStack {
-            Text(viewModel.playlistTitle)
+            Text(viewModel.playlist.playlistName)
                 .font(.system(size: 24, weight: .semibold))
             Spacer()
         }
         .padding(EdgeInsets(top: 32, leading: 24, bottom: 0, trailing: 24))
 
-        TextEditor(text: $viewModel.playlistDescription)
+        TextEditor(text: $viewModel.playlist.playlistDescription)
             .font(.system(size: 17))
             .scrollContentBackground(.hidden)
             .foregroundStyle(.black)

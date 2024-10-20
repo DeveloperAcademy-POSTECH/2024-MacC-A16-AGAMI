@@ -7,6 +7,8 @@
 
 import Foundation
 
+import ShazamKit
+
 struct ModelAdapter {
     static func toSwiftDataPlaylist(from playlistModel: PlaylistModel) -> SwiftDataPlaylistModel {
         return SwiftDataPlaylistModel(from: playlistModel)
@@ -22,5 +24,19 @@ struct ModelAdapter {
 
     static func toFirestoreSong(from songModel: SongModel) -> FirestoreSongModel {
         return FirestoreSongModel(from: songModel)
+    }
+    
+    static func fromSHtoSwiftDataSong(_ item: SHMediaItem) -> SwiftDataSongModel {
+        var artworkURL: String = ""
+        if let url = item.artworkURL {
+            artworkURL = url.absoluteString
+        }
+        
+        return SwiftDataSongModel(
+            songID: item.appleMusicID ?? "",
+            title: item.title ?? "",
+            artist: item.artist ?? "",
+            albumCoverURL: artworkURL
+        )
     }
 }

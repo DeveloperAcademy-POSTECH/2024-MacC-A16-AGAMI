@@ -25,6 +25,13 @@ final class CameraViewModel: ObservableObject {
         cameraService = CameraService()
         session = cameraService.session
         cameraPreView = CameraPreview(session: session)
+        
+        cameraService.onPhotoCaptured = { [weak self] imageData in
+            if let image = UIImage(data: imageData) {
+                self?.recentImage = image
+                self?.isPhotoCaptured = true
+            }
+        }
     }
     
     func configure() {
@@ -38,6 +45,9 @@ final class CameraViewModel: ObservableObject {
     func resetPhoto() {
         isPhotoCaptured = false
         recentImage = nil
+        
+        cameraService.session.stopRunning()
+        cameraService.setUpCamera()
     }
     
     func changeCamera() {

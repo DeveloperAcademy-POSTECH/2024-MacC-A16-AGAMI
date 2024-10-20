@@ -38,6 +38,7 @@ final class SearchCoordinator {
     var path: NavigationPath = .init()
     var sheet: SearchSheet?
     var fullScreenCover: SearchFullScreenCover?
+    var onDismiss: (() -> Void)?
     
     func push(view: SearchView) {
         path.append(view)
@@ -51,8 +52,9 @@ final class SearchCoordinator {
         path.removeLast(path.count)
     }
     
-    func presentSheet(_ sheet: SearchSheet) {
+    func presentSheet(_ sheet: SearchSheet, onDismiss: (() -> Void)?) {
         self.sheet = sheet
+        self.onDismiss = onDismiss
     }
     
     func presentFullScreenCover(_ cover: SearchFullScreenCover) {

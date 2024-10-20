@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SearchPlaylistModalView: View {
     @Environment(SearchCoordinator.self) var coordinator
-    @Environment(\.dismiss) private var dismiss
     var viewModel: SearchStartViewModel
     
     var body: some View {
@@ -37,7 +36,7 @@ struct SearchPlaylistModalView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing, content: {
                     Button(action: {
-                        dismiss()
+                        coordinator.dismissSheet()
                         coordinator.push(view: .writingView)
                     }, label: {
                         Text("Next")

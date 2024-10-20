@@ -59,15 +59,15 @@ struct SearchWritingView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    coordinator.push(view: .cameraView)
+                    Task {
+                        await viewModel.savedPlaylist()
+                        viewModel.clearDiggingList()
+                        coordinator.popToRoot()
+                    }
                 } label: {
                     Text("저장")
                 }
             }
         }
     }
-}
-
-#Preview {
-    SearchWritingView()
 }

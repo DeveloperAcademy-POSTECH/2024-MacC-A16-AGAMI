@@ -44,6 +44,9 @@ struct SearchDiggingListModalView: View {
                 })
             }
         }
+        .onAppear {
+            viewModel.loadSavedSongs()
+        }
         .onDisappear {
             viewModel.stopRecognition()
         }

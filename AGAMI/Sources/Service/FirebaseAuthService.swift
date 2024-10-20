@@ -82,11 +82,11 @@ final class FirebaseAuthService {
     }
     
     func signOut(completion: @escaping (Result<Void, Error>) -> Void) {
-           do {
-               try Auth.auth().signOut()
-               completion(.success(()))
-           } catch let signOutError as NSError {
-               completion(.failure(signOutError))
-           }
-       }
+        do {
+            try Auth.auth().signOut()
+            completion(.success(()))
+        } catch let signOutError as NSError {
+            completion(.failure(signOutError))
+        }
+    }
 }

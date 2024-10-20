@@ -9,16 +9,15 @@ import SwiftUI
 import AVFoundation
 
 struct CameraView: View {
-    @Environment(SearchCoordinator.self) var coordinator
     @State var viewModel = CameraViewModel()
-    @State var isFlashOn = true
-    @State var capturePhoto = true
     
     var body: some View {
         ZStack {
             Color.black.edgesIgnoringSafeArea(.all)
             
-            VStack {
+            VStack(spacing: 0) {
+                Spacer()
+                
                 if viewModel.isPhotoCaptured, let recentImage = viewModel.recentImage {
                     Image(uiImage: recentImage)
                         .resizable()
@@ -37,18 +36,21 @@ struct CameraView: View {
                             }
                             .onEnded { _ in
                                 viewModel.zoomInitialize()
-                            }
-                        )
+                            })
                 }
                 
-                HStack {
-                    captureButton
-                    resetPhotoButton
-                    switchFlashButton
-                    usedPhotoButton
-                    savePhotoButton
-                    changeCameraButton
+                HStack(spacing: 44) {
+                    if !viewModel.isPhotoCaptured {
+                        switchFlashButton
+                        captureButton
+                        changeCameraButton
+                    } else {
+                        resetPhotoButton
+                        usedPhotoButton
+                        savePhotoButton
+                    }
                 }
+                .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
             }
         }
     }
@@ -74,18 +76,17 @@ struct CameraView: View {
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))
-                .frame(width: 45, height: 45, alignment: .center)
+                .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: "multiply")
+                        .font(.system(size: 30, weight: .medium))
                         .foregroundColor(.white))
         }
     }
     
     var usedPhotoButton: some View {
         Button {
-            //image 넘기기
-            //넘길 이미지: viewModel.recentImage
-            coordinator.pop()
+            //TODO: - 찍은 사진사용 버튼
         } label: {
             ZStack {
                 Circle()
@@ -109,13 +110,14 @@ struct CameraView: View {
             viewModel.switchFlash()
         } label: {
             Circle()
-                .foregroundColor(Color.gray.opacity(0.2))
-                .frame(width: 45, height: 45, alignment: .center)
+                .foregroundColor(.gray.opacity(0.2))
+                .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
-                    Image(isFlashOn ? "bolt.fill" : "bolt.slash.fill")
-                        .font(.system(size: 20, weight: .medium, design: .default)))
+                    Image(systemName: viewModel.isFlashOn ? "bolt.fill" : "bolt.slash.fill")
+                        .font(.system(size: 30, weight: .medium))
+                )
+                .accentColor(viewModel.isFlashOn ? .yellow : .white)
         }
-        .accentColor(isFlashOn ? .yellow : .white)
     }
     
     var savePhotoButton: some View {
@@ -124,9 +126,10 @@ struct CameraView: View {
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))
-                .frame(width: 45, height: 45, alignment: .center)
+                .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: "square.and.arrow.down")
+                        .font(.system(size: 30, weight: .medium))
                         .foregroundColor(.white))
         }
     }
@@ -136,10 +139,11 @@ struct CameraView: View {
             viewModel.changeCamera()
         } label: {
             Circle()
-                .foregroundColor(Color.gray.opacity(0.2))
-                .frame(width: 45, height: 45, alignment: .center)
+                .foregroundColor(.gray.opacity(0.2))
+                .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: "camera.rotate.fill")
+                        .font(.system(size: 30, weight: .medium))
                         .foregroundColor(.white))
         }
     }

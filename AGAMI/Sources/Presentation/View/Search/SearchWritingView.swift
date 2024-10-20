@@ -39,7 +39,7 @@ struct SearchWritingView: View {
             }
             
             Button {
-                // diggingModal present
+                coordinator.presentFullScreenCover(.playlistFullscreenView(viewModel: viewModel))
             } label: {
                 RoundedRectangle(cornerRadius: 10)
                     .foregroundStyle(.gray.opacity(0.3))

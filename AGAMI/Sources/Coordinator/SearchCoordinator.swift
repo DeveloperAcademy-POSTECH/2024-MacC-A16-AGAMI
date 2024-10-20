@@ -16,21 +16,23 @@ enum SearchView: Hashable {
 enum SearchSheet: Identifiable {
     var id: String {
         switch self {
-        case .playlistModalView:
-            return "playlistModalView"
         case .diggingModalView:
             return "diggingModalView"
         }
     }
     
-    case playlistModalView(viewModel: SearchStartViewModel)
     case diggingModalView(viewModel: SearchStartViewModel)
 }
 
-enum SearchFullScreenCover: String, Identifiable {
-    var id: String { self.rawValue }
+enum SearchFullScreenCover: Identifiable {
+    var id: String {
+        switch self {
+        case .playlistFullscreenView:
+            return "playlistFullscreenView"
+        }
+    }
     
-    case dummyFullScreenCover
+    case playlistFullscreenView(viewModel: SearchWritingViewModel)
 }
 
 @Observable
@@ -84,20 +86,23 @@ final class SearchCoordinator {
     @ViewBuilder
     func buildSheet(sheet: SearchSheet) -> some View {
         switch sheet {
-        case .playlistModalView(let viewModel):
-            SearchPlaylistModalView(viewModel: viewModel)
-                .presentationDragIndicator(.visible)
         case .diggingModalView(let viewModel):
-            SearchPlaylistModalView(viewModel: viewModel)
+            SearchDiggingListModalView(viewModel: viewModel)
                 .presentationDragIndicator(.visible)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                .presentationDetents([.height(60), .medium, .large])
+                .presentationCornerRadius(20)
+                .presentationBackgroundInteraction(.enabled(upThrough: .large))
+                .interactiveDismissDisabled()
+                .bottomMaskForSheet()
         }
     }
     
     @ViewBuilder
     func buildFullScreenCover(cover: SearchFullScreenCover) -> some View {
         switch cover {
-        case .dummyFullScreenCover:
-            EmptyView()
+        case .playlistFullscreenView(let viewModel):
+            SearchPlayListFullscreenVIew(viewModel: viewModel)
         }
     }
 }

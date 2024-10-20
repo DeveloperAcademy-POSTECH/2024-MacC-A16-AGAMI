@@ -24,12 +24,6 @@ struct HomeView: View {
                             }
                             .sheet(item: $searchCoordinator.sheet) { sheet in
                                 searchCoordinator.buildSheet(sheet: sheet)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                                    .presentationDetents([.height(60), .medium, .large])
-                                    .presentationCornerRadius(20)
-                                    .presentationBackgroundInteraction(.enabled(upThrough: .large))
-                                    .interactiveDismissDisabled()
-                                    .bottomMaskForSheet()
                             }
                             .fullScreenCover(item: $searchCoordinator.fullScreenCover) { cover in
                                 searchCoordinator.buildFullScreenCover(cover: cover)

@@ -18,30 +18,39 @@ struct CameraView: View {
             Color.black.edgesIgnoringSafeArea(.all)
             
             VStack {
-                viewModel.cameraPreView
-                    .frame(height: 400)
-                    .onAppear {
-                        viewModel.configure()
-                    }
-                    .gesture(MagnificationGesture()
-                        .onChanged { val in
-                            viewModel.zoom(factor: val)
+                if viewModel.isPhotoCaptured, let recentImage = viewModel.recentImage {
+                    Image(uiImage: recentImage)
+                        .resizable()
+                        .scaledToFit()
+//                        .frame(height: 400)
+                } else {
+                    viewModel.cameraPreView
+                        .frame(height: 400)
+                        .onAppear {
+                            viewModel.configure()
                         }
-                        .onEnded { _ in
-                            viewModel.zoomInitialize()
-                        }
-                    )
+                        .gesture(MagnificationGesture()
+                            .onChanged { val in
+                                viewModel.zoom(factor: val)
+                            }
+                            .onEnded { _ in
+                                viewModel.zoomInitialize()
+                            }
+                        )
+                        .border(.yellow)
+                }
                 
                 HStack {
                     captureButton
-                    retryCaptureButton
+                    resetPhotoButton
                     switchFlashButton
-                    usedPhotoButton
+                    //                    usedPhotoButton
                     savePhotoButton
-                    flipCameraButton
+                    changeCameraButton
+                    
                 }
-                .border(.red)
             }
+            
         }
     }
     
@@ -60,7 +69,7 @@ struct CameraView: View {
         }
     }
     
-    var retryCaptureButton: some View {
+    var resetPhotoButton: some View {
         Button {
             
         } label: {
@@ -121,7 +130,7 @@ struct CameraView: View {
         }
     }
     
-    var flipCameraButton: some View {
+    var changeCameraButton: some View {
         Button {
             viewModel.changeCamera()
         } label: {

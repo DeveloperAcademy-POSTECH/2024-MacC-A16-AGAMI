@@ -11,7 +11,7 @@ import AVFoundation
 struct CameraView: View {
     @State var viewModel = CameraViewModel()
     @State var isFlashOn = true
-    @State var caputerPhoto = true
+    @State var capturePhoto = true
     
     var body: some View {
         ZStack {
@@ -31,18 +31,16 @@ struct CameraView: View {
                     usedPhotoButton
                     savePhotoButton
                     flipCameraButton
-                    
                 }
                 .border(.red)
             }
         }
     }
     
-    
     var captureButton: some View {
         Button {
             //TODO: - 사진 찍는 버튼
-            print("캡쳐완")
+            
         } label: {
             Circle()
                 .foregroundColor(.white)
@@ -102,7 +100,6 @@ struct CameraView: View {
                         .font(.system(size: 20, weight: .medium, design: .default)))
         }
         .accentColor(isFlashOn ? .yellow : .white)
-        
     }
     
     var savePhotoButton: some View {

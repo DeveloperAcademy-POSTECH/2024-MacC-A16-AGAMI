@@ -5,13 +5,14 @@
 //  Created by Seoyeon Choi on 10/16/24.
 //
 
-import Foundation
+import SwiftUI
 
 import ShazamKit
 
 @MainActor
 @Observable
 final class SearchStartViewModel: NSObject {
+    private let persistenceService = PersistenceService.shared
     private let shazamService = ShazamService()
     
     var currentItem: SHMediaItem?
@@ -23,6 +24,7 @@ final class SearchStartViewModel: NSObject {
     override init() {
         super.init()
         shazamService.delegate = self
+        loadSavedSongs()
     }
     
     private func startRecognition() {
@@ -40,9 +42,29 @@ final class SearchStartViewModel: NSObject {
         startRecognition()
     }
     
+    func loadSavedSongs() {
+        do {
+            self.diggingList = try persistenceService.fetchDiggingList()
+        } catch {
+            print("Failed to load saved songs: \(error)")
+        }
+    }
+    
     func deleteSong(indexSet: IndexSet) {
         for index in indexSet {
+            let songToDelete = diggingList[index]
             diggingList.remove(at: index)
+            
+            if let song = songToDelete as? SwiftDataSongModel {
+                do {
+                    try persistenceService.deleteSong(item: song)
+                    loadSavedSongs()
+                } catch {
+                    print("Error deleting song: \(error)")
+                }
+            } else {
+                print("Error: Song is not of type SwiftDataSongModel")
+            }
         }
     }
     
@@ -61,8 +83,12 @@ extension SearchStartViewModel: ShazamServiceDelegate {
         shazamStatus = .found
         
         if let item = currentItem {
-            let diggingData = ModelAdapter.fromSHtoSwiftDataSong(item)
-            diggingList.append(diggingData)
+            do {
+                try persistenceService.saveSongToDiggingList(from: item)
+                loadSavedSongs()
+            } catch {
+                dump("Failed to save song: \(error)")
+            }
         }
     }
     
@@ -70,6 +96,7 @@ extension SearchStartViewModel: ShazamServiceDelegate {
         dump(#function)
         dump("didNotFindMatch | signature: \(signature) | error: \(String(describing: error))")
         shazamStatus = .failed
+        stopRecognition()
     }
     
     func shazamService(_ service: ShazamService, didFailWithError error: any Error) {

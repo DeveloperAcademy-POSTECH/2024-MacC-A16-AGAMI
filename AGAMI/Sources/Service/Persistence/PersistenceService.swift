@@ -6,14 +6,16 @@
 //
 
 import Foundation
+
+import ShazamKit
 import SwiftData
 
 final class PersistenceService {
     let modelContainer: ModelContainer
     let modelContext: ModelContext
-
+    
     static let shared: PersistenceService = .init()
-
+    
     private init() {
         let schema = Schema([SwiftDataPlaylistModel.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -24,7 +26,7 @@ final class PersistenceService {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }
-
+    
     func createPlaylist(
         playlistName: String,
         playlistDescription: String,
@@ -42,34 +44,55 @@ final class PersistenceService {
         modelContext.insert(item)
         try modelContext.save()
     }
-
-    func fetchPlaylist() throws -> [SwiftDataPlaylistModel] {
-        return try modelContext.fetch(FetchDescriptor<SwiftDataPlaylistModel>())
-    }
-
+    
     func updatePlaylistName(for item: SwiftDataPlaylistModel, to newPlaylistName: String) throws {
         item.playlistName = newPlaylistName
         try modelContext.save()
     }
-
+    
     func updatePlaylistDescription(for item: SwiftDataPlaylistModel, to newPlaylistDescription: String) throws {
         item.playlistDescription = newPlaylistDescription
         try modelContext.save()
     }
-
+    
     func updatePhotoURL(for item: SwiftDataPlaylistModel, to newPhotoURL: String) throws {
         item.photoURL = newPhotoURL
         try modelContext.save()
     }
-
+    
     func updateCoordinates(for item: SwiftDataPlaylistModel, latitude: Double, longitude: Double) throws {
         item.latitude = latitude
         item.longitude = longitude
         try modelContext.save()
     }
-
+    
     func deletePlaylist(item: SwiftDataPlaylistModel) throws {
         modelContext.delete(item)
+        try modelContext.save()
+    }
+    
+    func fetchDiggingList() throws -> [SwiftDataSongModel] {
+        let fetchDescriptor = FetchDescriptor<SwiftDataSongModel>()
+        return try modelContext.fetch(fetchDescriptor)
+    }
+    
+    func saveSongToDiggingList(from mediaItem: SHMediaItem) throws {
+        let songModel = ModelAdapter.fromSHtoSwiftDataSong(mediaItem)
+        
+        modelContext.insert(songModel)
+        try modelContext.save()
+    }
+    
+    func deleteSong(item: SwiftDataSongModel) throws {
+        modelContext.delete(item)
+        try modelContext.save()
+    }
+    
+    func deleteAllSongs() throws {
+        let songs = try fetchDiggingList()
+        for song in songs {
+            modelContext.delete(song)
+        }
         try modelContext.save()
     }
 }

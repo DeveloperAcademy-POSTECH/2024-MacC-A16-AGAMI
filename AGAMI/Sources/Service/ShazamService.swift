@@ -10,7 +10,7 @@ import AVKit
 
 protocol ShazamServiceDelegate: AnyObject {
     @MainActor func shazamService(_ service: ShazamService, didFind match: SHMatch)
-    func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?)
+    @MainActor func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?)
     @MainActor func shazamService(_ service: ShazamService, didFailWithError error: Error)
 }
 
@@ -97,7 +97,9 @@ extension ShazamService: SHSessionDelegate {
     }
 
     func session(_ session: SHSession, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
-        self.delegate?.shazamService(self, didNotFindMatchFor: signature, error: error)
+        Task { @MainActor in
+            self.delegate?.shazamService(self, didNotFindMatchFor: signature, error: error)
+        }
     }
 
     func session(_ session: SHSession, didFailWithError error: Error) {

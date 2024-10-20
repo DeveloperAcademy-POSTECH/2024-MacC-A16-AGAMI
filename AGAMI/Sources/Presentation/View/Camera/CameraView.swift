@@ -38,20 +38,17 @@ struct CameraView: View {
                                 viewModel.zoomInitialize()
                             }
                         )
-                        .border(.yellow)
                 }
                 
                 HStack {
                     captureButton
                     resetPhotoButton
                     switchFlashButton
-                    //                    usedPhotoButton
+//                    usedPhotoButton
                     savePhotoButton
                     changeCameraButton
-                    
                 }
             }
-            
         }
     }
     

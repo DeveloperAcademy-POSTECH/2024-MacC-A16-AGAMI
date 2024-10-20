@@ -55,27 +55,44 @@ final class FirebaseService {
         return playlists
     }
     
-    func uploadImageToFirebase(userID: String, playlistID: String, image: UIImage) async throws {
-        guard let imageData = image.jpegData(compressionQuality: 1.0) else {
-            throw NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])
+//    func uploadImageToFirebase(userID: String, playlistID: String, image: UIImage) async throws {
+//        guard let imageData = image.jpegData(compressionQuality: 1.0) else {
+//            throw NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])
+//        }
+//        
+//        let storageRef = firestorage.reference()
+//            .child("\(userID)/\(playlistID)/image.jpg")
+//        
+//        _ = try await storageRef.putDataAsync(imageData, metadata: nil)
+//        
+//        let downloadURL = try await storageRef.downloadURL()
+//        
+//        let playlistRef = firestore.collection("UserID")
+//            .document(userID)
+//            .collection("PlaylistID")
+//            .document(playlistID)
+//        
+//        try await playlistRef.updateData([
+//            "photoURL": downloadURL.absoluteString
+//        ])
+//        
+//        dump("Firestore에 사진 URL이 성공적으로 업데이트되었습니다!")
+//    }
+    
+    func uploadImageToFirebase(userID: String, image: UIImage) async throws -> String {
+            guard let imageData = image.jpegData(compressionQuality: 1.0) else {
+                throw NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])
+            }
+            
+            let uniqueID = UUID().uuidString
+            
+            let storageRef = firestorage.reference()
+                .child("\(userID)/\(uniqueID)/image.jpg")
+            
+            _ = try await storageRef.putDataAsync(imageData, metadata: nil)
+            
+            let downloadURL = try await storageRef.downloadURL()
+            
+            return downloadURL.absoluteString
         }
-        
-        let storageRef = firestorage.reference()
-            .child("\(userID)/\(playlistID)/image.jpg")
-        
-        _ = try await storageRef.putDataAsync(imageData, metadata: nil)
-        
-        let downloadURL = try await storageRef.downloadURL()
-        
-        let playlistRef = firestore.collection("UserID")
-            .document(userID)
-            .collection("PlaylistID")
-            .document(playlistID)
-        
-        try await playlistRef.updateData([
-            "photoURL": downloadURL.absoluteString
-        ])
-        
-        dump("Firestore에 사진 URL이 성공적으로 업데이트되었습니다!")
-    }
 }

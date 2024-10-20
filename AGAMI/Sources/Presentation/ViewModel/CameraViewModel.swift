@@ -13,6 +13,7 @@ import UIKit
 final class CameraViewModel: ObservableObject {
     private let cameraService: CameraService
     private let session: AVCaptureSession
+    private let firebaseService = FirebaseService()
     
     private var currentZoomFactor: CGFloat = 1.0
     private var lastScale: CGFloat = 1.0
@@ -22,6 +23,7 @@ final class CameraViewModel: ObservableObject {
     var recentImage: UIImage?
     var isPhotoCaptured: Bool = false
     var isFlashOn: Bool = false
+    var imageURL: String?
     
     init() {
         cameraService = CameraService()
@@ -76,5 +78,18 @@ final class CameraViewModel: ObservableObject {
     func savePhoto() {
         guard let image = recentImage, let imageData = image.jpegData(compressionQuality: 1.0) else { return }
         cameraService.savePhoto(imageData)
+    }
+    
+    func savePhotoToFirebase(userID: String) async {
+        guard let image = recentImage else {
+            print("저장할 이미지가 없습니다.")
+            return
+        }
+        
+        do {
+            imageURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
+        } catch {
+            print("이미지 저장 실패: \(error.localizedDescription)")
+        }
     }
 }

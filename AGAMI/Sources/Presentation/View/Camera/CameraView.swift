@@ -9,6 +9,7 @@ import SwiftUI
 import AVFoundation
 
 struct CameraView: View {
+    @Environment(SearchCoordinator.self) private var coordinator
     @State var viewModel = CameraViewModel()
     
     var body: some View {
@@ -53,6 +54,7 @@ struct CameraView: View {
                 .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
             }
         }
+        .toolbar(.hidden, for: .tabBar)
     }
     
     var captureButton: some View {
@@ -86,7 +88,10 @@ struct CameraView: View {
     
     var usedPhotoButton: some View {
         Button {
-            //TODO: - 찍은 사진사용 버튼
+            Task {
+                await viewModel.savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "")
+                coordinator.pop()
+            }
         } label: {
             ZStack {
                 Circle()

@@ -147,4 +147,5 @@ struct CameraView: View {
 
 #Preview {
     CameraView()
+        .environment(SearchCoordinator())
 }

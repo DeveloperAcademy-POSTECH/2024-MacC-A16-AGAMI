@@ -23,6 +23,14 @@ struct CameraView: View {
                     .onAppear {
                         viewModel.configure()
                     }
+                    .gesture(MagnificationGesture()
+                        .onChanged { val in
+                            viewModel.zoom(factor: val)
+                        }
+                        .onEnded { _ in
+                            viewModel.zoomInitialize()
+                        }
+                    )
                 
                 HStack {
                     captureButton
@@ -67,7 +75,7 @@ struct CameraView: View {
     
     var usedPhotoButton: some View {
         Button {
-
+            
         } label: {
             ZStack {
                 Circle()
@@ -88,7 +96,7 @@ struct CameraView: View {
     
     var switchFlashButton: some View {
         Button {
-
+            
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))
@@ -102,7 +110,7 @@ struct CameraView: View {
     
     var savePhotoButton: some View {
         Button {
-
+            
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))

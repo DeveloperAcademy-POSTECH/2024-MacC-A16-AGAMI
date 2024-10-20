@@ -100,4 +100,19 @@ final class CameraService {
             print("카메라 전환 실패: \(error.localizedDescription)")
         }
     }
+    
+    func zoom(_ zoom: CGFloat){
+        let factor = zoom < 1 ? 1 : zoom
+        
+        guard let device = self.videoDeviceInput?.device else { return }
+        
+        do {
+            try device.lockForConfiguration()
+            device.videoZoomFactor = factor
+            device.unlockForConfiguration()
+        }
+        catch {
+            print(error.localizedDescription)
+        }
+    }
 }

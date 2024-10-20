@@ -7,28 +7,39 @@
 
 import SwiftUI
 import AuthenticationServices
-import FirebaseAuth
-import CryptoKit
 
 struct SignInView: View {
-        @State private var viewModel: SignInViewModel = SignInViewModel()
+    @State private var viewModel: SignInViewModel = SignInViewModel()
     
     var body: some View {
-        VStack {
-            Spacer()
+        ZStack(alignment: .top) {
+            Color.primaryColor.ignoresSafeArea()
             
-            SignInWithAppleButton(.continue) { request in
-                viewModel.signInRequest(request: request)
-            } onCompletion: { result in
-                switch result {
-                case .success(let authorization):
-                    viewModel.handleSuccessfulLogin(with: authorization)
-                case .failure(let error):
-                    viewModel.handleLoginError(with: error)
+            VStack(spacing: 0) {
+                Image(.plakeSignIn)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .padding(EdgeInsets(top: 117, leading: 0, bottom: 0, trailing: 0))
+                
+                Spacer()
+                
+                SignInWithAppleButton(.continue) { request in
+                    viewModel.signInRequest(request: request)
+                } onCompletion: { result in
+                    switch result {
+                    case .success(let authorization):
+                        viewModel.handleSuccessfulLogin(with: authorization)
+                    case .failure(let error):
+                        viewModel.handleLoginError(with: error)
+                    }
                 }
+                .frame(height: 54)
+                .padding(EdgeInsets(top: 0, leading: 16, bottom: 120, trailing: 16))
             }
-            .frame(height: 56)
-            .padding(EdgeInsets(top: 0, leading: 20, bottom: 80, trailing: 20))
         }
     }
+}
+
+#Preview {
+    SignInView()
 }

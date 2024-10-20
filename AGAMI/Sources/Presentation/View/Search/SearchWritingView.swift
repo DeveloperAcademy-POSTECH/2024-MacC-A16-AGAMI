@@ -18,7 +18,9 @@ struct SearchWritingView: View {
                 .frame(height: 345)
                 .foregroundStyle(.gray)
                 .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 4)
-            
+                .onTapGesture {
+                    coordinator.push(view: .cameraView)
+                }
             VStack(alignment: .leading, spacing: 0) {
                 TextField("타이틀을 입력하세요", text: $viewModel.userTitle)
                     .font(.system(size: 32, weight: .bold))

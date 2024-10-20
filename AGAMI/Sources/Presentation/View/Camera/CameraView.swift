@@ -18,7 +18,7 @@ struct CameraView: View {
             Color.black.edgesIgnoringSafeArea(.all)
             
             VStack {
-                viewModel.cameraPrewView
+                viewModel.cameraPreView
                     .frame(height: 400)
                     .onAppear {
                         viewModel.configure()

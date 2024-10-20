@@ -73,4 +73,31 @@ final class CameraService {
             print("권한 확인 실패")
         }
     }
+    
+    func changeCamera() {
+        guard let currentPosition = videoDeviceInput else { return }
+        
+        let newPosition: AVCaptureDevice.Position = currentPosition.device.position == .front ? .back : .front
+        
+        guard let newDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPosition) else { return }
+        
+        do {
+            // 새로운 입력 장치로 설정
+            let newVideoDeviceInput = try AVCaptureDeviceInput(device: newDevice)
+            session.beginConfiguration()
+            
+            // 현재 입력 장치 제거
+            session.removeInput(currentPosition)
+            
+            // 새로운 입력 장치 추가
+            if session.canAddInput(newVideoDeviceInput) {
+                session.addInput(newVideoDeviceInput)
+                videoDeviceInput = newVideoDeviceInput // videoDeviceInput 업데이트
+            }
+            
+            session.commitConfiguration()
+        } catch {
+            print("카메라 전환 실패: \(error.localizedDescription)")
+        }
+    }
 }

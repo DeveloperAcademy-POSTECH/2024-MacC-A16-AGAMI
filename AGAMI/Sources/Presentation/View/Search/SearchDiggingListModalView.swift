@@ -1,5 +1,5 @@
 //
-//  SearchPlaylistModalView.swift
+//  SearchDiggingListModalView.swift
 //  AGAMI
 //
 //  Created by Seoyeon Choi on 10/16/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SearchPlaylistModalView: View {
+struct SearchDiggingListModalView: View {
     @Environment(SearchCoordinator.self) var coordinator
     var viewModel: SearchStartViewModel
     
@@ -51,5 +51,5 @@ struct SearchPlaylistModalView: View {
 }
 
 #Preview {
-    SearchPlaylistModalView(viewModel: SearchStartViewModel())
+    SearchDiggingListModalView(viewModel: SearchStartViewModel())
 }

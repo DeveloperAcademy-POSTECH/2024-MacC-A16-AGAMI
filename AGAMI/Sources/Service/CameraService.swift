@@ -8,12 +8,15 @@
 import Foundation
 import AVFoundation
 
-final class CameraService {
+final class CameraService: NSObject {
     var session = AVCaptureSession()
     var videoDeviceInput: AVCaptureDeviceInput?
     var videoDevicePhotoSetting: AVCapturePhotoSettings?
     let output = AVCapturePhotoOutput()
+    var lastScale: CGFloat = 1.0
     
+    var onPhotoCaptured: ((Data) -> Void)?
+
     func setUpCamera() {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
             do {
@@ -74,6 +77,11 @@ final class CameraService {
         }
     }
     
+    func capturePhoto() {
+        let photoSettings = AVCapturePhotoSettings()
+        output.capturePhoto(with: photoSettings, delegate: self)
+    }
+    
     func changeCamera() {
         guard let currentPosition = videoDeviceInput else { return }
         
@@ -114,5 +122,26 @@ final class CameraService {
         catch {
             print(error.localizedDescription)
         }
+    }
+}
+
+extension CameraService: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+//        self.isCameraBusy = true
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        // 카메라 무음
+        AudioServicesDisposeSystemSoundID(1108)
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
+        // 카메라 무음
+        AudioServicesDisposeSystemSoundID(1108)
+    }
+    
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard let imageData = photo.fileDataRepresentation() else { return }
+        onPhotoCaptured?(imageData)
     }
 }

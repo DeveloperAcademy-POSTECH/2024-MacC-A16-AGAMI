@@ -12,11 +12,11 @@ struct ArchivePlaylistDetailView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Text(viewModel.playlistTitle)
+            Text(viewModel.playlist.playlistName)
                 .font(.system(size: 20, weight: .semibold))
                 .padding(.vertical, 11)
             List {
-                ForEach(viewModel.dummyPlaylist) { song in
+                ForEach(viewModel.playlist.songs, id: \.songID) { song in
                     PlaylistRow(song: song)
                 }
                 .onDelete(perform: viewModel.deleteMusic)
@@ -28,6 +28,6 @@ struct ArchivePlaylistDetailView: View {
     }
 }
 
-#Preview {
-    ArchivePlaylistDetailView(viewModel: ArchivePlaylistViewModel())
-}
+// #Preview {
+//     ArchivePlaylistDetailView(viewModel: ArchivePlaylistViewModel())
+// }

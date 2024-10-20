@@ -23,7 +23,7 @@ struct SearchDiggingListModalView: View {
                     Spacer()
                 }) {
                     List {
-                        ForEach(viewModel.diggingList) { song in
+                        ForEach(viewModel.diggingList, id: \.songID) { song in
                             PlaylistRow(song: song)
                         }
                         .onDelete(perform: viewModel.deleteSong)

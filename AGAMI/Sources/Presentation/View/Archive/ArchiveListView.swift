@@ -25,6 +25,9 @@ struct ArchiveListView: View {
             placement: .navigationBarDrawer(displayMode: .always),
             prompt: ""
         )
+        .onAppear {
+            viewModel.fetchPlaylists()
+        }
     }
 }
 
@@ -35,10 +38,10 @@ private struct ArchiveList: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: 12) {
-                ForEach(0..<100, id: \.self) { index in
+                ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                     ArchiveListCell(
                         viewModel: viewModel,
-                        index: index,
+                        playlist: playlist,
                         size: size
                     )
                 }
@@ -59,15 +62,15 @@ private struct ArchiveListCell: View {
     @Environment(ArchiveCoordinator.self) private var coord
 
     let viewModel: ArchiveListViewModel
-    let index: Int
+    let playlist: PlaylistModel
     let size: CGSize
     var verticalSize: CGFloat { size.width / 2 }
 
     var body: some View {
         Button {
-            coord.push(view: .playlistView)
+            coord.push(view: .playlistView(viewModel: .init(playlist: playlist)))
         } label: {
-            AsyncImage(url: viewModel.dummyURL) { image in
+            AsyncImage(url: URL(string: playlist.photoURL)) { image in
                 image
                     .resizable()
                     .clipShape(RoundedRectangle(cornerRadius: 16))

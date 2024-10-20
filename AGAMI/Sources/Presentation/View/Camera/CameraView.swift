@@ -9,6 +9,7 @@ import SwiftUI
 import AVFoundation
 
 struct CameraView: View {
+    @Environment(SearchCoordinator.self) var coordinator
     @State var viewModel = CameraViewModel()
     @State var isFlashOn = true
     @State var capturePhoto = true
@@ -44,7 +45,7 @@ struct CameraView: View {
                     captureButton
                     resetPhotoButton
                     switchFlashButton
-//                    usedPhotoButton
+                    usedPhotoButton
                     savePhotoButton
                     changeCameraButton
                 }
@@ -82,7 +83,9 @@ struct CameraView: View {
     
     var usedPhotoButton: some View {
         Button {
-            
+            //image 넘기기
+            //넘길 이미지: viewModel.recentImage
+            coordinator.pop()
         } label: {
             ZStack {
                 Circle()

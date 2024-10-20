@@ -7,17 +7,22 @@
 
 import Foundation
 import AVFoundation
+import UIKit
 
 final class CameraService: NSObject {
     var session = AVCaptureSession()
     var videoDeviceInput: AVCaptureDeviceInput?
-    var videoDevicePhotoSetting: AVCapturePhotoSettings?
     let output = AVCapturePhotoOutput()
     var lastScale: CGFloat = 1.0
     
+    var currentCameraPosition: AVCaptureDevice.Position = .back
     var onPhotoCaptured: ((Data) -> Void)?
-
+    
     func setUpCamera() {
+        if let currentInput = videoDeviceInput {
+            session.removeInput(currentInput)
+        }
+        
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
             do {
                 videoDeviceInput = try AVCaptureDeviceInput(device: device)
@@ -90,17 +95,15 @@ final class CameraService: NSObject {
         guard let newDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPosition) else { return }
         
         do {
-            // 새로운 입력 장치로 설정
             let newVideoDeviceInput = try AVCaptureDeviceInput(device: newDevice)
             session.beginConfiguration()
-            
-            // 현재 입력 장치 제거
             session.removeInput(currentPosition)
             
-            // 새로운 입력 장치 추가
             if session.canAddInput(newVideoDeviceInput) {
                 session.addInput(newVideoDeviceInput)
                 videoDeviceInput = newVideoDeviceInput // videoDeviceInput 업데이트
+                
+                currentCameraPosition = newPosition
             }
             
             session.commitConfiguration()
@@ -127,7 +130,7 @@ final class CameraService: NSObject {
 
 extension CameraService: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-//        self.isCameraBusy = true
+        //        self.isCameraBusy = true
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
@@ -142,6 +145,13 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let imageData = photo.fileDataRepresentation() else { return }
+        
+        var capturedImage = UIImage(data: imageData)
+        
+        if currentCameraPosition == .front {
+            capturedImage = capturedImage?.withHorizontallyFlippedOrientation()
+        }
+        
         onPhotoCaptured?(imageData)
     }
 }

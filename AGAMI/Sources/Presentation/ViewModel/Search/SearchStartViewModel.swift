@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 import ShazamKit
 
 @MainActor
@@ -34,20 +35,6 @@ final class SearchStartViewModel: NSObject {
         shazamService.stopRecognition()
     }
     
-    private func transform(_ item: SHMediaItem) -> SongModel {
-        var artworkURL: String = ""
-        if let url = item.artworkURL {
-            artworkURL = url.absoluteString
-        }
-        
-        return SwiftDataSongModel(
-            songID: item.appleMusicID ?? "",
-            title: item.title ?? "",
-            artist: item.artist ?? "",
-            albumCoverURL: artworkURL
-        )
-    }
-    
     func searchButtonTapped() {
         currentItem = nil
         startRecognition()
@@ -74,7 +61,7 @@ extension SearchStartViewModel: ShazamServiceDelegate {
         shazamStatus = .found
         
         if let item = currentItem {
-            let diggingData = transform(item)
+            let diggingData = ModelAdapter.fromSHtoSwiftDataSong(item)
             diggingList.append(diggingData)
         }
     }
@@ -82,7 +69,7 @@ extension SearchStartViewModel: ShazamServiceDelegate {
     func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
         dump(#function)
         dump("didNotFindMatch | signature: \(signature) | error: \(String(describing: error))")
-            shazamStatus = .failed
+        shazamStatus = .failed
     }
     
     func shazamService(_ service: ShazamService, didFailWithError error: any Error) {

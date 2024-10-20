@@ -7,6 +7,7 @@
 
 import SwiftUICore
 import AVFoundation
+import UIKit
 
 @Observable
 final class CameraViewModel: ObservableObject {
@@ -17,6 +18,9 @@ final class CameraViewModel: ObservableObject {
     
     let cameraPreView: CameraPreview
     
+    var recentImage: UIImage?
+    var isPhotoCaptured: Bool = false
+    
     init() {
         cameraService = CameraService()
         session = cameraService.session
@@ -25,6 +29,15 @@ final class CameraViewModel: ObservableObject {
     
     func configure() {
         cameraService.requestAndCheckPermission()
+    }
+    
+    func capturePhoto() {
+        cameraService.capturePhoto()
+    }
+    
+    func resetPhoto() {
+        isPhotoCaptured = false
+        recentImage = nil
     }
     
     func changeCamera() {

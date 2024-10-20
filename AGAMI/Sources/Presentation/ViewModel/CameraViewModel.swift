@@ -24,4 +24,12 @@ final class CameraViewModel: ObservableObject {
     func configure() {
         cameraService.requestAndCheckPermission()
     }
+    
+    func changeCamera() {
+        cameraService.changeCamera()
+    }
+    
+    func switchFlash() {
+        
+    }
 }

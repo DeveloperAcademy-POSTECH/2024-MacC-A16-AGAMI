@@ -13,6 +13,7 @@ import UIKit
 final class CameraViewModel: ObservableObject {
     private let cameraService: CameraService
     private let session: AVCaptureSession
+    
     private var currentZoomFactor: CGFloat = 1.0
     private var lastScale: CGFloat = 1.0
     
@@ -20,6 +21,7 @@ final class CameraViewModel: ObservableObject {
     
     var recentImage: UIImage?
     var isPhotoCaptured: Bool = false
+    var isFlashOn: Bool = false
     
     init() {
         cameraService = CameraService()
@@ -39,7 +41,7 @@ final class CameraViewModel: ObservableObject {
     }
     
     func capturePhoto() {
-        cameraService.capturePhoto()
+        cameraService.capturePhoto(withFlash: isFlashOn)
     }
     
     func resetPhoto() {
@@ -55,7 +57,7 @@ final class CameraViewModel: ObservableObject {
     }
     
     func switchFlash() {
-        
+        isFlashOn.toggle()
     }
     
     func zoom(factor: CGFloat) {
@@ -69,5 +71,10 @@ final class CameraViewModel: ObservableObject {
     
     func zoomInitialize() {
         lastScale = 1.0
+    }
+    
+    func savePhoto() {
+        guard let image = recentImage, let imageData = image.jpegData(compressionQuality: 1.0) else { return }
+        cameraService.savePhoto(imageData)
     }
 }

@@ -82,9 +82,17 @@ final class CameraService: NSObject {
         }
     }
     
-    func capturePhoto() {
+    func capturePhoto(withFlash isOn: Bool) {
         let photoSettings = AVCapturePhotoSettings()
+        photoSettings.flashMode = isOn ? .on : .off
         output.capturePhoto(with: photoSettings, delegate: self)
+    }
+    
+    func savePhoto(_ imageData: Data) {
+        guard let image = UIImage(data: imageData) else { return }
+                
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+        print("사진 저장")
     }
     
     func changeCamera() {

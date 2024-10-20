@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SearchPlaylistModalView: View {
+    @Environment(SearchCoordinator.self) var coordinator
     var viewModel: SearchStartViewModel
     
     var body: some View {
@@ -32,6 +33,16 @@ struct SearchPlaylistModalView: View {
                 }
             }
             .navigationTitle("플레이크 리스트")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing, content: {
+                    Button(action: {
+                        coordinator.dismissSheet()
+                        coordinator.push(view: .writingView)
+                    }, label: {
+                        Text("Next")
+                    })
+                })
+            }
         }
         .onDisappear {
             viewModel.stopRecognition()

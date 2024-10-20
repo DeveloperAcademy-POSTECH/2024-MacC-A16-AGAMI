@@ -24,19 +24,12 @@ struct SearchStartView: View {
                     .frame(width: 260, height: 100)
             }
         }
-        .task {
-            viewModel.showSheet = true
+        .onAppear {
+            coordinator.presentSheet(.diggingModalView(viewModel: viewModel),
+                                     onDismiss: { viewModel.shazamStatus = .idle })
         }
-        .sheet(isPresented: $viewModel.showSheet, onDismiss: {
-            viewModel.shazamStatus = .idle
-        }) {
-            SearchPlaylistModalView(viewModel: viewModel)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .presentationDetents([.height(60), .medium, .large])
-                .presentationCornerRadius(20)
-                .presentationBackgroundInteraction(.enabled(upThrough: .large))
-                .interactiveDismissDisabled()
-                .bottomMaskForSheet()
+        .onDisappear {
+            coordinator.dismissSheet()
         }
         .navigationTitle("Plaking")
     }

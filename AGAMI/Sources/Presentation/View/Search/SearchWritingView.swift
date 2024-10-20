@@ -52,14 +52,14 @@ struct SearchWritingView: View {
         .onTapGesture {
             hideKeyboard()
         }
-        .navigationTitle("타이틀")
+        .navigationTitle("플리카빙")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     coordinator.push(view: .cameraView)
                 } label: {
-                    Text("완료")
+                    Text("저장")
                 }
             }
         }

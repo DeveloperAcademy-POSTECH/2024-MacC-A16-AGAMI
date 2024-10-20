@@ -21,8 +21,9 @@ struct CameraView: View {
                 if viewModel.isPhotoCaptured, let recentImage = viewModel.recentImage {
                     Image(uiImage: recentImage)
                         .resizable()
-                        .scaledToFit()
-//                        .frame(height: 400)
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 400)
+                        .clipped()
                 } else {
                     viewModel.cameraPreView
                         .frame(height: 400)
@@ -56,7 +57,7 @@ struct CameraView: View {
     
     var captureButton: some View {
         Button {
-            
+            viewModel.capturePhoto()
         } label: {
             Circle()
                 .foregroundColor(.white)
@@ -71,7 +72,7 @@ struct CameraView: View {
     
     var resetPhotoButton: some View {
         Button {
-            
+            viewModel.resetPhoto()
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))

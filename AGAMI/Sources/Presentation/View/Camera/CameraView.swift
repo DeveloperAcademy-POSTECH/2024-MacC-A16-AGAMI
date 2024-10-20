@@ -39,7 +39,6 @@ struct CameraView: View {
     
     var captureButton: some View {
         Button {
-            //TODO: - 사진 찍는 버튼
             
         } label: {
             Circle()
@@ -55,7 +54,6 @@ struct CameraView: View {
     
     var retryCaptureButton: some View {
         Button {
-            //TODO: - 누르면 사진 다시 찍게하기
             
         } label: {
             Circle()
@@ -69,7 +67,7 @@ struct CameraView: View {
     
     var usedPhotoButton: some View {
         Button {
-            //TODO: - 찍은 사진사용 버튼
+
         } label: {
             ZStack {
                 Circle()
@@ -90,7 +88,7 @@ struct CameraView: View {
     
     var switchFlashButton: some View {
         Button {
-            //TODO: - 플래시 모드 on/off
+
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))
@@ -104,7 +102,7 @@ struct CameraView: View {
     
     var savePhotoButton: some View {
         Button {
-            //TODO: - 누르면 사진 저장되게 맹들기
+
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))
@@ -117,7 +115,7 @@ struct CameraView: View {
     
     var flipCameraButton: some View {
         Button {
-            //TODO: - 카메라 전/후면 돌리기
+            viewModel.changeCamera()
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))
@@ -128,8 +126,6 @@ struct CameraView: View {
         }
     }
 }
-
-
 
 #Preview {
     CameraView()

@@ -75,7 +75,7 @@ final class SearchCoordinator {
         case .writingView:
             SearchWritingView()
         case .cameraView:
-            EmptyView()
+            CameraView()
         }
     }
     

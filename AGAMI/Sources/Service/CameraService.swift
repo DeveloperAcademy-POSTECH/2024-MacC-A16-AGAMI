@@ -120,7 +120,7 @@ final class CameraService: NSObject {
         }
     }
     
-    func zoom(_ zoom: CGFloat){
+    func zoom(_ zoom: CGFloat) {
         let factor = zoom < 1 ? 1 : zoom
         
         guard let device = self.videoDeviceInput?.device else { return }
@@ -129,8 +129,7 @@ final class CameraService: NSObject {
             try device.lockForConfiguration()
             device.videoZoomFactor = factor
             device.unlockForConfiguration()
-        }
-        catch {
+        } catch {
             print(error.localizedDescription)
         }
     }
@@ -152,6 +151,7 @@ extension CameraService: AVCapturePhotoCaptureDelegate {
     }
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        // 카메라 좌우반전 아직 미구현
         guard let imageData = photo.fileDataRepresentation() else { return }
         
         var capturedImage = UIImage(data: imageData)

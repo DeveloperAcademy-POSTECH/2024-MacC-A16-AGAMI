@@ -79,12 +79,10 @@ extension SearchStartViewModel: ShazamServiceDelegate {
         }
     }
     
-    nonisolated func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
+    func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
         dump(#function)
         dump("didNotFindMatch | signature: \(signature) | error: \(String(describing: error))")
-        Task { @MainActor in
             shazamStatus = .failed
-        }
     }
     
     func shazamService(_ service: ShazamService, didFailWithError error: any Error) {

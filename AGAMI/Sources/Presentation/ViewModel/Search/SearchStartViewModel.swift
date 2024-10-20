@@ -17,6 +17,7 @@ final class SearchStartViewModel: NSObject {
     var diggingList: [SongModel] = []
     
     var shazamStatus: ShazamStatus = .idle
+    var showSheet: Bool = false
     
     override init() {
         super.init()

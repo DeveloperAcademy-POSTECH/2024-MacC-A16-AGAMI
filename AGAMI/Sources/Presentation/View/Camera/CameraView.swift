@@ -103,7 +103,7 @@ struct CameraView: View {
     
     var switchFlashButton: some View {
         Button {
-            
+            viewModel.switchFlash()
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))
@@ -117,7 +117,7 @@ struct CameraView: View {
     
     var savePhotoButton: some View {
         Button {
-            
+            viewModel.savePhoto()
         } label: {
             Circle()
                 .foregroundColor(Color.gray.opacity(0.2))

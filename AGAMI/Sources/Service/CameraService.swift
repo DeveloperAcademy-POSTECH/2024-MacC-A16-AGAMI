@@ -10,15 +10,21 @@ import AVFoundation
 
 final class CameraService {
     var session = AVCaptureSession()
-    var videoDeviceInput: AVCaptureDeviceInput!
+    var videoDeviceInput: AVCaptureDeviceInput?
+    var videoDevicePhotoSetting: AVCapturePhotoSettings?
     let output = AVCapturePhotoOutput()
     
     func setUpCamera() {
         if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) {
             do {
                 videoDeviceInput = try AVCaptureDeviceInput(device: device)
-                if session.canAddInput(videoDeviceInput) {
-                    session.addInput(videoDeviceInput)
+                
+                guard let videoInput = videoDeviceInput else { return }
+                
+                if session.canAddInput(videoInput) {
+                    session.addInput(videoInput)
+                } else {
+                    print("비디오 입력 에러")
                 }
                 
                 if session.canAddOutput(output) {

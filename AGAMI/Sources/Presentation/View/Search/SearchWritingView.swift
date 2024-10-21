@@ -13,14 +13,24 @@ struct SearchWritingView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            RoundedRectangle(cornerRadius: 10)
-                .padding(24)
-                .frame(height: 345)
-                .foregroundStyle(.gray)
-                .shadow(color: Color.black.opacity(0.25), radius: 8, x: 0, y: 4)
-                .onTapGesture {
-                    coordinator.push(view: .cameraView)
-                }
+            AsyncImage(url: URL(string: viewModel.photoUrl)) { image in
+                image
+                    .resizable()
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .aspectRatio(1, contentMode: .fit)
+                    .padding(.horizontal, 20)
+                    .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+            } placeholder: {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(.white)
+                    .aspectRatio(1, contentMode: .fit)
+                    .padding(.horizontal, 20)
+                    .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+            }
+            .onTapGesture {
+                coordinator.push(view: .cameraView(viewModel: viewModel))
+            }
+            
             VStack(alignment: .leading, spacing: 0) {
                 TextField("타이틀을 입력하세요", text: $viewModel.userTitle)
                     .font(.system(size: 32, weight: .bold))

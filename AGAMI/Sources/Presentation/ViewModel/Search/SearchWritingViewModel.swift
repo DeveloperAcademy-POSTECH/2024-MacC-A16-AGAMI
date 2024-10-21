@@ -15,6 +15,7 @@ final class SearchWritingViewModel {
     var playlist = SwiftDataPlaylistModel()
     var userTitle: String = ""
     var userDescription: String = ""
+    var photoUrl: String = ""
     var diggingList: [SongModel] = []
     
     init() {
@@ -31,15 +32,16 @@ final class SearchWritingViewModel {
     
     func savedPlaylist() async {
         do {
-            // 이미지 url, 경도, 위도 저장 필요
+            // 경도, 위도 저장 필요
             try persistenceService.createPlaylist(playlistName: userTitle,
                                                   playlistDescription: userDescription,
-                                                  photoURL: "",
+                                                  photoURL: photoUrl,
                                                   latitude: 1.0,
                                                   longitude: 1.0)
             playlist.playlistName = userTitle
             playlist.playlistDescription = userDescription
             playlist.songs = try persistenceService.fetchDiggingList()
+            playlist.photoURL = photoUrl
             try await firebaseService.savePlaylistToFirebase(userID: FirebaseAuthService.currentUID ?? "",
                                                              playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
         } catch {
@@ -54,5 +56,9 @@ final class SearchWritingViewModel {
         } catch {
             print("Failed to clear songs: \(error)")
         }
+    }
+    
+    func savePhotoUrl(photoUrl: String) {
+        self.photoUrl = photoUrl
     }
 }

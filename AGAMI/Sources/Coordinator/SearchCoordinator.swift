@@ -7,11 +7,48 @@
 
 import SwiftUI
 
-enum SearchView: Hashable {
+enum SearchView: Hashable, Identifiable {
+    var id: String {
+        switch self {
+        case .startView:
+            return "startView"
+        case .writingView:
+            return "writingView"
+        case .cameraView:
+            return "cameraView"
+        }
+    }
+    
     case startView
     case writingView
-    case cameraView
+    case cameraView(viewModel: SearchWritingViewModel)
+    
+    // Hashable 직접 구현
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .startView:
+            hasher.combine("startView")
+        case .writingView:
+            hasher.combine("writingView")
+        case .cameraView:
+            hasher.combine("cameraView")
+            // 여기서 viewModel 자체를 해시하지 않음
+        }
+    }
+    
+    static func == (lhs: SearchView, rhs: SearchView) -> Bool {
+        switch (lhs, rhs) {
+        case (.startView, .startView),
+            (.writingView, .writingView):
+            return true
+        case (.cameraView, .cameraView):
+            return true  // 여기서 viewModel은 비교하지 않음
+        default:
+            return false
+        }
+    }
 }
+
 
 enum SearchSheet: Identifiable {
     var id: String {
@@ -78,8 +115,8 @@ final class SearchCoordinator {
             SearchStartView()
         case .writingView:
             SearchWritingView()
-        case .cameraView:
-            CameraView()
+        case .cameraView(let viewModel):
+            CameraView(searchWritingViewModel: viewModel)
         }
     }
     

@@ -11,6 +11,7 @@ import AVFoundation
 struct CameraView: View {
     @Environment(SearchCoordinator.self) private var coordinator
     @State var viewModel = CameraViewModel()
+    var searchWritingViewModel: SearchWritingViewModel
     
     var body: some View {
         ZStack {
@@ -89,7 +90,9 @@ struct CameraView: View {
     var usedPhotoButton: some View {
         Button {
             Task {
-                await viewModel.savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "")
+                if let imageUrl = await viewModel.savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") {
+                    searchWritingViewModel.savePhotoUrl(photoUrl: imageUrl)
+                }
                 coordinator.pop()
             }
         } label: {
@@ -155,6 +158,6 @@ struct CameraView: View {
 }
 
 #Preview {
-    CameraView()
+    CameraView(searchWritingViewModel: SearchWritingViewModel())
         .environment(SearchCoordinator())
 }

@@ -80,16 +80,14 @@ final class CameraViewModel: ObservableObject {
         cameraService.savePhoto(imageData)
     }
     
-    func savePhotoToFirebase(userID: String) async {
-        guard let image = recentImage else {
-            print("저장할 이미지가 없습니다.")
-            return
+    func savePhotoToFirebase(userID: String) async -> String? {
+        if let image = recentImage {
+            do {
+                imageURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
+            } catch {
+                print("이미지 저장 실패: \(error.localizedDescription)")
+            }
         }
-        
-        do {
-            imageURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
-        } catch {
-            print("이미지 저장 실패: \(error.localizedDescription)")
-        }
+        return imageURL
     }
 }

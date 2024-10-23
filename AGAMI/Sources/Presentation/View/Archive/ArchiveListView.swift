@@ -11,22 +11,91 @@ struct ArchiveListView: View {
     @State var viewModel: ArchiveListViewModel = ArchiveListViewModel()
 
     var body: some View {
+        ArchiveListHeader(viewModel: viewModel)
         GeometryReader {
             let size = $0.size
-            
+
             ArchiveList(
                 viewModel: viewModel,
                 size: size
             )
         }
         .safeAreaPadding(.horizontal, 16)
-        .searchable(
-            text: $viewModel.searchText,
-            placement: .navigationBarDrawer(displayMode: .always),
-            prompt: ""
-        )
         .onAppear {
             viewModel.fetchPlaylists()
+        }
+        .toolbarBackground(.visible, for: .tabBar)
+        .confirmationDialog("", isPresented: $viewModel.isDialogPresented) {
+            ConfirmationDialogActions(viewModel: viewModel)
+        }
+    }
+}
+
+private struct ArchiveListHeader: View {
+    var viewModel: ArchiveListViewModel
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .bottom, spacing: 0) {
+                Image(.archiveLogo)
+                Spacer()
+                Button {
+                    viewModel.isDialogPresented = true
+                } label: {
+                    Image(.mypageIcon)
+                }
+            }
+            .padding(
+                EdgeInsets(
+                    top: 24,
+                    leading: 24,
+                    bottom: 12,
+                    trailing: 20
+                )
+            )
+            ArchiveSearchBar(viewModel: viewModel)
+        }
+    }
+}
+
+private struct ArchiveSearchBar: View {
+    @Bindable var viewModel: ArchiveListViewModel
+    @FocusState var isFocused: Bool
+
+    var body: some View {
+        ZStack {
+            TextField("당신의 아카이브", text: $viewModel.searchText)
+                .padding(
+                    EdgeInsets(
+                        top: 10,
+                        leading: 12,
+                        bottom: 10,
+                        trailing: 12
+                    )
+                )
+                .focused($isFocused)
+                .background(Color(rgbaHex: "#DDDDDF99"))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.accentColor, lineWidth: isFocused ? 1 : 0)
+                )
+                .padding(.horizontal, 8)
+                .padding(.vertical, 8)
+
+            HStack {
+                Spacer()
+                Button {
+                    if isFocused {
+                        viewModel.clearSearchText()
+                        isFocused = false
+                    }
+                } label: {
+                    Image(systemName: isFocused ? "x.circle.fill" : "magnifyingglass")
+                        .foregroundColor(Color(rgbaHex: "#88888AB2"))
+                        .padding(.trailing, 20)
+                }
+            }
         }
     }
 }
@@ -64,28 +133,37 @@ private struct ArchiveListCell: View {
     let viewModel: ArchiveListViewModel
     let playlist: PlaylistModel
     let size: CGSize
-    var verticalSize: CGFloat { size.width / 2 }
+    var verticalSize: CGFloat { size.width * 176 / 377 }
 
     var body: some View {
         Button {
             coord.push(view: .playlistView(viewModel: .init(playlist: playlist)))
         } label: {
-            AsyncImage(url: URL(string: playlist.photoURL)) { image in
-                image
+            ZStack {
+                AsyncImage(url: URL(string: playlist.photoURL)) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .clipped()
+                } placeholder: {
+                    Rectangle()
+                        .fill(.white)
+                }
+                .frame(width: size.width, height: verticalSize)
+                .shadow(radius: 10, x: 2, y: 4)
+                Image(.archiveCellOverlay)
                     .resizable()
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-            } placeholder: {
-                Rectangle()
-                    .fill(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
             }
-            .frame(width: size.width, height: verticalSize)
-            .shadow(radius: 10, x: 2, y: 4)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
     }
 }
 
-#Preview {
-    ArchiveListView()
-        .environment(ArchiveCoordinator())
+private struct ConfirmationDialogActions: View {
+    var viewModel: ArchiveListViewModel
+    var body: some View {
+        Button("로그아웃", role: .destructive) {
+            viewModel.logout()
+        }
+    }
 }

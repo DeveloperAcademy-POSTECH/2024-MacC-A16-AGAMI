@@ -9,6 +9,9 @@ import Foundation
 
 @Observable
 final class ArchiveListViewModel {
+    private let firebaseService = FirebaseService()
+    private let authService = FirebaseAuthService()
+
     var playlists: [PlaylistModel] = []
     private var unfilteredPlaylists: [PlaylistModel] = []
 
@@ -17,8 +20,7 @@ final class ArchiveListViewModel {
             filterPlaylists()
         }
     }
-
-    private let firebaseService = FirebaseService()
+    var isDialogPresented: Bool = false
 
     func fetchPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
@@ -34,6 +36,21 @@ final class ArchiveListViewModel {
                 dump("playlist를 가져오는 데 실패했습니다. \(error.localizedDescription)")
             }
 
+        }
+    }
+
+    func clearSearchText() {
+        searchText = ""
+    }
+
+    func logout() {
+        authService.signOut { result in
+            switch result {
+            case .success:
+                UserDefaults.standard.removeObject(forKey: "isSignedIn")
+            case .failure(let err):
+                dump(err.localizedDescription)
+            }
         }
     }
 

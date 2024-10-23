@@ -9,14 +9,14 @@ import SwiftUI
 import FirebaseAuth
 
 struct HomeView: View {
-    @State private var selectedTab: TabSelection = .search
+    @State private var viewModel: HomeViewModel = .init()
     @State var archiveCoord: ArchiveCoordinator = .init()
     @State var searchCoordinator: SearchCoordinator = .init()
-    
+
     var body: some View {
         if #available(iOS 18.0, *) {
-            TabView(selection: $selectedTab) {
-                Tab("Search", systemImage: "headphones", value: .search) {
+            TabView(selection: $viewModel.selectedTab) {
+                Tab("Plake", systemImage: "headphones", value: .plake) {
                     NavigationStack(path: $searchCoordinator.path) {
                         searchCoordinator.build(view: .startView)
                             .navigationDestination(for: SearchView.self) { view in
@@ -32,7 +32,7 @@ struct HomeView: View {
                     .environment(searchCoordinator)
                 }
 
-                Tab("Archive", systemImage: "archivebox.fill", value: .archive) {
+                Tab("Plakive", systemImage: "archivebox.fill", value: .plakive) {
                     NavigationStack(path: $archiveCoord.path) {
                         archiveCoord.build(view: .listView)
                             .navigationDestination(for: ArchiveView.self) { view in
@@ -47,8 +47,8 @@ struct HomeView: View {
                     }
                     .environment(archiveCoord)
                 }
-                
-                Tab("Map View", systemImage: "map.fill", value: .map) {
+
+                Tab("Map", systemImage: "map.fill", value: .map) {
                     MapView()
                 }
             }
@@ -69,12 +69,12 @@ struct HomeView: View {
                 .environment(searchCoordinator)
                 .tabItem {
                     VStack {
-                        Text("Search")
+                        Text("Plake")
                         Image(systemName: "headphones")
                     }
                 }
-                .tag(TabSelection.search)
-                
+                .tag(TabSelection.plake)
+
                 NavigationStack(path: $archiveCoord.path) {
                     archiveCoord.build(view: .listView)
                         .navigationDestination(for: ArchiveView.self) { view in
@@ -90,30 +90,22 @@ struct HomeView: View {
                 .environment(archiveCoord)
                 .tabItem {
                     VStack {
-                        Text("Archive")
+                        Text("Plakive")
                         Image(systemName: "archivebox.fill")
                     }
                 }
-                .tag(TabSelection.archive)
+                .tag(TabSelection.plakive)
 
                 MapView()
                     .tabItem {
                         VStack {
-                            Text("Map View")
+                            Text("Map")
                             Image(systemName: "map.fill")
                         }
                     }
                     .tag(TabSelection.map)
             }
         }
-    }
-}
-
-extension HomeView {
-    enum TabSelection: Hashable {
-        case search
-        case archive
-        case map
     }
 }
 

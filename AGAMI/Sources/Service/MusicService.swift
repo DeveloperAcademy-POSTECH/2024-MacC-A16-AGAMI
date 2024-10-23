@@ -27,14 +27,11 @@ final class MusicService {
         }
     }
     
-    func createPlaylist(name: String, description: String) async throws -> Playlist {
+    func createPlaylist(name: String, description: String) async throws {
         try await requestAuthorization()
         
         let library = MusicLibrary.shared
-        let newPlaylist = try await library.createPlaylist(name: name, description: description)
-        self.playlist = newPlaylist
-        
-        return newPlaylist
+        self.playlist = try await library.createPlaylist(name: name, description: description)
     }
     
     func getCurrentPlaylistUrl() -> String? {
@@ -88,3 +85,4 @@ enum MusicServiceError: Error {
     case playlistNotFound
     case songNotFound
 }
+

@@ -9,11 +9,27 @@ import SwiftUI
 
 struct ArchivePlaylistView: View {
     @State var viewModel: ArchivePlaylistViewModel
-    
+    @Environment(\.openURL) var openURL
+
     var body: some View {
-        VStack(spacing: 0) {
-            PlaylistImageCellView(viewModel: viewModel)
-            PlaylistContentsView(viewModel: viewModel)
+        ZStack {
+            VStack(spacing: 0) {
+                Button("appleMusic") {
+                    viewModel.exportPlaylistToAppleMusic()
+                }
+                Button("url") {
+                    if let url = viewModel.getCurrentPlaylistURL() {
+                        openURL(url)
+                    }
+                }
+                PlaylistImageCellView(viewModel: viewModel)
+                PlaylistContentsView(viewModel: viewModel)
+            }
+            .blur(radius: viewModel.isExporting ? 10 : 0)
+
+            if viewModel.isExporting {
+                ProgressView()
+            }
         }
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
     }

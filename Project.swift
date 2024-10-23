@@ -14,7 +14,10 @@ let fonts = [
 
 let project = Project(
     name: "AGAMI",
-    settings: Settings.settings(base: ["OTHER_LDFLAGS":["-all_load -Objc"]]),
+    settings: Settings.settings(base: [
+        "OTHER_LDFLAGS": ["-all_load -Objc"],
+        "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor"
+    ]),
     targets: [
         .target(
             name: "AGAMI",

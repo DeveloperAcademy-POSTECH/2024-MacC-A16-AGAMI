@@ -1,5 +1,17 @@
 import ProjectDescription
 
+let fonts = [
+    "Pretendard-Thin.otf",
+    "Pretendard-ExtraLight.otf",
+    "Pretendard-Light.otf",
+    "Pretendard-Regular.otf",
+    "Pretendard-Medium.otf",
+    "Pretendard-SemiBold.otf",
+    "Pretendard-Bold.otf",
+    "Pretendard-ExtraBold.otf",
+    "Pretendard-Black.otf"
+]
+
 let project = Project(
     name: "AGAMI",
     settings: Settings.settings(base: ["OTHER_LDFLAGS":["-all_load -Objc"]]),
@@ -20,13 +32,13 @@ let project = Project(
                     "NSMicrophoneUsageDescription": "Shazam 음악 인식을 위해 마이크에 접근합니다.",
                     "NSPhotoLibraryUsageDescription": "플레이리스트 사진 추가를 위해 사진 라이브러리에 접근합니다.",
                     "NSCameraUsageDescription": "플레이리스트 사진 추가를 위해 카메라에 접근합니다.",
-                    "Privacy - Location When In Use Usage Description": "위치 권한 받아오기.",
                     "NSLocationUsageDescription": "근처 장소 탐색을 위해 사용자의 위치 정보에 접근합니다.",
                     "NSLocationWhenInUseUsageDescription": "근처 장소 탐색을 위해 사용자의 위치 정보에 접근합니다.",
                     "UISupportedInterfaceOrientations": [
                         "UIInterfaceOrientationPortrait",
                         "UIInterfaceOrientationPortraitUpsideDown"
-                    ]
+                    ],
+                    "UIAppFonts": .array(fonts.map { .string($0) })
                 ]
             ),
             sources: ["AGAMI/Sources/**"],

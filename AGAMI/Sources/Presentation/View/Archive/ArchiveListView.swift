@@ -181,6 +181,7 @@ private struct ArchiveListCell: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .contextMenu {
             ContextMenuItems(viewModel: viewModel, playlist: playlist)
+
         }
     }
 }

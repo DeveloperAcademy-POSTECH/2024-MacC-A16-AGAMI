@@ -1,8 +1,24 @@
 {
   "images" : [
     {
+<<<<<<< HEAD
       "filename" : "mypageIcon.svg",
       "idiom" : "universal"
+=======
+      "filename" : "mypageIcon.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "mypageIcon@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "mypageIcon@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+>>>>>>> 5d3a9a3 ([#40] ArchiveListView UI 변경 대응 | 로그아웃)
     }
   ],
   "info" : {

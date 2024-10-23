@@ -26,17 +26,6 @@ struct MapView: View {
                     UserAnnotation()
                 }
                 .mapStyle(.standard)
-                
-                Button {
-                    viewModel.addCurrentLocation()
-
-                } label: {
-                    Text("좌표찍기")
-                        .padding()
-                        .background(.white)
-                        .foregroundStyle(.black)
-                        .cornerRadius(10)
-                }
             }
             .onAppear {
                 viewModel.requestCurrentLocation()

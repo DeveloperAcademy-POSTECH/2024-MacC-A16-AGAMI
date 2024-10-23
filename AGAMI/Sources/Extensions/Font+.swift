@@ -27,3 +27,45 @@ enum PretendardWeight: String {
         return self.rawValue
     }
 }
+
+struct PretendardFontTestView: View {
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+                Group {
+                    Text("Pretendard Thin")
+                        .font(.pretendard(weight: .thin, size: 16))
+
+                    Text("Pretendard ExtraLight")
+                        .font(.pretendard(weight: .extraLight, size: 16))
+
+                    Text("Pretendard Light")
+                        .font(.pretendard(weight: .light, size: 16))
+
+                    Text("Pretendard Regular")
+                        .font(.pretendard(weight: .regular, size: 16))
+
+                    Text("Pretendard Medium")
+                        .font(.pretendard(weight: .medium, size: 16))
+
+                    Text("Pretendard SemiBold")
+                        .font(.pretendard(weight: .semiBold, size: 16))
+                        .background(Color.accentColor)
+
+                    Text("Pretendard Bold")
+                        .font(.pretendard(weight: .bold, size: 16))
+
+                    Text("Pretendard ExtraBold")
+                        .font(.pretendard(weight: .extraBold, size: 16))
+
+                    Text("Pretendard Black")
+                        .font(.pretendard(weight: .black, size: 16))
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    PretendardFontTestView()
+}

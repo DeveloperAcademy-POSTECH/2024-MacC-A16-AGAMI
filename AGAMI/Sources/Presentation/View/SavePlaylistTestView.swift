@@ -15,6 +15,7 @@ struct SavePlaylistTestView: View {
     @State private var photoURL: String = ""
     @State private var latitude: String = "36.0126"
     @State private var longitude: String = "129.3235"
+    @State private var streetAddress: String = ""
     @State private var feedbackMessage: String = ""
 
     var body: some View {

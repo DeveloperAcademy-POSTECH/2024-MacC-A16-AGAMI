@@ -11,7 +11,8 @@ import MusicKit
 
 final class MusicService {
     private var playlist: Playlist?
-    
+    private var songs: [Song] = []
+
     func requestAuthorization() async throws {
         let status = MusicAuthorization.currentStatus
         switch status {
@@ -26,14 +27,12 @@ final class MusicService {
             throw MusicAuthorizationError.denied
         }
     }
-    
+
     func createPlaylist(name: String, description: String) async throws {
         try await requestAuthorization()
-        
-        let library = MusicLibrary.shared
-        self.playlist = try await library.createPlaylist(name: name, description: description)
+        self.playlist = try await MusicLibrary.shared.createPlaylist(name: name, description: description, items: self.songs)
     }
-    
+
     func getCurrentPlaylistUrl() -> String? {
         return playlist?.url?.absoluteString
     }
@@ -65,15 +64,13 @@ final class MusicService {
         
         return song
     }
-    
-    func addSongToPlaylist(song: Song) async throws {
-        try await requestAuthorization()
-        
-        guard let playlist = playlist else {
-            throw MusicServiceError.playlistNotFound
-        }
 
-        try await MusicLibrary.shared.add(song, to: playlist)
+    func addSongToSongs(song: Song) {
+        songs.append(song)
+    }
+
+    func clearSongs() {
+        songs.removeAll()
     }
 }
 

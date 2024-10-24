@@ -1,29 +1,17 @@
 {
   "images" : [
     {
-<<<<<<< HEAD
       "filename" : "photoPlaceHolder.jpg",
-=======
-      "filename" : "photoPlaceHolder.png",
->>>>>>> 0e0036f ([#48] imageURL 방식 수정)
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-<<<<<<< HEAD
       "filename" : "photoPlaceHolder@2x.jpg",
-=======
-      "filename" : "photoPlaceHolder 1.png",
->>>>>>> 0e0036f ([#48] imageURL 방식 수정)
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-<<<<<<< HEAD
       "filename" : "photoPlaceHolder@3x.jpg",
-=======
-      "filename" : "photoPlaceHolder 2.png",
->>>>>>> 0e0036f ([#48] imageURL 방식 수정)
       "idiom" : "universal",
       "scale" : "3x"
     }

@@ -13,16 +13,16 @@ extension Font {
 }
 
 enum PretendardWeight: String {
-    case thin = "Pretendard-Thin.otf"
-    case extraLight = "Pretendard-ExtraLight.otf"
-    case light = "Pretendard-Light"
-    case regular = "Pretendard-Regular"
-    case medium = "Pretendard-Medium"
-    case semiBold = "Pretendard-SemiBold"
-    case bold = "Pretendard-Bold"
-    case extraBold = "Pretendard-ExtraBold"
-    case black = "Pretendard-Black"
-
+    case thin100 = "Pretendard-Thin"
+    case extraLight200 = "Pretendard-ExtraLight"
+    case light300 = "Pretendard-Light"
+    case regular400 = "Pretendard-Regular"
+    case medium500 = "Pretendard-Medium"
+    case semiBold600 = "Pretendard-SemiBold"
+    case bold700 = "Pretendard-Bold"
+    case extraBold800 = "Pretendard-ExtraBold"
+    case black900 = "Pretendard-Black"
+    
     var fontName: String {
         return self.rawValue
     }

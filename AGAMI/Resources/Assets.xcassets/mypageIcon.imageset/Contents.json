@@ -2,6 +2,7 @@
   "images" : [
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
       "filename" : "mypageIcon.svg",
       "idiom" : "universal"
 =======
@@ -19,6 +20,10 @@
       "idiom" : "universal",
       "scale" : "3x"
 >>>>>>> 5d3a9a3 ([#40] ArchiveListView UI 변경 대응 | 로그아웃)
+=======
+      "filename" : "mypageIcon.svg",
+      "idiom" : "universal"
+>>>>>>> 9f19727 ([#40] mypageIcon 벡터 이미지로 교체 | 개행 수정)
     }
   ],
   "info" : {

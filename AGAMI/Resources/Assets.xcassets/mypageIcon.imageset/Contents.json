@@ -1,19 +1,8 @@
 {
   "images" : [
     {
-      "filename" : "mypageIcon.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "mypageIcon@2x.png",
-      "idiom" : "universal",
-      "scale" : "2x"
-    },
-    {
-      "filename" : "mypageIcon@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
+      "filename" : "mypageIcon.svg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

@@ -45,14 +45,7 @@ private struct ArchiveListHeader: View {
                     Image(.mypageIcon)
                 }
             }
-            .padding(
-                EdgeInsets(
-                    top: 24,
-                    leading: 24,
-                    bottom: 12,
-                    trailing: 20
-                )
-            )
+            .padding(EdgeInsets(top: 24, leading: 24, bottom: 12, trailing: 20))
             ArchiveSearchBar(viewModel: viewModel)
         }
     }
@@ -65,14 +58,7 @@ private struct ArchiveSearchBar: View {
     var body: some View {
         ZStack {
             TextField("당신의 아카이브", text: $viewModel.searchText)
-                .padding(
-                    EdgeInsets(
-                        top: 10,
-                        leading: 12,
-                        bottom: 10,
-                        trailing: 12
-                    )
-                )
+                .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
                 .focused($isFocused)
                 .background(Color(rgbaHex: "#DDDDDF99"))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -92,7 +78,7 @@ private struct ArchiveSearchBar: View {
                     }
                 } label: {
                     Image(systemName: isFocused ? "x.circle.fill" : "magnifyingglass")
-                        .foregroundColor(Color(rgbaHex: "#88888AB2"))
+                        .foregroundStyle(Color(rgbaHex: "#88888AB2"))
                         .padding(.trailing, 20)
                 }
             }
@@ -161,6 +147,7 @@ private struct ArchiveListCell: View {
 
 private struct ConfirmationDialogActions: View {
     var viewModel: ArchiveListViewModel
+
     var body: some View {
         Button("로그아웃", role: .destructive) {
             viewModel.logout()

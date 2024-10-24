@@ -61,7 +61,11 @@ private struct ArchiveSearchBar: View {
             TextField("당신의 아카이브", text: $viewModel.searchText)
                 .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
                 .focused($isFocused)
+<<<<<<< HEAD
                 .background(Color(.pGray2))
+=======
+                .background(Color.pGray2)
+>>>>>>> 8311e11 ([#40] Apple Music Export | openURL | placeholder 교체 | 라이트모드 고정 | 컬러셋 추가)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)

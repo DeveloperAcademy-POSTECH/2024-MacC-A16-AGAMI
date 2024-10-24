@@ -32,14 +32,16 @@ final class PersistenceService {
         playlistDescription: String,
         photoURL: String,
         latitude: Double,
-        longitude: Double
+        longitude: Double,
+        streetAddress: String
     ) throws {
         let item = SwiftDataPlaylistModel(
             playlistName: playlistName,
             playlistDescription: playlistDescription,
             photoURL: photoURL,
             latitude: latitude,
-            longitude: longitude
+            longitude: longitude,
+            streetAddress: streetAddress
         )
         modelContext.insert(item)
         try modelContext.save()

@@ -16,6 +16,7 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
     var photoURL: String
     var latitude: Double
     var longitude: Double
+    var streetAddress: String
     var generationTime: Date
     var firestoreSongs: [FirestoreSongModel]
 
@@ -33,6 +34,7 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
         photoURL: String = "",
         latitude: Double = 36.0126,
         longitude: Double = 129.3235,
+        streetAddress: String = "",
         firestoreSongs: [FirestoreSongModel] = [],
         generationTime: Date = Date()
     ) {
@@ -42,6 +44,7 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
         self.photoURL = photoURL
         self.latitude = latitude
         self.longitude = longitude
+        self.streetAddress = streetAddress
         self.firestoreSongs = firestoreSongs
         self.generationTime = generationTime
     }
@@ -53,6 +56,7 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
         self.photoURL = playlistModel.photoURL
         self.latitude = playlistModel.latitude
         self.longitude = playlistModel.longitude
+        self.streetAddress = playlistModel.streetAddress
         self.generationTime = playlistModel.generationTime
         self.firestoreSongs = playlistModel.songs.map { FirestoreSongModel(from: $0) }
     }

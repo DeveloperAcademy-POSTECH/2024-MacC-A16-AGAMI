@@ -16,6 +16,7 @@ final class SwiftDataPlaylistModel: PlaylistModel {
     var photoURL: String
     var latitude: Double
     var longitude: Double
+    var streetAddress: String
     var generationTime: Date
 
     @Relationship var swiftDataSongs: [SwiftDataSongModel] = []
@@ -31,6 +32,7 @@ final class SwiftDataPlaylistModel: PlaylistModel {
         photoURL: String = "",
         latitude: Double = 0.0,
         longitude: Double = 0.0,
+        streetAddress: String = "",
         generationTime: Date = Date()
     ) {
         self.playlistName = playlistName
@@ -38,6 +40,8 @@ final class SwiftDataPlaylistModel: PlaylistModel {
         self.photoURL = photoURL
         self.latitude = latitude
         self.longitude = longitude
+        self.streetAddress = streetAddress
+        self.playlistName = playlistName
         self.generationTime = generationTime
     }
 
@@ -48,6 +52,7 @@ final class SwiftDataPlaylistModel: PlaylistModel {
         self.photoURL = playlistModel.photoURL
         self.latitude = playlistModel.latitude
         self.longitude = playlistModel.longitude
+        self.streetAddress = playlistModel.streetAddress
         self.generationTime = playlistModel.generationTime
         self.swiftDataSongs = playlistModel.songs.map { SwiftDataSongModel(from: $0) }
     }

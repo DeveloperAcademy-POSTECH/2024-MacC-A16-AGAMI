@@ -37,7 +37,8 @@ final class SearchWritingViewModel {
                                                   playlistDescription: userDescription,
                                                   photoURL: photoUrl,
                                                   latitude: 1.0,
-                                                  longitude: 1.0)
+                                                  longitude: 1.0,
+                                                  streetAddress: "")
             playlist.playlistName = userTitle
             playlist.playlistDescription = userDescription
             playlist.songs = try persistenceService.fetchDiggingList()

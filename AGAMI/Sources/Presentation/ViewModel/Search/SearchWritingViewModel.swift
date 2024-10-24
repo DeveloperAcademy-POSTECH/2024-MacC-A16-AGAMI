@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 @Observable
 final class SearchWritingViewModel {
@@ -15,8 +16,10 @@ final class SearchWritingViewModel {
     var playlist = SwiftDataPlaylistModel()
     var userTitle: String = ""
     var userDescription: String = ""
-    var photoUrl: String = ""
+    var photoURL: String = ""
+    var photoUIIMage: UIImage?
     var diggingList: [SongModel] = []
+    var isLoading: Bool = false
     
     init() {
         loadSavedSongs()
@@ -35,13 +38,14 @@ final class SearchWritingViewModel {
             // 경도, 위도 저장 필요
             try persistenceService.createPlaylist(playlistName: userTitle,
                                                   playlistDescription: userDescription,
-                                                  photoURL: photoUrl,
+                                                  photoURL: photoURL,
                                                   latitude: 1.0,
                                                   longitude: 1.0)
             playlist.playlistName = userTitle
             playlist.playlistDescription = userDescription
             playlist.songs = try persistenceService.fetchDiggingList()
-            playlist.photoURL = photoUrl
+            playlist.photoURL = photoURL
+            await playlist.photoURL = savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") ?? ""
             try await firebaseService.savePlaylistToFirebase(userID: FirebaseAuthService.currentUID ?? "",
                                                              playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
         } catch {
@@ -59,6 +63,29 @@ final class SearchWritingViewModel {
     }
     
     func savePhotoUrl(photoUrl: String) {
-        self.photoUrl = photoUrl
+        self.photoURL = photoUrl
+    }
+    
+    func savePhotoUIimage(photoUIImage: UIImage) {
+        self.photoUIIMage = photoUIImage
+    }
+    
+    func savePhotoToFirebase(userID: String) async -> String? {
+        if let image = photoUIIMage {
+            do {
+                photoURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
+            } catch {
+                print("이미지 저장 실패: \(error.localizedDescription)")
+            }
+        }
+        return photoURL
+    }
+    
+    func showProgress() {
+        isLoading = true
+    }
+    
+    func hideProgress() {
+        isLoading = false
     }
 }

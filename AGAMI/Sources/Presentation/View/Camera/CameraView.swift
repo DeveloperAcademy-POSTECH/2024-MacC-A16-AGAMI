@@ -20,7 +20,7 @@ struct CameraView: View {
             VStack(spacing: 0) {
                 Spacer()
                 
-                if viewModel.isPhotoCaptured, let recentImage = viewModel.recentImage {
+                if viewModel.isPhotoCaptured, let recentImage = viewModel.photoUIImage {
                     Image(uiImage: recentImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -89,12 +89,11 @@ struct CameraView: View {
     
     var usedPhotoButton: some View {
         Button {
-            Task {
-                if let imageUrl = await viewModel.savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") {
-                    searchWritingViewModel.savePhotoUrl(photoUrl: imageUrl)
-                }
-                coordinator.pop()
+            if let uiImage = viewModel.photoUIImage {
+                searchWritingViewModel.savePhotoUIimage(photoUIImage: uiImage)
             }
+            coordinator.pop()
+            
         } label: {
             ZStack {
                 Circle()

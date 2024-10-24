@@ -49,7 +49,6 @@ enum SearchView: Hashable, Identifiable {
     }
 }
 
-
 enum SearchSheet: Identifiable {
     var id: String {
         switch self {

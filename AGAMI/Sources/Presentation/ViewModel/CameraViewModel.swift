@@ -20,10 +20,10 @@ final class CameraViewModel: ObservableObject {
     
     let cameraPreView: CameraPreview
     
-    var recentImage: UIImage?
+    var photoUIImage: UIImage?
     var isPhotoCaptured: Bool = false
     var isFlashOn: Bool = false
-    var imageURL: String?
+    var photoUrl: String?
     
     init() {
         cameraService = CameraService()
@@ -32,7 +32,7 @@ final class CameraViewModel: ObservableObject {
         
         cameraService.onPhotoCaptured = { [weak self] imageData in
             if let image = UIImage(data: imageData) {
-                self?.recentImage = image
+                self?.photoUIImage = image
                 self?.isPhotoCaptured = true
             }
         }
@@ -48,7 +48,7 @@ final class CameraViewModel: ObservableObject {
     
     func resetPhoto() {
         isPhotoCaptured = false
-        recentImage = nil
+        photoUIImage = nil
         
         cameraService.session.stopRunning()
         cameraService.setUpCamera()
@@ -76,18 +76,18 @@ final class CameraViewModel: ObservableObject {
     }
     
     func savePhoto() {
-        guard let image = recentImage, let imageData = image.jpegData(compressionQuality: 1.0) else { return }
+        guard let image = photoUIImage, let imageData = image.jpegData(compressionQuality: 1.0) else { return }
         cameraService.savePhoto(imageData)
     }
     
     func savePhotoToFirebase(userID: String) async -> String? {
-        if let image = recentImage {
+        if let image = photoUIImage {
             do {
-                imageURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
+                photoUrl = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             } catch {
                 print("이미지 저장 실패: \(error.localizedDescription)")
             }
         }
-        return imageURL
+        return photoUrl
     }
 }

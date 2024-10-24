@@ -11,16 +11,20 @@ struct ArchiveListView: View {
     @State var viewModel: ArchiveListViewModel = ArchiveListViewModel()
 
     var body: some View {
-        ArchiveListHeader(viewModel: viewModel)
-        GeometryReader {
-            let size = $0.size
-
-            ArchiveList(
-                viewModel: viewModel,
-                size: size
-            )
+        ZStack {
+            VStack(spacing: 0) {
+                ArchiveListHeader(viewModel: viewModel)
+                ArchiveSearchBar(viewModel: viewModel)
+                GeometryReader { proxy in
+                    ArchiveList(viewModel: viewModel, size: proxy.size)
+                }
+                .safeAreaPadding(.horizontal, 16)
+            }
+            .blur(radius: viewModel.isExporting ? 10 : 0)
+            if viewModel.isExporting {
+                ProgressView()
+            }
         }
-        .safeAreaPadding(.horizontal, 16)
         .onAppear {
             viewModel.fetchPlaylists()
         }
@@ -35,19 +39,16 @@ private struct ArchiveListHeader: View {
     var viewModel: ArchiveListViewModel
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .bottom, spacing: 0) {
-                Image(.archiveLogo)
-                Spacer()
-                Button {
-                    viewModel.isDialogPresented = true
-                } label: {
-                    Image(.mypageIcon)
-                }
+        HStack(alignment: .bottom, spacing: 0) {
+            Image(.archiveLogo)
+            Spacer()
+            Button {
+                viewModel.isDialogPresented = true
+            } label: {
+                Image(.mypageIcon)
             }
-            .padding(EdgeInsets(top: 24, leading: 24, bottom: 12, trailing: 20))
-            ArchiveSearchBar(viewModel: viewModel)
         }
+        .padding(EdgeInsets(top: 24, leading: 24, bottom: 12, trailing: 20))
     }
 }
 
@@ -60,7 +61,7 @@ private struct ArchiveSearchBar: View {
             TextField("당신의 아카이브", text: $viewModel.searchText)
                 .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
                 .focused($isFocused)
-                .background(Color(rgbaHex: "#DDDDDF99"))
+                .background(Color.pGray2)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -78,7 +79,7 @@ private struct ArchiveSearchBar: View {
                     }
                 } label: {
                     Image(systemName: isFocused ? "x.circle.fill" : "magnifyingglass")
-                        .foregroundStyle(Color(rgbaHex: "#88888AB2"))
+                        .foregroundStyle(Color.pGray1)
                         .padding(.trailing, 20)
                 }
             }
@@ -89,10 +90,13 @@ private struct ArchiveSearchBar: View {
 private struct ArchiveList: View {
     @Bindable var viewModel: ArchiveListViewModel
     let size: CGSize
+    var verticalSpacingValue: CGFloat {
+        size.width / 377 * 12
+    }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: 12) {
+            LazyVStack(spacing: verticalSpacingValue) {
                 ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                     ArchiveListCell(
                         viewModel: viewModel,
@@ -108,13 +112,14 @@ private struct ArchiveList: View {
             }
             .scrollTargetLayout()
         }
-        .scrollTargetBehavior(.viewAligned(limitBehavior: .always))
+        .scrollTargetBehavior(.viewAligned(limitBehavior: getAlwaysByOneIfAvailableElseAlways()))
         .safeAreaPadding(.vertical, size.height / 10)
     }
 }
 
 private struct ArchiveListCell: View {
     @Environment(ArchiveCoordinator.self) private var coord
+    @State private var asyncImageOpacity: Double = 0
 
     let viewModel: ArchiveListViewModel
     let playlist: PlaylistModel
@@ -131,9 +136,18 @@ private struct ArchiveListCell: View {
                         .resizable()
                         .scaledToFill()
                         .clipped()
+                        .opacity(asyncImageOpacity)
+                        .background(Color.pGray1)
+                        .onAppear {
+                            withAnimation(.easeOut(duration: 1)) {
+                                asyncImageOpacity = 1
+                            }
+                        }
+                        .onDisappear {
+                            asyncImageOpacity = 0
+                        }
                 } placeholder: {
-                    Rectangle()
-                        .fill(.white)
+                    Image(.archiveCellPlaceholder)
                 }
                 .frame(width: size.width, height: verticalSize)
                 .shadow(radius: 10, x: 2, y: 4)
@@ -141,6 +155,9 @@ private struct ArchiveListCell: View {
                     .resizable()
             }
             .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+        .contextMenu {
+            ContextMenuItems(viewModel: viewModel, playlist: playlist)
         }
     }
 }
@@ -151,6 +168,34 @@ private struct ConfirmationDialogActions: View {
     var body: some View {
         Button("로그아웃", role: .destructive) {
             viewModel.logout()
+        }
+    }
+}
+
+private struct ContextMenuItems: View {
+    @Environment(\.openURL) private var openURL
+    var viewModel: ArchiveListViewModel
+    let playlist: PlaylistModel
+
+    var body: some View {
+        Button {
+            Task {
+                if let appleMusicURL = await viewModel.exportPlaylistToAppleMusic(playlist: playlist) {
+                    openURL(appleMusicURL)
+                }
+            }
+        } label: {
+            Label("Apple Music에서 열기", systemImage: "square.and.arrow.up")
+        }
+        Button {
+
+        } label: {
+            Label("Spotify에서 열기", systemImage: "square.and.arrow.up")
+        }
+        Button(role: .destructive) {
+            viewModel.deletePlaylist(playlistID: playlist.playlistID)
+        } label: {
+            Label("삭제", systemImage: "trash")
         }
     }
 }

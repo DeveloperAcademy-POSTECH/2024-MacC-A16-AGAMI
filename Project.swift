@@ -41,7 +41,8 @@ let project = Project(
                         "UIInterfaceOrientationPortrait",
                         "UIInterfaceOrientationPortraitUpsideDown"
                     ],
-                    "UIAppFonts": .array(fonts.map { .string($0) })
+                    "UIAppFonts": .array(fonts.map { .string($0) }),
+                    "UIUserInterfaceStyle": "Light"
                 ]
             ),
             sources: ["AGAMI/Sources/**"],

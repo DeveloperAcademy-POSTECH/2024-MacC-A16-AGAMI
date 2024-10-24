@@ -20,4 +20,12 @@ extension View {
             self.toolbar(visibility, for: bar)
         }
     }
+
+    func getAlwaysByOneIfAvailableElseAlways() -> ViewAlignedScrollTargetBehavior.LimitBehavior {
+        if #available(iOS 18.0, *) {
+            return .alwaysByOne
+        } else {
+            return .always
+        }
+    }
 }

@@ -13,6 +13,7 @@ protocol PlaylistModel {
     var photoURL: String { get set }
     var latitude: Double { get set }
     var longitude: Double { get set }
+    var streetAddress: String { get set }
     var generationTime: Date { get set }
     var songs: [SongModel] { get set }
 }

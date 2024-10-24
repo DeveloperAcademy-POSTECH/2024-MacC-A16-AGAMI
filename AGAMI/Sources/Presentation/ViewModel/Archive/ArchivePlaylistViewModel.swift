@@ -32,14 +32,12 @@ final class ArchivePlaylistViewModel: Hashable {
         Task {
             isExporting = true
             do {
-                try await musicService.createPlaylist(
-                    name: playlist.playlistName,
-                    description: playlist.playlistDescription
-                )
+                musicService.clearSongs()
                 for song in playlist.songs {
                     let appleMusicSong = try await musicService.searchSongById(songId: song.songID)
-                    try await musicService.addSongToPlaylist(song: appleMusicSong)
+                    musicService.addSongToSongs(song: appleMusicSong)
                 }
+                try await musicService.createPlaylist(name: playlist.playlistName, description: playlist.playlistDescription)
             } catch {
                 dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
             }

@@ -15,6 +15,7 @@ final class ArchivePlaylistViewModel: Hashable {
     private let musicService: MusicService = MusicService()
 
     var isExporting: Bool = false
+    var isEditing: Bool = false
 
     init(playlist: PlaylistModel) {
         self.playlist = playlist

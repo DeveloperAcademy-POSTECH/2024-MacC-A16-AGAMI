@@ -58,8 +58,8 @@ struct SearchWritingView: View {
                             viewModel.showProgress()
                             await viewModel.savedPlaylist()
                             viewModel.clearDiggingList()
-                            coordinator.popToRoot()
                             viewModel.hideProgress()
+                            coordinator.popToRoot()
                         }
                     } label: {
                         Text("저장")
@@ -67,6 +67,7 @@ struct SearchWritingView: View {
                 }
             }
             .disabled(viewModel.isLoading)
+            .toolbarVisibilityForVersion(.hidden, for: .tabBar)
             .blur(radius: viewModel.isLoading ? 10 : 0)
             
             if viewModel.isLoading {
@@ -85,9 +86,7 @@ struct SearchWritingView: View {
                 .overlay {
                     HStack(spacing: 9) {
                         Image(systemName: "photo.fill")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 25.5535, height: 12.26568)
+                            .font(.system(size: 17, weight: .regular))
                             .foregroundColor(.accentColor)
                         Text("커버 설정하기")
                             .font(

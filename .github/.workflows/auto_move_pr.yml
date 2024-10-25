@@ -38,6 +38,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d9c6628 ([#55] project url 수정)
 =======
@@ -65,6 +66,8 @@ jobs:
 >>>>>>> 46fcce0 ([#55] project url 수정)
 =======
 >>>>>>> 4c8778c ([#55] Github Actions workflow 추가)
+=======
+>>>>>>> f54c534 ([#55] project url 수정)
 =======
 >>>>>>> 06dcf18 ([#55] project url 수정)
 >>>>>>> 9be8860 ([#55] project url 수정)
@@ -114,6 +117,8 @@ jobs:
 =======
 >>>>>>> 6ffc51e ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> 806cf54 ([#55] project url 수정)
+=======
 >>>>>>> d9c6628 ([#55] project url 수정)
 >>>>>>> 51848de ([#55] project url 수정)
 =======
@@ -127,9 +132,14 @@ jobs:
 =======
 >>>>>>> e1a5111 ([#55] Github Actions workflow 추가)
 =======
+=======
+>>>>>>> 06dcf18 ([#55] project url 수정)
+>>>>>>> 860dd9e ([#55] project url 수정)
+=======
 >>>>>>> e6dab41 ([#55] Github Actions workflow 추가)
 =======
 >>>>>>> 8eea315 ([#55] project url 수정)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -185,6 +195,8 @@ jobs:
 =======
 >>>>>>> 4c8778c ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> f54c534 ([#55] project url 수정)
+=======
 =======
 >>>>>>> e6dab41 ([#55] Github Actions workflow 추가)
 >>>>>>> e844bde ([#55] Github Actions workflow 추가)
@@ -232,6 +244,8 @@ jobs:
 =======
 >>>>>>> 6ffc51e ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> 806cf54 ([#55] project url 수정)
+=======
 >>>>>>> fbbcfeb ([#55] project url 수정)
 =======
 >>>>>>> d9c6628 ([#55] project url 수정)
@@ -247,9 +261,12 @@ jobs:
 =======
 >>>>>>> e1a5111 ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> 860dd9e ([#55] project url 수정)
+=======
 =======
 >>>>>>> e6dab41 ([#55] Github Actions workflow 추가)
 >>>>>>> e844bde ([#55] Github Actions workflow 추가)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 >>>>>>> 64294e1 ([#55] Github Actions workflow 추가)
@@ -336,8 +353,18 @@ jobs:
 =======
 =======
 >>>>>>> e1a5111 ([#55] Github Actions workflow 추가)
+<<<<<<< HEAD
 >>>>>>> 6ffc51e ([#55] Github Actions workflow 추가)
+<<<<<<< HEAD
 >>>>>>> 4c8778c ([#55] Github Actions workflow 추가)
+=======
+=======
+=======
+=======
+>>>>>>> 06dcf18 ([#55] project url 수정)
+>>>>>>> 860dd9e ([#55] project url 수정)
+>>>>>>> 806cf54 ([#55] project url 수정)
+>>>>>>> f54c534 ([#55] project url 수정)
           project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
 =======
           project-url: "https://github.com/DeveloperAcademy-POSTECH/2024-MacC-A16-AGAMI"
@@ -367,6 +394,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d9c6628 ([#55] project url 수정)
 =======
@@ -398,6 +426,8 @@ jobs:
 >>>>>>> 46fcce0 ([#55] project url 수정)
 =======
 >>>>>>> 4c8778c ([#55] Github Actions workflow 추가)
+=======
+>>>>>>> f54c534 ([#55] project url 수정)
 =======
 >>>>>>> e844bde ([#55] Github Actions workflow 추가)
 >>>>>>> 64294e1 ([#55] Github Actions workflow 추가)
@@ -451,11 +481,15 @@ jobs:
 =======
 >>>>>>> 6ffc51e ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> 806cf54 ([#55] project url 수정)
+=======
 >>>>>>> d9c6628 ([#55] project url 수정)
 >>>>>>> 51848de ([#55] project url 수정)
 =======
 =======
 >>>>>>> 9be8860 ([#55] project url 수정)
+=======
+>>>>>>> 860dd9e ([#55] project url 수정)
 =======
 >>>>>>> e844bde ([#55] Github Actions workflow 추가)
 >>>>>>> 64294e1 ([#55] Github Actions workflow 추가)
@@ -468,10 +502,13 @@ jobs:
 >>>>>>> e844bde ([#55] Github Actions workflow 추가)
 >>>>>>> e1a5111 ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> 06dcf18 ([#55] project url 수정)
+=======
           project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
 >>>>>>> 6e06c8b ([#55] project url 수정)
 =======
 >>>>>>> e6dab41 ([#55] Github Actions workflow 추가)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -506,6 +543,8 @@ jobs:
 =======
 >>>>>>> 4c8778c ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> f54c534 ([#55] project url 수정)
+=======
 >>>>>>> 06dcf18 ([#55] project url 수정)
 =======
 >>>>>>> b8ce79a ([#55] Github Actions workflow 추가)
@@ -536,6 +575,8 @@ jobs:
 =======
 >>>>>>> 6ffc51e ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> 806cf54 ([#55] project url 수정)
+=======
 >>>>>>> 06dcf18 ([#55] project url 수정)
 =======
 >>>>>>> 824d49d ([#55] project url 수정)
@@ -544,9 +585,14 @@ jobs:
 >>>>>>> e1a5111 ([#55] Github Actions workflow 추가)
 =======
 =======
+>>>>>>> 06dcf18 ([#55] project url 수정)
+>>>>>>> 860dd9e ([#55] project url 수정)
+=======
+=======
           project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
 >>>>>>> 6e06c8b ([#55] project url 수정)
 >>>>>>> 8eea315 ([#55] project url 수정)
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -586,6 +632,8 @@ jobs:
 =======
 >>>>>>> 4c8778c ([#55] Github Actions workflow 추가)
 =======
+>>>>>>> f54c534 ([#55] project url 수정)
+=======
 >>>>>>> e844bde ([#55] Github Actions workflow 추가)
 =======
 >>>>>>> 06dcf18 ([#55] project url 수정)
@@ -612,6 +660,8 @@ jobs:
 >>>>>>> 1d8db0c ([#55] project url 수정)
 =======
 >>>>>>> 6ffc51e ([#55] Github Actions workflow 추가)
+=======
+>>>>>>> 806cf54 ([#55] project url 수정)
 =======
 =======
           project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
@@ -761,8 +811,20 @@ jobs:
 =======
 >>>>>>> e844bde ([#55] Github Actions workflow 추가)
 >>>>>>> e1a5111 ([#55] Github Actions workflow 추가)
+<<<<<<< HEAD
 >>>>>>> 6ffc51e ([#55] Github Actions workflow 추가)
+<<<<<<< HEAD
 >>>>>>> 4c8778c ([#55] Github Actions workflow 추가)
+=======
+=======
+=======
+=======
+>>>>>>> e844bde ([#55] Github Actions workflow 추가)
+=======
+>>>>>>> 06dcf18 ([#55] project url 수정)
+>>>>>>> 860dd9e ([#55] project url 수정)
+>>>>>>> 806cf54 ([#55] project url 수정)
+>>>>>>> f54c534 ([#55] project url 수정)
           column-name: "In Pull Request"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

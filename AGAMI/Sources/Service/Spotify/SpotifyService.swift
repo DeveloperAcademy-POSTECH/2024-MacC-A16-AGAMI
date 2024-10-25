@@ -17,7 +17,7 @@ public final class SpotifyService {
     private let spotifyAPI = SpotifyAPI(authorizationManager:
                                             AuthorizationCodeFlowManager(clientId: SpotifyAPIKey.clientId,
                                                                          clientSecret: SpotifyAPIKey.clientSecret))
-    private let loginCallbackURL = URL(string: SpotifyAPIKey.redirectURL)!
+    private let loginCallbackURL: URL
     private let authorizationManagerKey = "authorizationManagerKey"
     private var authorizationState = String.randomURLSafe(length: 128)
     private let keychain = Keychain(service: "com.agami.plake")
@@ -29,6 +29,11 @@ public final class SpotifyService {
     private var cancellables: Set<AnyCancellable> = []
     
     private init() {
+        guard let url = URL(string: SpotifyAPIKey.redirectURL) else {
+            fatalError("Invalid redirect URL string.")
+        }
+        self.loginCallbackURL = url
+        
         self.spotifyAPI.apiRequestLogger.logLevel = .trace
         
         self.spotifyAPI.authorizationManagerDidChange
@@ -42,7 +47,6 @@ public final class SpotifyService {
             .store(in: &cancellables)
         
         getAuthorizationManager()
-        
     }
     
     private func getAuthorizationManager() {
@@ -67,8 +71,7 @@ public final class SpotifyService {
     }
     
     private func authorize() {
-        print(self.loginCallbackURL)
-        let url = self.spotifyAPI.authorizationManager.makeAuthorizationURL(
+        guard let url = self.spotifyAPI.authorizationManager.makeAuthorizationURL(
             redirectURI: self.loginCallbackURL,
             showDialog: true,
             state: self.authorizationState,
@@ -76,13 +79,14 @@ public final class SpotifyService {
                 .playlistModifyPrivate,
                 .playlistModifyPublic
             ]
-        )!
+        ) else {
+            print("Failed to create authorization URL.")
+            return
+        }
         UIApplication.shared.open(url)
-        
     }
     
     private func authorizationManagerDidChange() {
-        
         self.isAuthorized = self.spotifyAPI.authorizationManager.isAuthorized()
         
         print(
@@ -106,13 +110,10 @@ public final class SpotifyService {
                 "in keychain:\n\(error)"
             )
         }
-        
     }
     
     private func authorizationManagerDidDeauthorize() {
-        
         self.isAuthorized = false
-        
         self.currentUser = nil
         
         do {
@@ -128,7 +129,6 @@ public final class SpotifyService {
     }
     
     private func retrieveCurrentUser(onlyIfNil: Bool = true) {
-        
         if onlyIfNil && self.currentUser != nil {
             return
         }
@@ -179,18 +179,17 @@ public final class SpotifyService {
         
         self.authorizationState = String.randomURLSafe(length: 128)
         authorizationManagerDidChange()
-        
     }
     
     public func addPlayList(name: String,
                             musicList: [(String, String?)],
                             venue: String?,
-                            _ completionHandeler: () -> Void) {
+                            _ completionHandler: () -> Void) {
         if currentUser == nil {
             authorize()
         } else {
             performPlaylistCreation(name: name, musicList: musicList, venue: venue)
-            completionHandeler()
+            completionHandler()
         }
     }
     
@@ -276,4 +275,3 @@ public final class SpotifyService {
         case noTracksFound
     }
 }
-

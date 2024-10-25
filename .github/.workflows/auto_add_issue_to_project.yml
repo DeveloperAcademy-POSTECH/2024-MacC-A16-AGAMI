@@ -11,7 +11,7 @@ jobs:
       - name: Add issue to project
         uses: actions/add-to-project@v0.1.0
         with:
-          project-url: "https://github.com/DeveloperAcademy-POSTECH/2024-MacC-A16-AGAMI"
+          project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
           column-name: "In Progress"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

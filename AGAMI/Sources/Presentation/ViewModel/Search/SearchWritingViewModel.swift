@@ -12,7 +12,7 @@ import UIKit
 final class SearchWritingViewModel {
     private let persistenceService = PersistenceService.shared
     private let firebaseService = FirebaseService()
-    private let locationService = LocationService()
+    private let locationService = LocationService.shared
     
     var playlist = SwiftDataPlaylistModel()
     var userTitle: String = ""
@@ -37,8 +37,6 @@ final class SearchWritingViewModel {
     func savedPlaylist() async {
         do {
             guard let currentLocation = locationService.getCurrentLocation() else { return }
-            let latitude = currentLocation.latitude
-            let longitude = currentLocation.longitude
             
             try persistenceService.createPlaylist(playlistName: userTitle,
                                                   playlistDescription: userDescription,

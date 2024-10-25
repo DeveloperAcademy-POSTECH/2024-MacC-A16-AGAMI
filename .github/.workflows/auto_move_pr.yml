@@ -11,7 +11,11 @@ jobs:
       - name: Move PR to "In Pull Request"
         uses: actions/add-to-project@v0.1.0
         with:
+<<<<<<< HEAD
           project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
+=======
+          project-url: "https://github.com/DeveloperAcademy-POSTECH/2024-MacC-A16-AGAMI"
+>>>>>>> 628925b ([#55] Github Actions workflow 추가)
           column-name: "In Pull Request"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

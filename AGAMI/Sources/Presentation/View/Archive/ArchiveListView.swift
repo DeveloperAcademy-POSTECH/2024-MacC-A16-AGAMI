@@ -61,7 +61,7 @@ private struct ArchiveSearchBar: View {
             TextField("당신의 아카이브", text: $viewModel.searchText)
                 .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
                 .focused($isFocused)
-                .background(Color.pGray2)
+                .background(Color(.pGray2))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
@@ -79,7 +79,7 @@ private struct ArchiveSearchBar: View {
                     }
                 } label: {
                     Image(systemName: isFocused ? "x.circle.fill" : "magnifyingglass")
-                        .foregroundStyle(Color.pGray1)
+                        .foregroundStyle(Color(.pGray1))
                         .padding(.trailing, 20)
                 }
             }
@@ -137,7 +137,7 @@ private struct ArchiveListCell: View {
                         .scaledToFill()
                         .clipped()
                         .opacity(asyncImageOpacity)
-                        .background(Color.pGray1)
+                        .background(Color(.pGray1))
                         .onAppear {
                             withAnimation(.easeOut(duration: 1)) {
                                 asyncImageOpacity = 1
@@ -159,7 +159,7 @@ private struct ArchiveListCell: View {
                     HStack(spacing: 0) {
                         Text(playlist.playlistName)
                             .font(.pretendard(weight: .bold700, size: 22))
-                            .foregroundStyle(Color.pWhite)
+                            .foregroundStyle(Color(.pWhite))
                             .shadow(radius: 10)
                             .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
                         Spacer()
@@ -169,9 +169,9 @@ private struct ArchiveListCell: View {
                         Spacer()
                         Text(viewModel.formatDateToString(playlist.generationTime))
                             .font(.pretendard(weight: .regular400, size: 14))
-                            .foregroundStyle(Color.pWhite)
+                            .foregroundStyle(Color(.pWhite))
                             .padding(8)
-                            .background(Color.pGray1)
+                            .background(Color(.pGray1))
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 12))
                     }

@@ -19,6 +19,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d9c6628 ([#55] project url 수정)
 =======
@@ -51,6 +52,8 @@ jobs:
 =======
 >>>>>>> 06dcf18 ([#55] project url 수정)
 >>>>>>> 9be8860 ([#55] project url 수정)
+=======
+>>>>>>> 4f36fc0 ([#55] project url 수정)
           project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
 =======
           project-url: "https://github.com/DeveloperAcademy-POSTECH/2024-MacC-A16-AGAMI"
@@ -61,6 +64,7 @@ jobs:
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d9c6628 ([#55] project url 수정)
 =======
@@ -105,6 +109,11 @@ jobs:
 =======
 >>>>>>> 06dcf18 ([#55] project url 수정)
 >>>>>>> 9be8860 ([#55] project url 수정)
+=======
+=======
+          project-url: "https://github.com/orgs/DeveloperAcademy-POSTECH/projects/163"
+>>>>>>> 6e06c8b ([#55] project url 수정)
+>>>>>>> 4f36fc0 ([#55] project url 수정)
           column-name: "In Pull Request"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

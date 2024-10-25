@@ -15,10 +15,9 @@ import PackageDescription
 let package = Package(
     name: "AGAMI",
     dependencies: [
-        // Add your own dependencies here:
-        // .package(url: "https://github.com/Alamofire/Alamofire", from: "5.0.0"),
-        // You can read more about dependencies here: https://docs.tuist.io/documentation/tuist/dependencies
-        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.22.0")
+        .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.22.0"),
+        .package(url: "https://github.com/Peter-Schorn/SpotifyAPI.git", from: "3.0.3"),
+        .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.2")
     ],
     targets: [
             .target(
@@ -28,7 +27,9 @@ let package = Package(
                     .product(name: "FirebaseAuth", package: "firebase-ios-sdk"),
                     .product(name: "FirebaseFirestore", package: "firebase-ios-sdk"),
                     .product(name: "FirebaseCore", package: "firebase-ios-sdk"),
-                    .product(name: "FirebaseStorage", package: "firebase-ios-sdk")
+                    .product(name: "FirebaseStorage", package: "firebase-ios-sdk"),
+                    .product(name: "SpotifyAPI", package: "SpotifyAPI"),
+                    .product(name: "KeychainAccess", package: "KeychainAccess")
                 ],
                 path: "AGAMI/Sources"
             ),

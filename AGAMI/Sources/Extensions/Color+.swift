@@ -44,13 +44,3 @@ extension Color {
         )
     }
 }
-
-extension Color {
-    static let pWhite = Color("pWhite")
-    static let pLightGray = Color("pLightGray")
-    static let pGray1 = Color("pGray1")
-    static let pGray2 = Color("pGray2")
-    static let pBlack = Color("pBlack")
-    static let pPrimary = Color("pPrimary")
-    static let pSecondary = Color("pSecondary")
-}

@@ -6,35 +6,33 @@
 //
 
 import Foundation
-import MapKit
 import CoreLocation
 
 final class LocationService: NSObject {
-    private var currentLocation: CLLocationCoordinate2D?
-    private var locationManager: CLLocationManager = .init()
+    private var currentLocation: CLLocation?
+    private var locationManager: CLLocationManager = CLLocationManager()
+    private var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    var streetAddress: String?
     
-    override init() {
+    static let shared = LocationService()
+    
+    private override init() {
+        locationManager = CLLocationManager()
         super.init()
-        self.locationManager.delegate = self
+        locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        
-        if self.locationManager.authorizationStatus == .notDetermined {
-            self.locationManager.requestWhenInUseAuthorization()
-        }
     }
     
-    func requestLocationAuthorization() throws {
-        let status = CLLocationManager().authorizationStatus
+    func requestLocationAuthorization() {
+        let status = locationManager.authorizationStatus
         
         switch status {
-        case .authorizedAlways, .authorizedWhenInUse:
-            return
         case .notDetermined:
-            CLLocationManager().requestWhenInUseAuthorization()
-        case .restricted:
-            throw LocationAuthorizationError.restricted
-        default:
-            throw LocationAuthorizationError.denied
+            locationManager.requestWhenInUseAuthorization()
+        case .restricted, .denied, .authorizedAlways, .authorizedWhenInUse:
+            return
+        @unknown default:
+            return
         }
     }
     
@@ -49,24 +47,61 @@ final class LocationService: NSObject {
         }
     }
     
-    func getCurrentLocation() -> CLLocationCoordinate2D? {
-        return currentLocation
+    func getCurrentLocation() -> CLLocation? {
+        currentLocation
+    }
+    
+    func coordinateToStreetAddress() {
+        guard let currentLocation else { return }
+        
+        let geocoder = CLGeocoder()
+        let locale = Locale(identifier: "ko_KR")
+        
+        geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: {(placemarks, error) in
+            if let address: [CLPlacemark] = placemarks {
+                var currentAddress: String = ""
+                
+                if let area: String = address.last?.locality {
+                    currentAddress += area
+                }
+                
+                if let name: String = address.last?.name {
+                    currentAddress += "\(name)"
+                }
+                
+                self.streetAddress = currentAddress
+            }
+        })
     }
 }
 
 extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
-            currentLocation = location.coordinate
+            currentLocation = location
+            manager.desiredAccuracy = kCLLocationAccuracyBest
         }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        dump("Failed to get user's location: \(error.localizedDescription)")
+        dump("위치 정보 가져오기 실패: \(error.localizedDescription)")
     }
-}
-
-enum LocationAuthorizationError: Error {
-    case restricted
-    case denied
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        authorizationStatus = manager.authorizationStatus
+        
+        switch manager.authorizationStatus {
+        case .authorizedAlways, .authorizedWhenInUse:
+            print("위치 서비스 권한이 허용되었습니다.")
+            manager.requestLocation()
+        case .denied, .restricted:
+            print("위치 서비스 권한이 거부되었습니다.")
+            manager.requestWhenInUseAuthorization()
+        case .notDetermined:
+            print("위치 서비스 권한이 결정되지 않았습니다.")
+            manager.requestWhenInUseAuthorization()
+        @unknown default:
+            break
+        }
+    }
 }

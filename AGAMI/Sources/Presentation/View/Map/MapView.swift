@@ -15,13 +15,13 @@ struct MapView: View {
         NavigationStack {
             ZStack(alignment: .bottom) {
                 Map {
-                    ForEach(viewModel.places) { place in
-                        Annotation("", coordinate: place.location) {
-                            NavigationLink(destination: CollectionPlaceView()) {
-                                PlaceMarkerView()
-                            }
-                        }
-                    }
+//                    ForEach(viewModel.places) { place in
+//                        Annotation("", coordinate: place.location) {
+//                            NavigationLink(destination: CollectionPlaceView()) {
+//                                PlaceMarkerView()
+//                            }
+//                        }
+//                    }
                     
                     UserAnnotation()
                 }

@@ -8,31 +8,34 @@
 import Foundation
 import MapKit
 
-struct Place: Identifiable {
-    var id: UUID = UUID()
-    var location: CLLocationCoordinate2D
-}
-
 @Observable
 final class MapViewModel {
-    private let locationService = LocationService()
-
-    var places: [Place] = [
-        Place(location: CLLocationCoordinate2D(latitude: 36.114332, longitude: 129.425743)),
-        Place(location: CLLocationCoordinate2D(latitude: 36.214332, longitude: 129.525743))
-    ]
+    let locationService = LocationService.shared
+    
+    var currentlatitude: Double?
+    var currentlongitude: Double?
+    var currentStreetAddress: String?
+    
+    func requestLocationAuthorization() {
+        locationService.requestLocationAuthorization()
+    }
     
     func requestCurrentLocation() {
         locationService.requestCurrentLocation()
     }
     
-    func addCurrentLocation() {
-        if let loc = locationService.getCurrentLocation() {
-            dump(loc)
-            let newPlace = Place(location: loc)
-            places.append(newPlace)
-        } else {
-            dump("location nil")
+    func getCurrentLocation() {
+        guard let currentLocation = locationService.getCurrentLocation() else {
+            dump("currentLocation == nil")
+            return
         }
+        currentlatitude = currentLocation.coordinate.latitude
+        currentlongitude = currentLocation.coordinate.longitude
+        requestCurrentStreetAddress()
+    }
+    
+    func requestCurrentStreetAddress() {
+        locationService.coordinateToStreetAddress()
+        currentStreetAddress = locationService.streetAddress
     }
 }

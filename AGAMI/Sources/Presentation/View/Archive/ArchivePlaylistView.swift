@@ -32,12 +32,18 @@ struct ArchivePlaylistView: View {
             }
         }
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                TopBarTrailingItems(viewModel: viewModel)
+            }
+        }
+        .navigationTitle("플라키브")
     }
 }
 
 private struct PlaylistImageCellView: View {
     let viewModel: ArchivePlaylistViewModel
-    
+
     var body: some View {
         AsyncImage(url: URL(string: viewModel.playlist.photoURL)) { image in
             image
@@ -90,5 +96,41 @@ private struct PlaylistContentsView: View {
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .padding(EdgeInsets(top: 0, leading: 24, bottom: 40, trailing: 24))
         Spacer()
+    }
+}
+
+private struct TopBarTrailingItems: View {
+    var viewModel: ArchivePlaylistViewModel
+
+    var body: some View {
+        HStack {
+            Button("편집") {
+                viewModel.isEditing.toggle()
+            }
+            Menu {
+                MenuContents(viewModel: viewModel)
+            } label: {
+                Image(systemName: "ellipsis.circle")
+            }
+
+        }
+    }
+}
+
+private struct MenuContents: View {
+    var viewModel: ArchivePlaylistViewModel
+
+    var body: some View {
+        Button {
+
+        } label: {
+            Label("공유하기", systemImage: "square.and.arrow.up")
+        }
+
+        Button(role: .destructive) {
+
+        } label: {
+            Label("삭제하기", systemImage: "trash")
+        }
     }
 }

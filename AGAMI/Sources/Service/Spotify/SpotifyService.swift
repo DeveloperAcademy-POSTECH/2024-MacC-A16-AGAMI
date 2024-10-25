@@ -17,7 +17,7 @@ public final class SpotifyService {
     private let spotifyAPI = SpotifyAPI(authorizationManager:
                                             AuthorizationCodeFlowManager(clientId: SpotifyAPIKey.clientId,
                                                                          clientSecret: SpotifyAPIKey.clientSecret))
-    private let loginCallbackURL = URL(string: SpotifyAPIKey.redirectUri)!
+    private let loginCallbackURL = URL(string: SpotifyAPIKey.redirectURL)!
     private let authorizationManagerKey = "authorizationManagerKey"
     private var authorizationState = String.randomURLSafe(length: 128)
     private let keychain = Keychain(service: "com.agami.plake")
@@ -185,7 +185,7 @@ public final class SpotifyService {
     public func addPlayList(name: String,
                             musicList: [(String, String?)],
                             venue: String?,
-                            _ completionHandeler: ()->Void) {
+                            _ completionHandeler: () -> Void) {
         if currentUser == nil {
             authorize()
         } else {

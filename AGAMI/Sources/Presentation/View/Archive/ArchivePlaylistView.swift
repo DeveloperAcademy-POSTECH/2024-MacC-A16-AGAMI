@@ -13,18 +13,17 @@ struct ArchivePlaylistView: View {
 
     var body: some View {
         ZStack {
-            VStack(spacing: 0) {
-                Button("appleMusic") {
-                    viewModel.exportPlaylistToAppleMusic()
+            List {
+                ImageAndTitleWithHeaderView(viewModel: viewModel)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden, edges: .top)
+                ForEach(viewModel.playlist.songs, id: \.songID) { song in
+                    PlaylistRow(song: song)
                 }
-                Button("url") {
-                    if let url = viewModel.getCurrentPlaylistURL() {
-                        openURL(url)
-                    }
-                }
-                PlaylistImageCellView(viewModel: viewModel)
-                PlaylistContentsView(viewModel: viewModel)
+                .onDelete(perform: viewModel.deleteMusic)
+                .onMove(perform: viewModel.moveMusic)
             }
+            .listStyle(.plain)
             .blur(radius: viewModel.isExporting ? 10 : 0)
 
             if viewModel.isExporting {
@@ -41,25 +40,62 @@ struct ArchivePlaylistView: View {
     }
 }
 
-private struct PlaylistImageCellView: View {
+private struct ImageAndTitleWithHeaderView: View {
     let viewModel: ArchivePlaylistViewModel
+    @State private var asyncImageOpacity: Double = 0
 
     var body: some View {
-        AsyncImage(url: URL(string: viewModel.playlist.photoURL)) { image in
-            image
-                .resizable()
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-                .aspectRatio(1, contentMode: .fit)
-                .padding(.horizontal, 20)
-                .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-        } placeholder: {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(.white)
-                .aspectRatio(1, contentMode: .fit)
-                .padding(.horizontal, 20)
-                .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .bottom) {
+                AsyncImage(url: URL(string: viewModel.playlist.photoURL)) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(1, contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+//                        .shadow(color: .black.opacity(0.25), radius: 10)
+                        .opacity(asyncImageOpacity)
+                        .onAppear {
+                            withAnimation(.easeOut(duration: 1)) {
+                                asyncImageOpacity = 1
+                            }
+                        }
+                } placeholder: {
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(.white)
+                        .aspectRatio(1, contentMode: .fit)
+                }
+
+                VStack(spacing: 0) {
+                    Group {
+                        Text(viewModel.playlist.streetAddress)
+                            .padding(.bottom, 12)
+                        Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
+                            .padding(.bottom, 22)
+                    }
+                    .font(.pretendard(weight: .medium500, size: 20))
+                    .foregroundStyle(Color(.pWhite))
+                }
+            }
+            .padding(EdgeInsets(top: 20, leading: 8, bottom: 0, trailing: 8))
+            .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+
+            Text(viewModel.playlist.playlistName)
+                .font(.pretendard(weight: .bold700, size: 26))
+                .multilineTextAlignment(.leading)
+                .foregroundStyle(Color(.pBlack))
+                .padding(EdgeInsets(top: 30, leading: 16, bottom: 0, trailing: 0))
+
+            HStack(alignment: .bottom, spacing: 0) {
+                Text("수집한 플레이크")
+                    .font(.pretendard(weight: .semiBold600, size: 20))
+                    .foregroundStyle(Color(.pBlack))
+                Spacer()
+                Text("\(viewModel.playlist.songs.count) 플레이크")
+                    .font(.pretendard(weight: .medium500, size: 16))
+                    .foregroundStyle(Color(.pPrimary))
+            }
+            .padding(EdgeInsets(top: 49, leading: 16, bottom: 16, trailing: 16))
         }
-        .padding(.top, 20)
     }
 }
 

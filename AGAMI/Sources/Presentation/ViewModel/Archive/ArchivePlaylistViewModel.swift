@@ -60,5 +60,11 @@ final class ArchivePlaylistViewModel: Hashable {
     func moveMusic(from source: IndexSet, to destination: Int) {
         playlist.songs.move(fromOffsets: source, toOffset: destination)
     }
+    
+    func formatDateToString(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd."
+        return dateFormatter.string(from: date)
+    }
 }
 

@@ -155,22 +155,26 @@ private struct ArchiveListCell: View {
                 Image(.archiveCellOverlay)
                     .resizable()
 
-                VStack(spacing: 0) {
-                    HStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 0) {
+                    Group {
                         Text(playlist.playlistName)
                             .font(.pretendard(weight: .bold700, size: 22))
-                            .foregroundStyle(Color(.pWhite))
-                            .shadow(radius: 10)
                             .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
-                        Spacer()
+                        Text(playlist.streetAddress)
+                            .font(.pretendard(weight: .medium500, size: 16))
+                            .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
                     }
+                    .foregroundStyle(Color(.pWhite))
+                    .shadow(radius: 10)
+
                     Spacer()
+
                     HStack(spacing: 0) {
                         Spacer()
                         Text(viewModel.formatDateToString(playlist.generationTime))
                             .font(.pretendard(weight: .regular400, size: 14))
                             .foregroundStyle(Color(.pWhite))
-                            .padding(8)
+                            .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                             .background(Color(.pGray1))
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 12))

@@ -188,18 +188,20 @@ final class SpotifyService {
     func addPlayList(name: String,
                      musicList: [(String, String?)],
                      venue: String?,
-                     _ completionHandler: () -> Void) {
+                     _ completionHandler: @escaping (String?) -> Void) {
         if currentUser == nil {
             authorize()
         } else {
-            performPlaylistCreation(name: name, musicList: musicList, venue: venue)
-            completionHandler()
+            performPlaylistCreation(name: name, musicList: musicList, venue: venue) { playlistUri in
+                completionHandler(playlistUri)
+            }
         }
     }
     
     private func performPlaylistCreation(name: String,
                                          musicList: [(String, String?)],
-                                         venue: String?) {
+                                         venue: String?,
+                                         _ completionHandler: @escaping (String?) -> Void) {
         var trackUris: [String] = []
         var playlistUri: String = ""
         
@@ -266,8 +268,10 @@ final class SpotifyService {
                 switch completion {
                 case .finished:
                     print("Playlist creation completed successfully.")
+                    completionHandler(playlistUri)
                 case .failure(let error):
                     print("Error: \(error)")
+                    completionHandler(nil)
                 }
             }, receiveValue: {})
             .store(in: &cancellables)

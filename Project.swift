@@ -48,25 +48,12 @@ let project = Project(
                                 "UIInterfaceOrientationPortrait",
                                 "UIInterfaceOrientationPortraitUpsideDown"
                             ],
-                            "UIAppFonts": .array(
-                                fonts
-                                    .map {
-                                        .string(
-                                            $0
-                                        )
-                                    }),
-                            "LSApplicationQueriesSchemes": .array(
-                                ["spotify"]
-                            ),
-                            "CFBundleURLTypes": .array(
-                                [.dictionary(
-                                    [
-                                        "CFBundleURLSchemes" : .array(
-                                            ["plake-agami"]
-                                        ),
-                                        "CFBundleURLName" : .string(
-                                            "com.agami.plake"
-                                        )
+                            "UIAppFonts": .array( fonts .map { .string( $0 ) }),
+                            "LSApplicationQueriesSchemes": .array( ["spotify"] ),
+                            "CFBundleURLTypes": .array([
+                                .dictionary(
+                                    [ "CFBundleURLSchemes" : .array(["plake-agami"]),
+                                      "CFBundleURLName" : .string("com.agami.plake")
                                     ]
                                 )]
                             )

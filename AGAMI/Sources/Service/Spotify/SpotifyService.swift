@@ -12,8 +12,8 @@ import SpotifyWebAPI
 import KeychainAccess
 
 @Observable
-public final class SpotifyService {
-    public static let shared = SpotifyService()
+final class SpotifyService {
+    static let shared = SpotifyService()
     private let spotifyAPI = SpotifyAPI(authorizationManager:
                                             AuthorizationCodeFlowManager(clientId: SpotifyAPIKey.clientId,
                                                                          clientSecret: SpotifyAPIKey.clientSecret))
@@ -181,10 +181,10 @@ public final class SpotifyService {
         authorizationManagerDidChange()
     }
     
-    public func addPlayList(name: String,
-                            musicList: [(String, String?)],
-                            venue: String?,
-                            _ completionHandler: () -> Void) {
+    func addPlayList(name: String,
+                     musicList: [(String, String?)],
+                     venue: String?,
+                     _ completionHandler: () -> Void) {
         if currentUser == nil {
             authorize()
         } else {

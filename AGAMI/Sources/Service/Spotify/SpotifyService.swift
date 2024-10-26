@@ -14,9 +14,13 @@ import KeychainAccess
 @Observable
 final class SpotifyService {
     static let shared = SpotifyService()
-    private let spotifyAPI = SpotifyAPI(authorizationManager:
-                                            AuthorizationCodeFlowManager(clientId: SpotifyAPIKey.clientId,
-                                                                         clientSecret: SpotifyAPIKey.clientSecret))
+    private let spotifyAPI = SpotifyAPI(
+        authorizationManager:
+            AuthorizationCodeFlowManager(
+                clientId: SpotifyAPIKey.clientId,
+                clientSecret: SpotifyAPIKey.clientSecret
+            )
+    )
     private let loginCallbackURL: URL
     private let authorizationManagerKey = "authorizationManagerKey"
     private var authorizationState = String.randomURLSafe(length: 128)

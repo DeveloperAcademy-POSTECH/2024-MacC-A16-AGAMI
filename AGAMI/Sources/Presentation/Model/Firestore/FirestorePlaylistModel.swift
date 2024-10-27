@@ -34,7 +34,7 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
         photoURL: String = "",
         latitude: Double = 36.0126,
         longitude: Double = 129.3235,
-        streetAddress: String = "",
+        streetAddress: String = "", 
         firestoreSongs: [FirestoreSongModel] = [],
         generationTime: Date = Date()
     ) {

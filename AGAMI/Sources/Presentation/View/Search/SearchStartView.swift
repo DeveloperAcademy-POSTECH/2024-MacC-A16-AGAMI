@@ -13,7 +13,8 @@ struct SearchStartView: View {
 
     var body: some View {
         ZStack {
-            Color(.pPrimary).ignoresSafeArea(edges: .top)
+            Color(viewModel.shazamStatus.backgroundColor)
+                .ignoresSafeArea(edges: .top)
             
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
@@ -39,13 +40,15 @@ struct SearchStartView: View {
                 }
                 
                 VStack(spacing: 5) {
-                    Text("플레이크를 눌러 디깅하기")
+                    Text(viewModel.shazamStatus.title)
                         .font(.pretendard(weight: .semiBold600, size: 24))
                         .foregroundStyle(.white)
                     
-                    Text("지금 들리는 노래를 디깅해보세요.")
-                        .font(.pretendard(weight: .medium500, size: 20))
-                        .foregroundStyle(.white)
+                    if let subTitle = viewModel.shazamStatus.subTitle {
+                        Text(subTitle)
+                            .font(.pretendard(weight: .medium500, size: 20))
+                            .foregroundStyle(.white)
+                    }
                 }
                 .padding(.top, -50)
                 

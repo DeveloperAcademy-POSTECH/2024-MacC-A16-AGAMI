@@ -15,6 +15,11 @@ final class MapViewModel {
     var currentlatitude: Double?
     var currentlongitude: Double?
     var currentStreetAddress: String?
+    var isLoaded: Bool = false
+    
+    init() {
+        locationService.delegate = self
+    }
     
     func requestLocationAuthorization() {
         locationService.requestLocationAuthorization()
@@ -29,6 +34,7 @@ final class MapViewModel {
             dump("currentLocation == nil")
             return
         }
+        
         currentlatitude = currentLocation.coordinate.latitude
         currentlongitude = currentLocation.coordinate.longitude
         requestCurrentStreetAddress()
@@ -37,5 +43,12 @@ final class MapViewModel {
     func requestCurrentStreetAddress() {
         locationService.coordinateToStreetAddress()
         currentStreetAddress = locationService.streetAddress
+    }
+}
+
+extension MapViewModel: LocationServiceDelegate {
+    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
+        dump(#function)
+        isLoaded = true
     }
 }

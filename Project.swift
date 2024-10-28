@@ -56,7 +56,8 @@ let project = Project(
                                       "CFBundleURLName" : .string("com.agami.plake")
                                     ]
                                 )]
-                            )
+                            ),
+                            "UIUserInterfaceStyle": "Light"
                         ]
                     ),
             sources: ["AGAMI/Sources/**"],
@@ -72,7 +73,7 @@ let project = Project(
                 .external(name: "FirebaseStorage"),
                 .external(name: "SpotifyAPI"),
                 .external(name: "KeychainAccess"),
-                .external(name: "Lottie")
+                .external(name: "Lottie"),
                 .external(name: "Kingfisher")
             ]
         ),

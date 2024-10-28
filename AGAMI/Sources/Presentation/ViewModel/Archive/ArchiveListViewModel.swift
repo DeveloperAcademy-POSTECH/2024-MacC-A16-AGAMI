@@ -22,7 +22,7 @@ final class ArchiveListViewModel {
         }
     }
     var isDialogPresented: Bool = false
-    var isExporting: Bool = false
+    var exportingState: ExportingState = .none
 
     func fetchPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
@@ -83,7 +83,7 @@ final class ArchiveListViewModel {
     }
 
     func exportPlaylistToAppleMusic(playlist: PlaylistModel) async -> URL? {
-        isExporting = true
+        exportingState = .isAppleMusicExporting
         do {
             musicService.clearSongs()
             for song in playlist.songs {
@@ -94,11 +94,36 @@ final class ArchiveListViewModel {
         } catch {
             dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
         }
-        isExporting = false
+        exportingState = .none
         guard let urlString = musicService.getCurrentPlaylistUrl() else {
             return nil
         }
         return URL(string: urlString)
+    }
+
+    func exportPlaylistToSpotify(playlist: PlaylistModel, completion: @escaping (Result<URL, Error>) -> Void) {
+
+        exportingState = .isSpotifyExporting
+        let musicList = playlist.songs.map { ($0.title, $0.artist) }
+        SpotifyService.shared.addPlayList(name: playlist.playlistName,
+                                          musicList: musicList,
+                                          description: playlist.playlistDescription) { [weak self] playlistUri in
+            guard let playlistUri = playlistUri else {
+                self?.exportingState = .none
+                let error = SpotifyError.invalidURI
+                completion(.failure(error))
+                return
+            }
+            guard let playlistURL = URL(string: playlistUri.replacingOccurrences(of: "spotify:playlist:", with: "spotify://playlist/")) else {
+                self?.exportingState = .none
+                let error = SpotifyError.invalidURL
+                completion(.failure(error))
+                return
+            }
+            self?.exportingState = .none
+            completion(.success(playlistURL))
+        }
+        exportingState = .none
     }
 
     func formatDateToString(_ date: Date) -> String {
@@ -106,4 +131,9 @@ final class ArchiveListViewModel {
         dateFormatter.dateFormat = "yyyy. MM. dd."
         return dateFormatter.string(from: date)
     }
+}
+
+enum SpotifyError: Error {
+    case invalidURI
+    case invalidURL
 }

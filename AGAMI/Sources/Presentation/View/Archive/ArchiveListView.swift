@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Lottie
 
 struct ArchiveListView: View {
     @State var viewModel: ArchiveListViewModel = ArchiveListViewModel()
@@ -20,9 +21,15 @@ struct ArchiveListView: View {
                 }
                 .safeAreaPadding(.horizontal, 16)
             }
-            .blur(radius: viewModel.isExporting ? 10 : 0)
-            if viewModel.isExporting {
-                ProgressView()
+            switch viewModel.exportingState {
+            case .isAppleMusicExporting:
+                LottieView(animation: .named("applemusicLottie"))
+                    .playing(loopMode: .loop)
+            case .isSpotifyExporting:
+                LottieView(animation: .named("spotifyLottie"))
+                    .playing(loopMode: .loop)
+            case .none:
+                EmptyView()
             }
         }
         .onAppear {
@@ -215,7 +222,14 @@ private struct ContextMenuItems: View {
             Label("Apple Music에서 열기", systemImage: "square.and.arrow.up")
         }
         Button {
-
+            viewModel.exportPlaylistToSpotify(playlist: playlist) { result in
+                switch result {
+                case .success(let url):
+                    openURL(url)
+                case .failure(let err):
+                    dump(err.localizedDescription)
+                }
+            }
         } label: {
             Label("Spotify에서 열기", systemImage: "square.and.arrow.up")
         }

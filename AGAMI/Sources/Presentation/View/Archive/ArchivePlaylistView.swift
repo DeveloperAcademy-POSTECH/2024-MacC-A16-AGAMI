@@ -18,11 +18,9 @@ struct ArchivePlaylistView: View {
             ListView(viewModel: viewModel)
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
-                LottieView(animation: .named("applemusicLottie"))
-                    .playing(loopMode: .loop)
+                CustomLottieView(.applemusicExporting)
             case .isSpotifyExporting:
-                LottieView(animation: .named("spotifyLottie"))
-                    .playing(loopMode: .loop)
+                CustomLottieView(.spotifyExporting)
             case .none:
                 EmptyView()
             }

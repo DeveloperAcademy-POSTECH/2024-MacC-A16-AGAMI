@@ -15,24 +15,27 @@ final class SearchWritingViewModel {
     private let firebaseService = FirebaseService()
     private let locationService = LocationService.shared
     
+    // 플레이리스트 정보
     var playlist = SwiftDataPlaylistModel()
     var diggingList: [SongModel] = []
     var userTitle: String = ""
     var userDescription: String = ""
+    
+    // 커버 이미지
     var photoURL: String = ""
     var photoUIImage: UIImage?
-
     var isLoading: Bool = false
     
+    // 유저 위치
     var currentlatitude: Double?
     var currentlongitude: Double?
     var currentStreetAddress: String?
-    
-    var isLoaded: Bool = false
     var placeHolderAddress: String = ""
+    var isLoaded: Bool = false
     
     init() {
         loadSavedSongs()
+        
         if let address = locationService.placeHolderAddress {
             placeHolderAddress = address
         }
@@ -107,11 +110,7 @@ final class SearchWritingViewModel {
         }
     }
     
-    func savePhotoUrl(photoUrl: String) {
-        self.photoURL = photoUrl
-    }
-    
-    func savePhotoUIimage(photoUIImage: UIImage) {
+    func savePhotoUIImage(photoUIImage: UIImage) {
         self.photoUIImage = photoUIImage
     }
     
@@ -137,7 +136,7 @@ final class SearchWritingViewModel {
 
 extension SearchWritingViewModel: LocationServiceDelegate {
     func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
-        guard let currentLocation = locationService.getCurrentLocation() else {
+        guard locationService.getCurrentLocation() != nil else {
             print("location nil")
             return
         }

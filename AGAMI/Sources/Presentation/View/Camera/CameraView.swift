@@ -89,8 +89,8 @@ struct CameraView: View {
     
     var usedPhotoButton: some View {
         Button {
-            if let uiImage = viewModel.photoUIImage {
-                searchWritingViewModel.savePhotoUIimage(photoUIImage: uiImage)
+            if let uiImage = viewModel.photoUIImage?.resizeToSquare() {
+                searchWritingViewModel.savePhotoUIImage(photoUIImage: uiImage)
             }
             coordinator.pop()
         } label: {

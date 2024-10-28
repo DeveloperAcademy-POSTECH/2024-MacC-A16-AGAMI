@@ -63,7 +63,6 @@ struct SearchWritingView: View {
         }
         .onAppear {
             viewModel.getCurrentLocation()
-            print("viewModel.photoURL: \(viewModel.photoURL)")
         }
         .listStyle(PlainListStyle())
         .navigationTitle("플리카빙")

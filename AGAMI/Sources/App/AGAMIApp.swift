@@ -13,6 +13,9 @@ struct AGAMIApp: App {
         WindowGroup {
             if isSignedIn {
                 HomeView()
+                    .onOpenURL { url in
+                        SpotifyService.shared.handleURL(url)
+                    }
             } else {
                 SignInView()
             }

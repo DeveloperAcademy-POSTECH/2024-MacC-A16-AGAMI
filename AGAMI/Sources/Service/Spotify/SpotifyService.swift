@@ -92,30 +92,26 @@ final class SpotifyService {
     
     private func authorizationManagerDidChange() {
         self.isAuthorized = self.spotifyAPI.authorizationManager.isAuthorized()
-        
-        print(
-            "Spotify.authorizationManagerDidChange: isAuthorized:",
-            self.isAuthorized
-        )
-        
+
+        if self.isAuthorized {
+            print("Authorization successful: isAuthorized is true.")
+        } else {
+            print("Authorization failed: isAuthorized is false.")
+        }
+
+        print("Spotify.authorizationManagerDidChange: isAuthorized:", self.isAuthorized)
         self.retrieveCurrentUser()
-        
+
         do {
-            let authManagerData = try JSONEncoder().encode(
-                self.spotifyAPI.authorizationManager
-            )
-            
+            let authManagerData = try JSONEncoder().encode(self.spotifyAPI.authorizationManager)
+            print("authManagerData: \(authManagerData)")
             self.keychain[data: self.authorizationManagerKey] = authManagerData
-            print("did save authorization manager to keychain")
-            
+            print("Did save authorization manager to keychain.")
         } catch {
-            print(
-                "couldn't encode authorizationManager for storage " +
-                "in keychain:\n\(error)"
-            )
+            print("Couldn't encode authorizationManager for storage in keychain:\n\(error)")
         }
     }
-    
+
     private func authorizationManagerDidDeauthorize() {
         self.isAuthorized = false
         self.currentUser = nil
@@ -136,9 +132,7 @@ final class SpotifyService {
         if onlyIfNil && self.currentUser != nil {
             return
         }
-        
-        guard self.isAuthorized else { return }
-        
+
         self.spotifyAPI.currentUserProfile()
             .receive(on: RunLoop.main)
             .sink(
@@ -187,12 +181,12 @@ final class SpotifyService {
     
     func addPlayList(name: String,
                      musicList: [(String, String?)],
-                     venue: String?,
+                     description: String?,
                      _ completionHandler: @escaping (String?) -> Void) {
         if currentUser == nil {
             authorize()
         } else {
-            performPlaylistCreation(name: name, musicList: musicList, venue: venue) { playlistUri in
+            performPlaylistCreation(name: name, musicList: musicList, description: description) { playlistUri in
                 completionHandler(playlistUri)
             }
         }
@@ -200,7 +194,7 @@ final class SpotifyService {
     
     private func performPlaylistCreation(name: String,
                                          musicList: [(String, String?)],
-                                         venue: String?,
+                                         description: String?,
                                          _ completionHandler: @escaping (String?) -> Void) {
         var trackUris: [String] = []
         var playlistUri: String = ""
@@ -229,7 +223,7 @@ final class SpotifyService {
                 .eraseToAnyPublisher()
         }
         
-        func createPlaylist() -> AnyPublisher<Void, Error> {
+        func createPlaylist(description: String?) -> AnyPublisher<Void, Error> {
             guard let userURI: SpotifyURIConvertible = self.currentUser?.uri else {
                 return Fail(error: ErrorType.userNotFound).eraseToAnyPublisher()
             }
@@ -237,8 +231,8 @@ final class SpotifyService {
             let playlistDetails = PlaylistDetails(name: "\(name) @ \(DateFormatter.spotifyAlbumLong.string(from: Date()))",
                                                   isPublic: false,
                                                   isCollaborative: false,
-                                                  description: "Plake에서 생성된 플레이리스트 입니다.")
-            
+                                                  description: description)
+
             return self.spotifyAPI.createPlaylist(for: userURI, playlistDetails)
                 .map { playlist in
                     print("Playlist created: \(playlist)")
@@ -262,7 +256,7 @@ final class SpotifyService {
         }
         
         searchTracks()
-            .flatMap { _ in createPlaylist() }
+            .flatMap { _ in createPlaylist(description: description) }
             .flatMap { _ in addTracks() }
             .sink(receiveCompletion: { completion in
                 switch completion {

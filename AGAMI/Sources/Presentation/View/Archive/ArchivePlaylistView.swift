@@ -7,19 +7,24 @@
 
 import SwiftUI
 import Kingfisher
+import Lottie
 
 struct ArchivePlaylistView: View {
     @State var viewModel: ArchivePlaylistViewModel
     @Environment(\.openURL) private var openURL
 
     var body: some View {
-        Menu("이거 뜨나") {
-            ConfirmationDialogActions(viewModel: viewModel)
-        }
         ZStack {
             ListView(viewModel: viewModel)
-            if viewModel.isExporting {
-                ProgressView()
+            switch viewModel.exportingState {
+            case .isAppleMusicExporting:
+                LottieView(animation: .named("applemusicLottie"))
+                    .playing(loopMode: .loop)
+            case .isSpotifyExporting:
+                LottieView(animation: .named("spotifyLottie"))
+                    .playing(loopMode: .loop)
+            case .none:
+                EmptyView()
             }
         }
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
@@ -71,7 +76,6 @@ private struct ListView: View {
 
         }
         .listStyle(.plain)
-        .blur(radius: viewModel.isExporting ? 10 : 0)
     }
 }
 
@@ -211,25 +215,31 @@ private struct ExportButton: View {
 }
 
 private struct ConfirmationDialogActions: View {
+    @Environment(\.openURL) var openURL
     var viewModel: ArchivePlaylistViewModel
 
     var body: some View {
         Button {
-            
-        } label: {
-            HStack {
-                Text("Apple Music에서 열기")
-                Image(.appleSmallBlackLogo)
+            Task {
+                if let url = await viewModel.exportPlaylistToAppleMusic() {
+                    openURL(url)
+                }
             }
+        } label: {
+            Label("Apple Music에서 열기", image: .appleSmallBlackLogo)
         }
 
         Button {
-
-        } label: {
-            HStack {
-                Text("Spotify에서 열기")
-                Image(.spotifySmallBlackLogo)
+            viewModel.exportPlaylistToSpotify { result in
+                switch result {
+                case .success(let url):
+                    openURL(url)
+                case .failure(let err):
+                    dump(err.localizedDescription)
+                }
             }
+        } label: {
+            Label("Spotify에서 열기", image: .spotifySmallBlackLogo)
         }
     }
 }

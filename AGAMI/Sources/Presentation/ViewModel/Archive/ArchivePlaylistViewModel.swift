@@ -15,7 +15,7 @@ final class ArchivePlaylistViewModel: Hashable {
     private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
 
-    var isExporting: Bool = false
+    var exportingState: ExportingState = .none
     var isEditing: Bool = false
     var isDialogPresented: Bool = false
 
@@ -31,20 +31,46 @@ final class ArchivePlaylistViewModel: Hashable {
         hasher.combine(id)
     }
 
-    func exportPlaylistToAppleMusic() {
-        Task {
-            isExporting = true
-            do {
-                musicService.clearSongs()
-                for song in playlist.songs {
-                    let appleMusicSong = try await musicService.searchSongById(songId: song.songID)
-                    musicService.addSongToSongs(song: appleMusicSong)
-                }
-                try await musicService.createPlaylist(name: playlist.playlistName, description: playlist.playlistDescription)
-            } catch {
-                dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
+    func exportPlaylistToAppleMusic() async -> URL? {
+        exportingState = .isAppleMusicExporting
+        do {
+            musicService.clearSongs()
+            for song in playlist.songs {
+                dump("song")
+                let appleMusicSong = try await musicService.searchSongById(songId: song.songID)
+                musicService.addSongToSongs(song: appleMusicSong)
             }
-            isExporting = false
+            try await musicService.createPlaylist(name: playlist.playlistName, description: playlist.playlistDescription)
+        } catch {
+            dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
+        }
+        exportingState = .isAppleMusicExporting
+        guard let urlString = musicService.getCurrentPlaylistUrl() else {
+            return nil
+        }
+        return URL(string: urlString)
+    }
+
+    func exportPlaylistToSpotify(completion: @escaping (Result<URL, Error>) -> Void) {
+        exportingState = .isSpotifyExporting
+        let musicList = playlist.songs.map { ($0.title, $0.artist) }
+        SpotifyService.shared.addPlayList(name: playlist.playlistName,
+                                          musicList: musicList,
+                                          description: playlist.playlistDescription) { [weak self] playlistUri in
+            guard let playlistUri = playlistUri else {
+                self?.exportingState = .none
+                let error = SpotifyError.invalidURI
+                completion(.failure(error))
+                return
+            }
+            guard let playlistURL = URL(string: playlistUri.replacingOccurrences(of: "spotify:playlist:", with: "spotify://playlist/")) else {
+                self?.exportingState = .none
+                let error = SpotifyError.invalidURL
+                completion(.failure(error))
+                return
+            }
+            self?.exportingState = .none
+            completion(.success(playlistURL))
         }
     }
 
@@ -78,7 +104,7 @@ final class ArchivePlaylistViewModel: Hashable {
         }
         try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
     }
-    
+
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy. MM. dd."

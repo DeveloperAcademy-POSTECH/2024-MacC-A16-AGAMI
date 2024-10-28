@@ -50,7 +50,7 @@ final class ArchivePlaylistViewModel: Hashable {
         } catch {
             dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
         }
-        exportingState = .isAppleMusicExporting
+        exportingState = .none
         guard let urlString = musicService.getCurrentPlaylistUrl() else {
             return nil
         }

@@ -19,8 +19,10 @@ struct ArchivePlaylistView: View {
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
                 CustomLottieView(.applemusicExporting)
+                    .ignoresSafeArea()
             case .isSpotifyExporting:
                 CustomLottieView(.spotifyExporting)
+                    .ignoresSafeArea()
             case .none:
                 EmptyView()
             }
@@ -106,7 +108,7 @@ private struct ArchivePlaylistRow: View {
                         .frame(width: 60, height: 60)
                 })
                 .frame(width: 60, height: 60)
-                .padding(.trailing, 20)
+                .padding(.trailing, 12)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(song.title)
@@ -164,13 +166,8 @@ private struct ImageAndTitleWithHeaderView: View {
                     Group {
                         Text(viewModel.playlist.streetAddress)
                             .padding(.bottom, 12)
-                        Text(
-                            viewModel
-                                .formatDateToString(
-                                    viewModel.playlist.generationTime
-                                )
-                        )
-                        .padding(.bottom, 22)
+                        Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
+                            .padding(.bottom, 22)
                     }
                     .font(.pretendard(weight: .medium500, size: 20))
                     .foregroundStyle(Color(.pWhite))
@@ -194,7 +191,7 @@ private struct ImageAndTitleWithHeaderView: View {
 
             if viewModel.isEditing {
                 TextField("", text: $viewModel.playlist.playlistName)
-                    .font(.pretendard(weight: .bold700, size: 26))
+                    .font(.pretendard(weight: .bold700, size: 24))
                     .foregroundStyle(Color(.pBlack))
                     .padding(16)
                     .background(Color(.pLightGray))
@@ -206,10 +203,10 @@ private struct ImageAndTitleWithHeaderView: View {
                     .font(.pretendard(weight: .bold700, size: 26))
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(Color(.pBlack))
-                    .padding(EdgeInsets(top: 30, leading: 16, bottom: 0, trailing: 16))
+                    .padding(EdgeInsets(top: 33, leading: 8, bottom: 0, trailing: 8))
             }
 
-            HStack(alignment: .bottom, spacing: 0) {
+            HStack(spacing: 0) {
                 Text("수집한 플레이크")
                     .font(.pretendard(weight: .semiBold600, size: 20))
                     .foregroundStyle(Color(.pBlack))
@@ -231,6 +228,7 @@ private struct PlaylistDescription: View {
             TextField("", text: $viewModel.playlist.playlistDescription)
                 .font(.pretendard(weight: .regular400, size: 16))
                 .foregroundStyle(Color(.pBlack))
+                .kerning(-0.3)
                 .multilineTextAlignment(.leading)
                 .padding(EdgeInsets(top: 16, leading: 8, bottom: 16, trailing: 8))
                 .background(Color(.pLightGray))
@@ -238,6 +236,7 @@ private struct PlaylistDescription: View {
         } else {
             Text(viewModel.playlist.playlistDescription)
                 .font(.pretendard(weight: .regular400, size: 16))
+                .kerning(-0.3)
                 .foregroundStyle(Color(.pBlack))
                 .multilineTextAlignment(.leading)
         }
@@ -254,15 +253,16 @@ private struct ExportButton: View {
                 Text("플라키브 내보내기")
                     .font(.pretendard(weight: .medium500, size: 20))
                     .foregroundColor(Color(.pWhite))
+                    .kerning(-0.41)
 
                 Image(systemName: "square.and.arrow.up.on.square.fill")
-                    .font(.pretendard(weight: .medium500, size: 20))
+                    .font(.pretendard(weight: .medium500, size: 18))
                     .foregroundColor(Color(.pWhite))
             }
             .padding(EdgeInsets(top: 20, leading: 50, bottom: 20, trailing: 50))
             .background(Color(.pPrimary))
-            .clipShape(RoundedRectangle(cornerRadius: 99))
-            .contentShape(RoundedRectangle(cornerRadius: 99))
+            .clipShape(Capsule())
+            .contentShape(Capsule())
             .onTapGesture {
                 viewModel.isDialogPresented = true
             }
@@ -328,6 +328,7 @@ private struct TopBarTrailingItems: View {
                     MenuContents(viewModel: viewModel)
                 } label: {
                     Image(systemName: "ellipsis.circle")
+                        .font(.system(size: 17, weight: .regular))
                 }
             }
         }
@@ -335,7 +336,7 @@ private struct TopBarTrailingItems: View {
 }
 
 private struct MenuContents: View {
-    @Environment(ArchiveCoordinator.self) private var coord
+    @Environment(ArchiveCoordinator.self) private var coordinator
     var viewModel: ArchivePlaylistViewModel
 
     var body: some View {
@@ -348,7 +349,7 @@ private struct MenuContents: View {
         Button(role: .destructive) {
             Task {
                 await viewModel.deletePlaylist()
-                coord.pop()
+                coordinator.pop()
             }
         } label: {
             Label("삭제하기", systemImage: "trash")

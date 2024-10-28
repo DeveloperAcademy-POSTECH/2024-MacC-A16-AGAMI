@@ -7,34 +7,37 @@
 
 import SwiftUI
 
-import UIKit
 import Lottie
 
-struct LottieView: UIViewRepresentable {
-
-    var filename: String
+struct CustomLottieView: View {
+    let lottie: LottieAnimationType
+    let loopMode: LottieLoopMode
+    let speed: CGFloat
     
-    func makeUIView(context: UIViewRepresentableContext<LottieView>) -> UIView {
-        let view = UIView(frame: .zero)
-        
-        let animationView = LottieAnimationView()
-        animationView.animation = LottieAnimation.named(filename)
-        animationView.contentMode = .scaleAspectFit
-        animationView.loopMode = .loop
-        
-        animationView.play()
-        
-        animationView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(animationView)
-        
-        NSLayoutConstraint.activate([
-            animationView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            animationView.heightAnchor.constraint(equalTo: view.heightAnchor)
-        ])
-        
-        return view
+    init(_ lottie: LottieAnimationType, loopMode: LottieLoopMode = .loop, speed: CGFloat = 1.0) {
+        self.lottie = lottie
+        self.loopMode = loopMode
+        self.speed = speed
     }
-    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<LottieView>) {
-        // do nothing
+    
+    var body: some View {
+        LottieView(animation: .named(lottie.filename, bundle: .module))
+            .configure({ lottieView in
+                lottieView.animationSpeed = speed
+                lottieView.loopMode = loopMode
+            })
+            .playing()
+    }
+}
+
+enum LottieAnimationType: String {
+    case search
+    
+    // add lottie filename case
+    internal var filename: String {
+        switch self {
+        case .search:
+            "shazamLottie"
+        }
     }
 }

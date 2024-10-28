@@ -60,15 +60,10 @@ enum SearchSheet: Identifiable {
     case diggingModalView(viewModel: SearchStartViewModel)
 }
 
-enum SearchFullScreenCover: Identifiable {
-    var id: String {
-        switch self {
-        case .playlistFullscreenView:
-            return "playlistFullscreenView"
-        }
-    }
+enum SearchFullScreenCover: String, Identifiable {
+    var id: String { self.rawValue }
     
-    case playlistFullscreenView(viewModel: SearchWritingViewModel)
+    case dummyFullScreenCover
 }
 
 @Observable
@@ -137,8 +132,8 @@ final class SearchCoordinator {
     @ViewBuilder
     func buildFullScreenCover(cover: SearchFullScreenCover) -> some View {
         switch cover {
-        case .playlistFullscreenView(let viewModel):
-            SearchPlayListFullscreenVIew(viewModel: viewModel)
+        case .dummyFullScreenCover:
+            EmptyView()
         }
     }
 }

@@ -83,6 +83,9 @@ let project = Project(
                 ),
                 .external(
                     name: "KeychainAccess"
+                ),
+                .external(
+                    name: "Lottie"
                 )
             ]
         ),
@@ -103,10 +106,7 @@ let project = Project(
 
 extension TargetScript {
     static let swiftLintShell = TargetScript.pre(
-        path:
-                .relativeToRoot(
-                    "Scripts/SwiftLintRunScript.sh"
-                ),
+        path: .relativeToRoot("Scripts/SwiftLintRunScript.sh"),
         name: "swiftLintShell",
         basedOnDependencyAnalysis: false
     )

@@ -149,6 +149,9 @@ struct SearchWritingView: View {
         .onTapGesture {
             hideKeyboard()
         }
+        .onAppear {
+            viewModel.getCurrentLocation()
+        }
         .listStyle(PlainListStyle())
         .navigationTitle("플리카빙")
         .navigationBarTitleDisplayMode(.inline)
@@ -251,7 +254,7 @@ private struct PlaylistTitleTextField: View {
     @FocusState var isFocused: Bool
     
     var body: some View {
-        TextField("효자동에서 만난 플레이크", text: $viewModel.userTitle)
+        TextField("\(viewModel.placeHolderAddress)에서 만난 플레이크", text: $viewModel.userTitle)
             .font(.pretendard(weight: .semiBold600, size: 24))
             .foregroundStyle(.black)
             .focused($isFocused)

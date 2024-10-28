@@ -7,6 +7,7 @@
 
 import Foundation
 import UIKit
+import CoreLocation
 
 @Observable
 final class SearchWritingViewModel {
@@ -15,6 +16,7 @@ final class SearchWritingViewModel {
     private let locationService = LocationService.shared
     
     var playlist = SwiftDataPlaylistModel()
+    var diggingList: [SongModel] = []
     var userTitle: String = ""
     var userDescription: String = ""
     var photoURL: String = ""
@@ -22,8 +24,18 @@ final class SearchWritingViewModel {
     var diggingList: [SongModel] = []
     var isLoading: Bool = false
     
+    var currentlatitude: Double?
+    var currentlongitude: Double?
+    var currentStreetAddress: String?
+    
+    var isLoaded: Bool = false
+    var placeHolderAddress: String = ""
+    
     init() {
         loadSavedSongs()
+        if let address = locationService.placeHolderAddress {
+            placeHolderAddress = address
+        }
     }
     
     func loadSavedSongs() {
@@ -34,21 +46,49 @@ final class SearchWritingViewModel {
         }
     }
     
+    func requestCurrentLocation() {
+        locationService.requestCurrentLocation()
+    }
+    
+    func requestCurrentStreetAddress() {
+        locationService.coordinateToStreetAddress()
+        currentStreetAddress = locationService.streetAddress
+    }
+    
+    func getCurrentLocation() {
+        guard let currentLocation = locationService.getCurrentLocation() else { return }
+        
+        currentlatitude = currentLocation.coordinate.latitude
+        currentlongitude = currentLocation.coordinate.longitude
+        
+        requestCurrentStreetAddress()
+        
+        if currentlatitude != nil && currentlongitude != nil && currentStreetAddress != nil {
+            isLoaded = true
+        }
+    }
+    
     func savedPlaylist() async {
         do {
-            guard let currentLocation = locationService.getCurrentLocation() else { return }
+            guard let currentlatitude = self.currentlatitude,
+                  let currentlongitude = self.currentlongitude,
+                  let currentStreetAddress = self.currentStreetAddress else { return }
+            
+            userTitle = userTitle == "" ? "\(placeHolderAddress)에서 만난 플레이크" : userTitle
             
             try persistenceService.createPlaylist(playlistName: userTitle,
                                                   playlistDescription: userDescription,
-                                                  photoURL: photoURL,
-                                                  latitude: 1.0,
-                                                  longitude: 1.0,
-                                                  streetAddress: "")
+                                                  photoURL: photoUrl,
+                                                  latitude: currentlatitude,
+                                                  longitude: currentlongitude,
+                                                  streetAddress: currentStreetAddress)
             playlist.playlistName = userTitle
             playlist.playlistDescription = userDescription
             playlist.songs = try persistenceService.fetchDiggingList()
-            playlist.photoURL = photoURL
-            await playlist.photoURL = savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") ?? ""
+            playlist.photoURL = photoUrl
+            playlist.latitude = currentlatitude
+            playlist.longitude = currentlongitude
+            playlist.streetAddress = currentStreetAddress
             try await firebaseService.savePlaylistToFirebase(userID: FirebaseAuthService.currentUID ?? "",
                                                              playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
         } catch {
@@ -90,5 +130,14 @@ final class SearchWritingViewModel {
     
     func hideProgress() {
         isLoading = false
+    }
+}
+
+extension SearchWritingViewModel: LocationServiceDelegate {
+    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
+        guard let currentLocation = locationService.getCurrentLocation() else {
+            print("location nil")
+            return
+        }
     }
 }

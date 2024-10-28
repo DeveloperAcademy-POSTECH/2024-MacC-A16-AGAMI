@@ -10,8 +10,85 @@ import SwiftUI
 struct SearchWritingView: View {
     @Environment(SearchCoordinator.self) var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
+    @FocusState var isFocused: Bool
+    @State private var showActionSheet: Bool = false
     
     var body: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                AsyncImage(url: URL(string: viewModel.photoUrl)) { image in
+                    image
+                        .resizable()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .aspectRatio(1, contentMode: .fit)
+                        .padding(.horizontal, 58)
+                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+                } placeholder: {
+                    Image(.basicCover)
+                        .padding(.horizontal, 58)
+                        .overlay {
+                            HStack(spacing: 0) {
+                                Image(systemName: "photo.fill")
+                                    .font(.system(size: 17, weight: .regular))
+                                    .foregroundStyle(Color(.pPrimary))
+                                
+                                Text("커버 설정하기")
+                                    .font(.pretendard(weight: .semiBold600, size: 20))
+                                    .foregroundStyle(Color(.pPrimary))
+                                    .padding(.leading, 5)
+                            }
+                        }
+                }
+                .onTapGesture {
+                    if viewModel.photoUrl == "" {
+                        coordinator.push(view: .cameraView(viewModel: viewModel))
+                    } else {
+                        showActionSheet.toggle()
+                    }
+                }
+                
+                //TODO: 실시간 위치 넣기
+                TextField("효자동에서 만난 플레이크", text: $viewModel.userTitle)
+                    .font(.pretendard(weight: .semiBold600, size: 24))
+                    .foregroundStyle(.black)
+                    .focused($isFocused)
+                    .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 8))
+                    .background(Color(.pLightGray))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
+                    }
+                    .padding(.top, 30)
+                    .padding(.horizontal, 8)
+                
+                HStack(spacing: 0) {
+                    Text("수집한 플레이크")
+                        .font(.pretendard(weight: .semiBold600, size: 20))
+                        .foregroundStyle(Color(.pBlack))
+                    Spacer()
+                    Text("\(viewModel.diggingList.count) 플레이크")
+                        .font(.pretendard(weight: .medium500, size: 16))
+                        .foregroundStyle(Color(.pPrimary))
+                }
+                .padding(.top, 40)
+                .padding(.horizontal, 24)
+                
+                List {
+                    ForEach(viewModel.diggingList, id: \.songID) { song in
+                        PlaylistRow(song: song)
+                    }
+                }
+                .listStyle(PlainListStyle())
+                .padding(.horizontal, 8)
+                
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundStyle(Color(.pLightGray))
+                    .overlay(alignment: .topLeading) {
+                        TextField("플레이크에 대한 설명 추가하기", text: $viewModel.userDescription, axis: .vertical)
+                            .background(.clear)
+                            .foregroundStyle(.black)
+                            .padding()
         ZStack {
             VStack(spacing: 0) {
                 photoView
@@ -64,9 +141,36 @@ struct SearchWritingView: View {
                     } label: {
                         Text("저장")
                     }
+                    .frame(height: 65)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 13)
                 }
                 .disabled(!viewModel.isLoaded)
             }
+            .confirmationDialog("", isPresented: $showActionSheet) {
+                Button("다시 찍기") {
+                    coordinator.push(view: .cameraView(viewModel: viewModel))
+                }
+                Button("기본 이미지로 변경") {
+                    viewModel.photoUrl = ""
+                }
+                Button("취소", role: .cancel) {}
+            }
+            .navigationTitle("플리카빙")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        Task {
+                            await viewModel.savedPlaylist()
+                            viewModel.clearDiggingList()
+                            coordinator.popToRoot()
+                        }
+                    } label: {
+                        Text("저장")
+                            .font(.pretendard(weight: .semiBold600, size: 17))
+                    }
+                }
             .disabled(viewModel.isLoading)
             .blur(radius: viewModel.isLoading ? 10 : 0)
             
@@ -74,6 +178,10 @@ struct SearchWritingView: View {
                 ProgressView()
                 
             }
+            .toolbarRole(.editor)
+        }
+        .onTapGesture {
+            hideKeyboard()
         }
     }
     

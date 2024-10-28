@@ -20,8 +20,8 @@ final class SearchWritingViewModel {
     var userTitle: String = ""
     var userDescription: String = ""
     var photoURL: String = ""
-    var photoUIIMage: UIImage?
-    var diggingList: [SongModel] = []
+    var photoUIImage: UIImage?
+
     var isLoading: Bool = false
     
     var currentlatitude: Double?
@@ -78,17 +78,19 @@ final class SearchWritingViewModel {
             
             try persistenceService.createPlaylist(playlistName: userTitle,
                                                   playlistDescription: userDescription,
-                                                  photoURL: photoUrl,
+                                                  photoURL: photoURL,
                                                   latitude: currentlatitude,
                                                   longitude: currentlongitude,
                                                   streetAddress: currentStreetAddress)
             playlist.playlistName = userTitle
             playlist.playlistDescription = userDescription
             playlist.songs = try persistenceService.fetchDiggingList()
-            playlist.photoURL = photoUrl
+            playlist.photoURL = photoURL
             playlist.latitude = currentlatitude
             playlist.longitude = currentlongitude
             playlist.streetAddress = currentStreetAddress
+            
+            await playlist.photoURL = savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") ?? ""
             try await firebaseService.savePlaylistToFirebase(userID: FirebaseAuthService.currentUID ?? "",
                                                              playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
         } catch {
@@ -110,11 +112,11 @@ final class SearchWritingViewModel {
     }
     
     func savePhotoUIimage(photoUIImage: UIImage) {
-        self.photoUIIMage = photoUIImage
+        self.photoUIImage = photoUIImage
     }
     
     func savePhotoToFirebase(userID: String) async -> String? {
-        if let image = photoUIIMage {
+        if let image = photoUIImage {
             do {
                 photoURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             } catch {

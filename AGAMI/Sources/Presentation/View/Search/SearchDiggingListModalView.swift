@@ -30,6 +30,7 @@ struct SearchDiggingListModalView: View {
                         .onMove(perform: viewModel.moveSong)
                     }
                     .scrollIndicators(.hidden)
+                    .listStyle(InsetGroupedListStyle())
                 }
             }
             .navigationTitle("플레이크 리스트")
@@ -39,7 +40,9 @@ struct SearchDiggingListModalView: View {
                         coordinator.dismissSheet()
                         coordinator.push(view: .writingView)
                     }, label: {
-                        Text("Next")
+                        Image(.nextButton)
+                            .resizable()
+                            .frame(width: 34, height: 34)
                     })
                 })
             }

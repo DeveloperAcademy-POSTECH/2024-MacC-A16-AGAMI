@@ -111,10 +111,10 @@ enum ShazamStatus {
     case found
     case failed
     
-    var title: String {
+    var title: String? {
         switch self {
         case .idle: return "플레이크를 눌러 디깅하기"
-        case .searching: return "플레이킹중..."
+        case .searching: return nil
         case .found: return "노래를 찾았습니다. 확인해보세요!"
         case .failed: return "플레이크로 다시 디깅하기"
         }

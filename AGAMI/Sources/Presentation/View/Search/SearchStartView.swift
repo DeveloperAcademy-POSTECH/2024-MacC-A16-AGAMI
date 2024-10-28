@@ -7,14 +7,21 @@
 
 import SwiftUI
 
+import Lottie
+
 struct SearchStartView: View {
     @Environment(SearchCoordinator.self) var coordinator
     @State var viewModel: SearchStartViewModel = SearchStartViewModel()
-
+    
     var body: some View {
         ZStack {
             Color(viewModel.shazamStatus.backgroundColor)
                 .ignoresSafeArea(edges: .top)
+            
+            if viewModel.shazamStatus == .searching {
+                LottieView(filename: "shazamLottie")
+                    .ignoresSafeArea()
+            }
             
             VStack(spacing: 0) {
                 HStack(spacing: 0) {
@@ -29,20 +36,24 @@ struct SearchStartView: View {
                 Button {
                     viewModel.searchButtonTapped()
                 } label: {
-                    Image(.diggingButtonBackground)
-                        .resizable()
-                        .frame(width: 393, height: 393)
-                        .overlay {
-                            Image(.diggingButton)
-                                .resizable()
-                                .frame(width: 85, height: 85)
-                        }
+                    if viewModel.shazamStatus != .searching {
+                        Image(.diggingButtonBackground)
+                            .resizable()
+                            .frame(width: 393, height: 393)
+                            .overlay {
+                                Image(.diggingButton)
+                                    .resizable()
+                                    .frame(width: 85, height: 85)
+                            }
+                    }
                 }
                 
                 VStack(spacing: 5) {
-                    Text(viewModel.shazamStatus.title)
-                        .font(.pretendard(weight: .semiBold600, size: 24))
-                        .foregroundStyle(.white)
+                    if let title = viewModel.shazamStatus.title {
+                        Text(title)
+                            .font(.pretendard(weight: .semiBold600, size: 24))
+                            .foregroundStyle(.white)
+                    }
                     
                     if let subTitle = viewModel.shazamStatus.subTitle {
                         Text(subTitle)

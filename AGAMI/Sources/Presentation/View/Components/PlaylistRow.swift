@@ -34,7 +34,7 @@ struct PlaylistRow: View {
             }
             Spacer()
             Image(systemName: "line.3.horizontal")
-                .foregroundStyle(.gray)
+                .foregroundStyle(Color(.pGray3))
                 .font(.system(size: 16, weight: .regular))
                 .padding(.trailing, 15)
         }

@@ -25,7 +25,10 @@ struct SearchWritingView: View {
                         .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
                 } placeholder: {
                     Image(.basicCover)
+                        .resizable()
+                        .clipShape(RoundedRectangle(cornerRadius: 13))
                         .padding(.horizontal, 58)
+                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
                         .overlay {
                             HStack(spacing: 0) {
                                 Image(systemName: "photo.fill")
@@ -39,6 +42,7 @@ struct SearchWritingView: View {
                             }
                         }
                 }
+                .padding(.top, 18)
                 .onTapGesture {
                     if viewModel.photoUrl == "" {
                         coordinator.push(view: .cameraView(viewModel: viewModel))
@@ -47,7 +51,7 @@ struct SearchWritingView: View {
                     }
                 }
                 
-                //TODO: 실시간 위치 넣기
+                // 실시간 위치 넣기
                 TextField("효자동에서 만난 플레이크", text: $viewModel.userTitle)
                     .font(.pretendard(weight: .semiBold600, size: 24))
                     .foregroundStyle(.black)
@@ -151,7 +155,7 @@ struct SearchWritingView: View {
                 Button("다시 찍기") {
                     coordinator.push(view: .cameraView(viewModel: viewModel))
                 }
-                Button("기본 이미지로 변경") {
+                Button("기본 이미지로 변경", role: .destructive) {
                     viewModel.photoUrl = ""
                 }
                 Button("취소", role: .cancel) {}
@@ -183,6 +187,8 @@ struct SearchWritingView: View {
         .onTapGesture {
             hideKeyboard()
         }
+        .scrollIndicators(.hidden)
+        .toolbarVisibilityForVersion(.hidden, for: .tabBar)
     }
     
     @ViewBuilder

@@ -8,6 +8,10 @@
 import Foundation
 import CoreLocation
 
+protocol LocationServiceDelegate: AnyObject {
+    func locationService(_ service: LocationService, didUpdate location: [CLLocation])
+}
+
 final class LocationService: NSObject {
     private var currentLocation: CLLocation?
     private var locationManager: CLLocationManager = CLLocationManager()
@@ -15,6 +19,8 @@ final class LocationService: NSObject {
     var streetAddress: String?
     
     static let shared = LocationService()
+    
+    weak var delegate: LocationServiceDelegate?
     
     private override init() {
         locationManager = CLLocationManager()
@@ -79,8 +85,8 @@ extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             currentLocation = location
-            manager.desiredAccuracy = kCLLocationAccuracyBest
         }
+        self.delegate?.locationService(self, didUpdate: locations)
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

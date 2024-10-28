@@ -24,8 +24,10 @@ struct ArchiveListView: View {
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
                 CustomLottieView(.applemusicExporting)
+                    .ignoresSafeArea()
             case .isSpotifyExporting:
                 CustomLottieView(.spotifyExporting)
+                    .ignoresSafeArea()
             case .none:
                 EmptyView()
             }
@@ -167,9 +169,11 @@ private struct ArchiveListCell: View {
                     Group {
                         Text(playlist.playlistName)
                             .font(.pretendard(weight: .bold700, size: 22))
+                            .kerning(-0.5)
                             .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
                         Text(playlist.streetAddress)
                             .font(.pretendard(weight: .medium500, size: 16))
+                            .kerning(-0.5)
                             .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
                     }
                     .foregroundStyle(Color(.pWhite))
@@ -182,6 +186,7 @@ private struct ArchiveListCell: View {
                         Text(viewModel.formatDateToString(playlist.generationTime))
                             .font(.pretendard(weight: .regular400, size: 14))
                             .foregroundStyle(Color(.pWhite))
+                            .kerning(-0.5)
                             .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
                             .background(Color(.pGray1))
                             .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -204,6 +209,7 @@ private struct ConfirmationDialogActions: View {
         Button("로그아웃", role: .destructive) {
             viewModel.logout()
         }
+        Button("취소", role: .cancel) { }
     }
 }
 

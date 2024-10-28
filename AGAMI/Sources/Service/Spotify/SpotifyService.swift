@@ -228,7 +228,7 @@ final class SpotifyService {
                 return Fail(error: ErrorType.userNotFound).eraseToAnyPublisher()
             }
             
-            let playlistDetails = PlaylistDetails(name: "\(name) @ \(DateFormatter.spotifyAlbumLong.string(from: Date()))",
+            let playlistDetails = PlaylistDetails(name: name,
                                                   isPublic: false,
                                                   isCollaborative: false,
                                                   description: description)

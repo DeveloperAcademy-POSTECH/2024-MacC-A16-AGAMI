@@ -19,8 +19,7 @@ struct SearchStartView: View {
                 .ignoresSafeArea(edges: .top)
             
             if viewModel.shazamStatus == .searching {
-                LottieView(animation: .named("shazamLottie"))
-                    .playing(loopMode: .loop)
+                CustomLottieView(.search)
                     .ignoresSafeArea()
             }
             

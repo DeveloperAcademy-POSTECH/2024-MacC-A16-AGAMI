@@ -18,6 +18,12 @@ final class ArchivePlaylistViewModel: Hashable {
     var exportingState: ExportingState = .none
     var isEditing: Bool = false
     var isDialogPresented: Bool = false
+    var isShowingAlert: Bool = false
+    var isUpdating: Bool = false
+
+    var showDeleteButton: Bool {
+        !playlist.photoURL.isEmpty && isEditing
+    }
 
     init(playlist: PlaylistModel) {
         self.playlist = playlist
@@ -87,28 +93,32 @@ final class ArchivePlaylistViewModel: Hashable {
         return URL(string: url)
     }
 
-    func deleteMusic(indexSet: IndexSet) async {
+    func deleteMusic(indexSet: IndexSet) {
         playlist.songs.remove(atOffsets: indexSet)
-        guard let userID = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
-            return
-        }
-        try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
     }
 
-    func moveMusic(from source: IndexSet, to destination: Int) async {
+    func moveMusic(from source: IndexSet, to destination: Int) {
         playlist.songs.move(fromOffsets: source, toOffset: destination)
-        guard let userID = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
-            return
-        }
-        try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
     }
 
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy. MM. dd."
         return dateFormatter.string(from: date)
+    }
+
+    func deletePhotoURL() {
+        playlist.photoURL = ""
+    }
+
+    func applyChangesToFirestore() async {
+        isUpdating = true
+        guard let userID = FirebaseAuthService.currentUID else {
+            return
+        }
+        let firestoreModel = ModelAdapter.toFirestorePlaylist(from: playlist)
+        try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
+        isUpdating = false
     }
 }
 

@@ -28,4 +28,13 @@ extension View {
             return .always
         }
     }
+
+    @ViewBuilder
+    func conditionalModifier(_ condition: Bool, builder: (Self) -> some View) -> some View {
+        if condition {
+            builder(self)
+        } else {
+            self
+        }
+    }
 }

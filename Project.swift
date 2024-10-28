@@ -66,27 +66,14 @@ let project = Project(
                 .swiftLintShell
             ],
             dependencies: [
-                .external(
-                    name: "FirebaseAnalytics"
-                ),
-                .external(
-                    name: "FirebaseAuth"
-                ),
-                .external(
-                    name: "FirebaseFirestore"
-                ),
-                .external(
-                    name: "FirebaseStorage"
-                ),
-                .external(
-                    name: "SpotifyAPI"
-                ),
-                .external(
-                    name: "KeychainAccess"
-                ),
-                .external(
-                    name: "Lottie"
-                )
+                .external(name: "FirebaseAnalytics"),
+                .external(name: "FirebaseAuth"),
+                .external(name: "FirebaseFirestore"),
+                .external(name: "FirebaseStorage"),
+                .external(name: "SpotifyAPI"),
+                .external(name: "KeychainAccess"),
+                .external(name: "Lottie")
+                .external(name: "Kingfisher")
             ]
         ),
         .target(

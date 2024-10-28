@@ -12,10 +12,12 @@ final class ArchivePlaylistViewModel: Hashable {
     let id: UUID = .init()
 
     var playlist: PlaylistModel
+    private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
 
     var isExporting: Bool = false
     var isEditing: Bool = false
+    var isDialogPresented: Bool = false
 
     init(playlist: PlaylistModel) {
         self.playlist = playlist
@@ -46,19 +48,35 @@ final class ArchivePlaylistViewModel: Hashable {
         }
     }
 
+    func deletePlaylist() async {
+        guard let userID = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        try? await firebaseService.deletePlaylist(userID: userID, playlistID: playlist.playlistID)
+    }
+
     func getCurrentPlaylistURL() -> URL? {
         guard let url = musicService.getCurrentPlaylistUrl() else { return nil }
         return URL(string: url)
     }
 
-    func deleteMusic(indexSet: IndexSet) {
-        for index in indexSet {
-            playlist.songs.remove(at: index)
+    func deleteMusic(indexSet: IndexSet) async {
+        playlist.songs.remove(atOffsets: indexSet)
+        guard let userID = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
         }
+        try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
     }
 
-    func moveMusic(from source: IndexSet, to destination: Int) {
+    func moveMusic(from source: IndexSet, to destination: Int) async {
         playlist.songs.move(fromOffsets: source, toOffset: destination)
+        guard let userID = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
     }
     
     func formatDateToString(_ date: Date) -> String {

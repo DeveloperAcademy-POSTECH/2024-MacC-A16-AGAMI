@@ -19,6 +19,7 @@ struct PlaylistRow: View {
 
             } placeholder: {
                 ProgressView()
+                    .frame(width: 60, height: 60)
             }
             .padding(.trailing, 20)
 

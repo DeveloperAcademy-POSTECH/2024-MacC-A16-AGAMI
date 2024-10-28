@@ -14,12 +14,32 @@ struct SearchDiggingListModalView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                Section(header: HStack {
+                HStack(spacing: 0) {
+                    Text("플레이크 리스트")
+                        .font(.pretendard(weight: .bold700, size: 30))
+                        .foregroundStyle(Color(.pBlack))
+                    
+                    Spacer()
+                    
+                    Button {
+                        coordinator.push(view: .writingView)
+                        coordinator.dismissSheet()
+                    } label: {
+                        Image(.nextButton)
+                            .resizable()
+                            .frame(width: 34, height: 34)
+                    }
+                }
+                .padding(.top, 42)
+                .padding(.horizontal, 24)
+                
+                Section(header: HStack(spacing: 0) {
                     Text("\(viewModel.diggingList.count) 플레이크")
                         .font(.system(size: 16, weight: .semibold))
-                        .kerning(0.4)
-                        .padding(.vertical, 13)
-                        .padding(.leading, 16)
+                        .foregroundStyle(Color(.pBlack))
+                        .padding(.top, 34)
+                        .padding(.bottom, 13)
+                        .padding(.leading, 24)
                     Spacer()
                 }) {
                     List {
@@ -32,19 +52,6 @@ struct SearchDiggingListModalView: View {
                     .scrollIndicators(.hidden)
                     .listStyle(InsetGroupedListStyle())
                 }
-            }
-            .navigationTitle("플레이크 리스트")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing, content: {
-                    Button(action: {
-                        coordinator.dismissSheet()
-                        coordinator.push(view: .writingView)
-                    }, label: {
-                        Image(.nextButton)
-                            .resizable()
-                            .frame(width: 34, height: 34)
-                    })
-                })
             }
         }
         .onAppear {

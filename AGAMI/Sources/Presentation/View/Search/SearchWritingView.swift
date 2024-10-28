@@ -65,6 +65,7 @@ struct SearchWritingView: View {
                         Text("저장")
                     }
                 }
+                .disabled(!viewModel.isLoaded)
             }
             .disabled(viewModel.isLoading)
             .blur(radius: viewModel.isLoading ? 10 : 0)

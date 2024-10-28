@@ -33,8 +33,7 @@ struct CustomLottieView: View {
 enum LottieAnimationType: String {
     case search
     
-    // add lottie filename case
-    internal var filename: String {
+    var filename: String {
         switch self {
         case .search:
             "shazamLottie"

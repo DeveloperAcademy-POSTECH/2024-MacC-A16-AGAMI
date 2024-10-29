@@ -14,8 +14,11 @@ struct AGAMIApp: App {
             if isSignedIn {
                 HomeView()
                     .onOpenURL { url in
-                        if url.absoluteString.contains(SpotifyAPIKey.redirectURL) {
-                            SpotifyService.shared.handleURL(url)
+                        if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
+                           let decodedRedirectURL = redirectURL.removingPercentEncoding {
+                            if url.absoluteString.contains(decodedRedirectURL) {
+                                SpotifyService.shared.handleURL(url)
+                            }
                         }
                     }
             } else {

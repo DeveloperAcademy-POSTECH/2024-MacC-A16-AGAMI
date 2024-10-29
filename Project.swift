@@ -19,6 +19,10 @@ let project = Project(
             base: [
                 "OTHER_LDFLAGS": ["-all_load -Objc"],
                 "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor"
+            ],
+            configurations: [
+                .debug(name: "Debug", xcconfig: "Configurations/Debug.xcconfig"),
+                .release(name: "Release", xcconfig: "Configurations/Release.xcconfig")
             ]
         ),
     targets: [
@@ -27,10 +31,7 @@ let project = Project(
             destinations: [.iPhone],
             product: .app,
             bundleId: "io.tuist.AGAMI",
-            deploymentTargets:
-                    .iOS(
-                        "17.0"
-                    ),
+            deploymentTargets: .iOS("17.0"),
             infoPlist:
                     .extendingDefault(
                         with: [
@@ -57,7 +58,10 @@ let project = Project(
                                     ]
                                 )]
                             ),
-                            "UIUserInterfaceStyle": "Light"
+                            "UIUserInterfaceStyle": "Light",
+                            "CLIENT_ID": .string("$(CLIENT_ID)"),
+                            "CLIENT_SECRET": .string("$(CLIENT_SECRET)"),
+                            "REDIRECT_URL": .string("$(REDIRECT_URL)")
                         ]
                     ),
             sources: ["AGAMI/Sources/**"],

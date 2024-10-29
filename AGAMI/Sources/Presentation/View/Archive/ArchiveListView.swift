@@ -38,8 +38,11 @@ struct ArchiveListView: View {
             ConfirmationDialogActions(viewModel: viewModel)
         }
         .onOpenURL { url in
-            if url.absoluteString.contains(SpotifyAPIKey.redirectURL) {
-                viewModel.exportingState = .none
+            if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
+               let decodedRedirectURL = redirectURL.removingPercentEncoding {
+                if url.absoluteString.contains(decodedRedirectURL) {
+                    viewModel.exportingState = .none
+                }
             }
         }
     }

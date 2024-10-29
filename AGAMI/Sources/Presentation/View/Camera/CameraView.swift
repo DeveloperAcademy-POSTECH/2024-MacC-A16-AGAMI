@@ -26,7 +26,7 @@ struct CameraView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(height: 400)
-                        .cornerRadius(10)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                         .clipped()
                 } else {
                     viewModel.cameraPreView

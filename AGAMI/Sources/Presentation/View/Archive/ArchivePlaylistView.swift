@@ -75,12 +75,12 @@ private struct ListView: View {
                     }
             }
             .listRowInsets(
-                EdgeInsets(top: 1, leading: 16, bottom: 1, trailing: 16)
+                EdgeInsets(top: 1, leading: 8, bottom: 1, trailing: 8)
             )
 
             PlaylistDescription(viewModel: viewModel)
                 .listRowInsets(
-                    EdgeInsets(top: 25, leading: 16, bottom: 0, trailing: 16)
+                    EdgeInsets(top: 25, leading: 8, bottom: 0, trailing: 8)
                 )
 
             ExportButton(viewModel: viewModel)
@@ -88,7 +88,6 @@ private struct ListView: View {
                     EdgeInsets(top: 54, leading: 0, bottom: 82, trailing: 0)
                 )
                 .listRowSeparator(.hidden)
-
         }
         .listStyle(.plain)
         .scrollIndicators(.hidden)
@@ -155,68 +154,71 @@ private struct ImageAndTitleWithHeaderView: View {
                                 asyncImageOpacity = 1
                             }
                         }
+                        .overlay {
+                            if viewModel.isEditing {
+                                VStack {
+                                    HStack {
+                                        Spacer()
+                                        Image(.deletePhotoButton)
+                                            .padding(7)
+                                            .onTapGesture {
+                                                viewModel.isShowingAlert = true
+                                            }
+                                    }
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .padding(.horizontal, viewModel.isEditing ? 50 : 0)
                 } placeholder: {
                     Image(.photoPlaceHolder)
                         .resizable()
                         .aspectRatio(1, contentMode: .fit)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .shadow(color: .black.opacity(0.25), radius: 10)
+                        .padding(.horizontal, viewModel.isEditing ? 50 : 0)
                 }
 
                 VStack(spacing: 0) {
                     Group {
                         Text(viewModel.playlist.streetAddress)
-                            .padding(.bottom, 12)
+                            .padding(.bottom, viewModel.isEditing ? 9 : 12)
                         Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
-                            .padding(.bottom, 22)
+                            .padding(.bottom, viewModel.isEditing ? 16 : 22)
                     }
-                    .font(.pretendard(weight: .medium500, size: 20))
+                    .font(.pretendard(weight: .medium500, size: viewModel.isEditing ? 15 : 20))
                     .foregroundStyle(Color(.pWhite))
-                }
-
-                if viewModel.showDeleteButton {
-                    VStack {
-                        HStack {
-                            Spacer()
-                            Image(.deletePhotoButton)
-                                .padding(7)
-                                .onTapGesture {
-                                    viewModel.isShowingAlert = true
-                                }
-                        }
-                        Spacer()
-                    }
                 }
             }
             .padding(EdgeInsets(top: 20, leading: 8, bottom: 0, trailing: 8))
 
             if viewModel.isEditing {
                 TextField("", text: $viewModel.playlist.playlistName)
-                    .font(.pretendard(weight: .bold700, size: 24))
+                    .font(.pretendard(weight: .semiBold600, size: 28))
                     .foregroundStyle(Color(.pBlack))
                     .padding(16)
                     .background(Color(.pLightGray))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .padding(EdgeInsets(top: 30, leading: 16, bottom: 0, trailing: 16))
+                    .padding(EdgeInsets(top: 30, leading: 8, bottom: 0, trailing: 8))
 
             } else {
                 Text(viewModel.playlist.playlistName)
-                    .font(.pretendard(weight: .bold700, size: 26))
+                    .font(.pretendard(weight: .bold700, size: 30))
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(Color(.pBlack))
-                    .padding(EdgeInsets(top: 33, leading: 8, bottom: 0, trailing: 8))
+                    .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 16))
             }
 
             HStack(spacing: 0) {
                 Text("수집한 플레이크")
-                    .font(.pretendard(weight: .semiBold600, size: 20))
+                    .font(.pretendard(weight: .semiBold600, size: 23))
                     .foregroundStyle(Color(.pBlack))
                 Spacer()
                 Text("\(viewModel.playlist.songs.count) 플레이크")
-                    .font(.pretendard(weight: .medium500, size: 16))
+                    .font(.pretendard(weight: .medium500, size: 18))
                     .foregroundStyle(Color(.pPrimary))
             }
-            .padding(EdgeInsets(top: 49, leading: 16, bottom: 16, trailing: 16))
+            .padding(EdgeInsets(top: 37, leading: 16, bottom: 10, trailing: 16))
         }
     }
 }
@@ -227,7 +229,7 @@ private struct PlaylistDescription: View {
     var body: some View {
         if viewModel.isEditing {
             TextField("", text: $viewModel.playlist.playlistDescription, axis: .vertical)
-                .font(.pretendard(weight: .regular400, size: 16))
+                .font(.pretendard(weight: .regular400, size: 18))
                 .foregroundStyle(Color(.pBlack))
                 .kerning(-0.3)
                 .multilineTextAlignment(.leading)
@@ -236,7 +238,7 @@ private struct PlaylistDescription: View {
                 .clipShape(RoundedRectangle(cornerRadius: 10))
         } else {
             Text(viewModel.playlist.playlistDescription)
-                .font(.pretendard(weight: .regular400, size: 16))
+                .font(.pretendard(weight: .regular400, size: 18))
                 .kerning(-0.3)
                 .foregroundStyle(Color(.pBlack))
                 .multilineTextAlignment(.leading)
@@ -246,21 +248,21 @@ private struct PlaylistDescription: View {
 
 private struct ExportButton: View {
     var viewModel: ArchivePlaylistViewModel
-
+    
     var body: some View {
         HStack {
             Spacer()
-            HStack(spacing: 8) {
+            HStack(spacing: 5) {
                 Text("플라키브 내보내기")
                     .font(.pretendard(weight: .medium500, size: 20))
                     .foregroundColor(Color(.pWhite))
                     .kerning(-0.41)
-
+                
                 Image(systemName: "square.and.arrow.up.on.square.fill")
                     .font(.pretendard(weight: .medium500, size: 18))
                     .foregroundColor(Color(.pWhite))
             }
-            .padding(EdgeInsets(top: 20, leading: 50, bottom: 20, trailing: 50))
+            .padding(EdgeInsets(top: 13, leading: 50, bottom: 13, trailing: 50))
             .background(Color(.pPrimary))
             .clipShape(Capsule())
             .contentShape(Capsule())

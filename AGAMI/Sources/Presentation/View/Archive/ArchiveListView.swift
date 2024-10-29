@@ -168,7 +168,7 @@ private struct ArchiveListCell: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Group {
                         Text(playlist.playlistName)
-                            .font(.pretendard(weight: .bold700, size: 22))
+                            .font(.pretendard(weight: .bold700, size: 24))
                             .kerning(-0.5)
                             .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
                         Text(playlist.streetAddress)

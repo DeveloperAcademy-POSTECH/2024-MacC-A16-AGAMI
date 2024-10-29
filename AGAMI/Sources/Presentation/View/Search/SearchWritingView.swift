@@ -13,41 +13,48 @@ struct SearchWritingView: View {
     @State private var showActionSheet: Bool = false
     
     var body: some View {
-        List {
-            PlaylistCoverImageView(viewModel: viewModel)
-                .onTapGesture {
-                    if viewModel.photoUIImage == nil {
-                        coordinator.push(view: .cameraView(viewModel: viewModel))
-                    } else {
-                        showActionSheet.toggle()
+        ZStack {
+            List {
+                PlaylistCoverImageView(viewModel: viewModel)
+                    .onTapGesture {
+                        if viewModel.photoUIImage == nil {
+                            coordinator.push(view: .cameraView(viewModel: viewModel))
+                        } else {
+                            showActionSheet.toggle()
+                        }
                     }
-                }
-                .listRowSeparator(.hidden)
-                .listRowInsets(.zero)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(.zero)
+                
+                PlaylistTitleTextField(viewModel: viewModel)
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 8)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(.zero)
+                
+                PlaylistSongListHeader(viewModel: viewModel)
+                    .padding(.top, 28)
+                    .padding(.horizontal, 24)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(.zero)
+                
+                PlaylistSongList(viewModel: viewModel)
+                    .padding(.top, 10)
+                    .padding(.horizontal, 8)
+                    .listRowInsets(.zero)
+                
+                PlaylistDescriptionTextField(viewModel: viewModel)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 13)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(.zero)
+                    .padding(.bottom, 56)
+            }
             
-            PlaylistTitleTextField(viewModel: viewModel)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 8)
-                .listRowSeparator(.hidden)
-                .listRowInsets(.zero)
-            
-            PlaylistSongListHeader(viewModel: viewModel)
-                .padding(.top, 28)
-                .padding(.horizontal, 24)
-                .listRowSeparator(.hidden)
-                .listRowInsets(.zero)
-            
-            PlaylistSongList(viewModel: viewModel)
-                .padding(.top, 10)
-                .padding(.horizontal, 8)
-                .listRowInsets(.zero)
-            
-            PlaylistDescriptionTextField(viewModel: viewModel)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 13)
-                .listRowSeparator(.hidden)
-                .listRowInsets(.zero)
-                .padding(.bottom, 56)
+            if viewModel.isSaving {
+                ProgressView("저장 중입니다...")
+                    .padding()
+            }
         }
         .confirmationDialog("", isPresented: $showActionSheet) {
             Button("다시 찍기") {
@@ -61,10 +68,9 @@ struct SearchWritingView: View {
         .onTapGesture {
             hideKeyboard()
         }
-        .onAppear {
-            viewModel.getCurrentLocation()
-        }
         .listStyle(PlainListStyle())
+        .scrollDisabled(viewModel.isSaving)
+        .allowsHitTesting(!viewModel.isSaving)
         .navigationTitle("플리카빙")
         .navigationBarTitleDisplayMode(.inline)
         .scrollIndicators(.hidden)
@@ -72,15 +78,18 @@ struct SearchWritingView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     Task {
-                        await viewModel.savedPlaylist()
-                        viewModel.clearDiggingList()
-                        coordinator.popToRoot()
+                        if await viewModel.savedPlaylist() {
+                            viewModel.clearDiggingList()
+                            coordinator.popToRoot()
+                        } else {
+                            print("Failed to save playlist. Please try again.")
+                        }
                     }
                 } label: {
                     Text("저장")
                         .font(.pretendard(weight: .semiBold600, size: 17))
                 }
-                .disabled(viewModel.diggingList.isEmpty)
+                .disabled(viewModel.diggingList.isEmpty || viewModel.isSaving)
             }
         }
         .toolbarRole(.editor)

@@ -20,7 +20,7 @@ struct SearchStartView: View {
             
             if viewModel.shazamStatus == .searching {
                 CustomLottieView(.search)
-                    .ignoresSafeArea()
+                    .ignoresSafeArea(edges: [.top, .vertical])
             }
             
             VStack(spacing: 0) {
@@ -34,18 +34,18 @@ struct SearchStartView: View {
                 .padding(.bottom, 68)
                 
                 Button {
-                    viewModel.searchButtonTapped()
-                } label: {
-                    if viewModel.shazamStatus != .searching {
-                        Image(.diggingButtonBackground)
-                            .resizable()
-                            .frame(width: 393, height: 393)
-                            .overlay {
-                                Image(.diggingButton)
-                                    .resizable()
-                                    .frame(width: 85, height: 85)
-                            }
+                    Task {
+                        await viewModel.searchButtonTapped()
                     }
+                } label: {
+                    Image(.diggingButtonBackground)
+                        .resizable()
+                        .frame(width: 393, height: 393)
+                        .overlay {
+                            Image(.diggingButton)
+                                .resizable()
+                                .frame(width: 85, height: 85)
+                        }
                 }
                 
                 VStack(spacing: 5) {

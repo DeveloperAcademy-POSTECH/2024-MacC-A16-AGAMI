@@ -14,12 +14,19 @@ import ShazamKit
 final class SearchStartViewModel: NSObject {
     private let persistenceService = PersistenceService.shared
     private let shazamService = ShazamService()
+    private let locationService = LocationService.shared
     
     var currentItem: SHMediaItem?
     var diggingList: [SongModel] = []
     
     var shazamStatus: ShazamStatus = .idle
     var showSheet: Bool = false
+    
+    // 유저 위치
+    var currentlatitude: Double?
+    var currentlongitude: Double?
+    var currentStreetAddress: String?
+    var isLocationFetched: Bool = false
     
     override init() {
         super.init()
@@ -36,9 +43,25 @@ final class SearchStartViewModel: NSObject {
         shazamService.stopRecognition()
     }
     
-    func searchButtonTapped() {
+    func searchButtonTapped() async {
         currentItem = nil
-        startRecognition()
+        
+        if diggingList.isEmpty {
+            isLocationFetched = false
+        }
+        
+        if shazamStatus == .searching {
+            stopRecognition()
+            shazamStatus = .idle
+        } else {
+            startRecognition()
+            
+            if !isLocationFetched {
+                print("getCurrentLocation click!")
+                await getCurrentLocation()
+                isLocationFetched = true
+            }
+        }
     }
     
     func loadSavedSongs() {
@@ -69,6 +92,30 @@ final class SearchStartViewModel: NSObject {
     
     func moveSong(from source: IndexSet, to destination: Int) {
         diggingList.move(fromOffsets: source, toOffset: destination)
+    }
+    
+    func getCurrentLocation() async {
+        guard let currentLocation = locationService.getCurrentLocation() else { return }
+        
+        currentlatitude = currentLocation.coordinate.latitude
+        currentlongitude = currentLocation.coordinate.longitude
+        
+        await requestCurrentStreetAddress()
+        
+        isLocationFetched = true
+    }
+    
+    func requestCurrentStreetAddress() async {
+        if let address = await locationService.coordinateToStreetAddress() {
+            currentStreetAddress = address
+        }
+    }
+    
+    private func clearLocationData() {
+        currentlatitude = nil
+        currentlongitude = nil
+        currentStreetAddress = nil
+        isLocationFetched = false
     }
 }
 
@@ -114,7 +161,7 @@ enum ShazamStatus {
     var title: String? {
         switch self {
         case .idle: return "플레이크를 눌러 디깅하기"
-        case .searching: return nil
+        case .searching: return "플레이킹 중 ..."
         case .found: return "노래를 찾았습니다. 확인해보세요!"
         case .failed: return "플레이크로 다시 디깅하기"
         }

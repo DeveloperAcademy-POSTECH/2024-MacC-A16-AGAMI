@@ -61,8 +61,8 @@ final class LocationService: NSObject {
         currentLocation
     }
     
-    func coordinateToStreetAddress() {
-        guard let currentLocation else { return }
+    func coordinateToStreetAddress() async -> String? {
+        guard let currentLocation else { return nil }
         
         let geocoder = CLGeocoder()
         let locale = Locale(identifier: "ko_KR")
@@ -85,7 +85,18 @@ final class LocationService: NSObject {
                     dump("self.streetAddress = currentAddress")
                 }
             }
-        })
+            
+            if let name = placemarks.last?.name {
+                currentAddress += "\(name)"
+                self.placeHolderAddress = name
+            }
+            
+            self.streetAddress = currentAddress
+            return currentAddress
+        } catch {
+            print("Failed to fetch address: \(error)")
+            return nil
+        }
     }
 }
 

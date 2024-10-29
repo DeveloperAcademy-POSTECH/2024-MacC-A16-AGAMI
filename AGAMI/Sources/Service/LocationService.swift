@@ -10,6 +10,7 @@ import CoreLocation
 
 protocol LocationServiceDelegate: AnyObject {
     func locationService(_ service: LocationService, didUpdate location: [CLLocation])
+    func locationService(_ service: LocationService, didGetReverseGeocode location: String)
 }
 
 final class LocationService: NSObject {
@@ -43,6 +44,7 @@ final class LocationService: NSObject {
     }
     
     func requestCurrentLocation() {
+        dump("service currentLocation")
         let status = self.locationManager.authorizationStatus
         
         switch status {
@@ -63,19 +65,23 @@ final class LocationService: NSObject {
         let geocoder = CLGeocoder()
         let locale = Locale(identifier: "ko_KR")
         
-        geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: {(placemarks, error) in
-            if let address: [CLPlacemark] = placemarks {
-                var currentAddress: String = ""
-                
-                if let area: String = address.last?.locality {
-                    currentAddress += area
+        geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
+            if let self = self {
+                if let address: [CLPlacemark] = placemarks {
+                    var currentAddress: String = ""
+                    
+                    if let area: String = address.last?.locality {
+                        currentAddress += area
+                    }
+                    
+                    if let name: String = address.last?.name {
+                        currentAddress += "\(name)"
+                    }
+                    
+                    self.streetAddress = currentAddress
+                    self.delegate?.locationService(self, didGetReverseGeocode: currentAddress)
+                    dump("self.streetAddress = currentAddress")
                 }
-                
-                if let name: String = address.last?.name {
-                    currentAddress += "\(name)"
-                }
-                
-                self.streetAddress = currentAddress
             }
         })
     }
@@ -86,6 +92,7 @@ extension LocationService: CLLocationManagerDelegate {
         if let location = locations.last {
             currentLocation = location
         }
+        dump("CLLocationManagerDelegate method called")
         self.delegate?.locationService(self, didUpdate: locations)
     }
     

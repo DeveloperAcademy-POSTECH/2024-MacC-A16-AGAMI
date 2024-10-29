@@ -10,7 +10,6 @@ import SwiftUI
 struct SearchWritingView: View {
     @Environment(SearchCoordinator.self) var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
-    @State private var showActionSheet: Bool = false
     
     var body: some View {
         ZStack {
@@ -20,7 +19,7 @@ struct SearchWritingView: View {
                         if viewModel.photoUIImage == nil {
                             coordinator.push(view: .cameraView(viewModel: viewModel))
                         } else {
-                            showActionSheet.toggle()
+                            viewModel.showSheet.toggle()
                         }
                     }
                     .listRowSeparator(.hidden)
@@ -56,7 +55,7 @@ struct SearchWritingView: View {
                     .padding()
             }
         }
-        .confirmationDialog("", isPresented: $showActionSheet) {
+        .confirmationDialog("", isPresented: $viewModel.showSheet) {
             Button("다시 찍기") {
                 coordinator.push(view: .cameraView(viewModel: viewModel))
             }

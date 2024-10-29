@@ -143,9 +143,7 @@ private struct ImageAndTitleWithHeaderView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .bottom) {
-                AsyncImage(
-                    url: URL(string: viewModel.playlist.photoURL)
-                ) { image in
+                AsyncImage(url: URL(string: viewModel.playlist.photoURL)) { image in
                     image
                         .resizable()
                         .aspectRatio(1, contentMode: .fit)
@@ -158,9 +156,11 @@ private struct ImageAndTitleWithHeaderView: View {
                             }
                         }
                 } placeholder: {
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(.white)
+                    Image(.photoPlaceHolder)
+                        .resizable()
                         .aspectRatio(1, contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .shadow(color: .black.opacity(0.25), radius: 10)
                 }
 
                 VStack(spacing: 0) {

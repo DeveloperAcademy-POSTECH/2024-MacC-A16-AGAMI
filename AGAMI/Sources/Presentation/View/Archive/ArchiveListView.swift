@@ -23,11 +23,9 @@ struct ArchiveListView: View {
             }
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
-                CustomLottieView(.applemusicExporting)
-                    .ignoresSafeArea()
+                AppleMusicLottieView()
             case .isSpotifyExporting:
-                CustomLottieView(.spotifyExporting)
-                    .ignoresSafeArea()
+                SpotifyLottieView()
             case .none:
                 EmptyView()
             }
@@ -38,6 +36,11 @@ struct ArchiveListView: View {
         .toolbarBackground(.visible, for: .tabBar)
         .confirmationDialog("", isPresented: $viewModel.isDialogPresented) {
             ConfirmationDialogActions(viewModel: viewModel)
+        }
+        .onOpenURL { url in
+            if url.absoluteString.contains(SpotifyAPIKey.redirectURL) {
+                viewModel.exportingState = .none
+            }
         }
     }
 }

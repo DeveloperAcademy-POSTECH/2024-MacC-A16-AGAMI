@@ -18,11 +18,9 @@ struct ArchivePlaylistView: View {
             ListView(viewModel: viewModel)
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
-                CustomLottieView(.applemusicExporting)
-                    .ignoresSafeArea()
+                AppleMusicLottieView()
             case .isSpotifyExporting:
-                CustomLottieView(.spotifyExporting)
-                    .ignoresSafeArea()
+                SpotifyLottieView()
             case .none:
                 EmptyView()
             }

@@ -64,6 +64,9 @@ struct SearchWritingView: View {
             }
             Button("취소", role: .cancel) {}
         }
+        .onAppear {
+            viewModel.requestCurrentLocation()
+        }
         .onTapGesture {
             hideKeyboard()
         }
@@ -80,6 +83,8 @@ struct SearchWritingView: View {
                         if await viewModel.savedPlaylist() {
                             viewModel.clearDiggingList()
                             coordinator.popToRoot()
+                            
+                            viewModel.isLoaded = false
                         } else {
                             print("Failed to save playlist. Please try again.")
                         }
@@ -88,7 +93,7 @@ struct SearchWritingView: View {
                     Text("저장")
                         .font(.pretendard(weight: .semiBold600, size: 17))
                 }
-                .disabled(viewModel.diggingList.isEmpty || viewModel.isSaving)
+                .disabled(viewModel.diggingList.isEmpty || viewModel.isSaving || !viewModel.isLoaded)
             }
         }
         .toolbarRole(.editor)
@@ -152,7 +157,7 @@ private struct PlaylistTitleTextField: View {
     @FocusState var isFocused: Bool
     
     var body: some View {
-        TextField("\(viewModel.placeHolderAddress)에서 만난 플레이크", text: $viewModel.userTitle)
+        TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
             .font(.pretendard(weight: .semiBold600, size: 24))
             .foregroundStyle(.black)
             .focused($isFocused)

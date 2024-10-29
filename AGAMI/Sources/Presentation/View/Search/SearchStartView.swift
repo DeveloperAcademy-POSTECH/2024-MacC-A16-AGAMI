@@ -34,9 +34,7 @@ struct SearchStartView: View {
                 .padding(.bottom, 68)
                 
                 Button {
-                    Task {
-                        await viewModel.searchButtonTapped()
-                    }
+                    viewModel.searchButtonTapped()
                 } label: {
                     Image(.diggingButtonBackground)
                         .resizable()

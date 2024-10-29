@@ -43,7 +43,7 @@ final class SearchStartViewModel: NSObject {
         shazamService.stopRecognition()
     }
     
-    func searchButtonTapped() async {
+    func searchButtonTapped() {
         currentItem = nil
         
         if diggingList.isEmpty {
@@ -57,9 +57,11 @@ final class SearchStartViewModel: NSObject {
             startRecognition()
             
             if !isLocationFetched {
-                print("getCurrentLocation click!")
-                await getCurrentLocation()
-                isLocationFetched = true
+                Task {
+                    print("getCurrentLocation click!")
+                    await getCurrentLocation()
+                    isLocationFetched = true
+                }
             }
         }
     }

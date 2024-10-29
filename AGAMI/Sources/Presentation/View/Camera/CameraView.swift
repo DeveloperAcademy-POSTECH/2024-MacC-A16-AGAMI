@@ -7,6 +7,7 @@
 
 import SwiftUI
 import AVFoundation
+import UIKit
 
 struct CameraView: View {
     @Environment(SearchCoordinator.self) private var coordinator
@@ -89,8 +90,8 @@ struct CameraView: View {
     
     var usedPhotoButton: some View {
         Button {
-            if let uiImage = viewModel.photoUIImage?.resizeToSquare() {
-                searchWritingViewModel.savePhotoUIImage(photoUIImage: uiImage)
+            if let croppedImage = viewModel.photoUIImage?.cropSquare() {
+                searchWritingViewModel.savePhotoUIImage(photoUIImage: croppedImage)
             }
             coordinator.pop()
         } label: {

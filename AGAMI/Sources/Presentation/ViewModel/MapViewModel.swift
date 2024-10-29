@@ -18,7 +18,7 @@ final class MapViewModel {
     var isLoaded: Bool = false
     
     init() {
-        locationService.delegate = self
+//        locationService.delegate = self
     }
     
     func requestLocationAuthorization() {
@@ -47,8 +47,11 @@ final class MapViewModel {
 }
 
 extension MapViewModel: LocationServiceDelegate {
+    func locationService(_ service: LocationService, didGetReverseGeocode location: String) {
+        
+    }
+    
     func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
-        dump(#function)
         isLoaded = true
     }
 }

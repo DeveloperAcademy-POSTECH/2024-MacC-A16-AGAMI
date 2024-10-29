@@ -17,10 +17,6 @@ final class MapViewModel {
     var currentStreetAddress: String?
     var isLoaded: Bool = false
     
-    init() {
-//        locationService.delegate = self
-    }
-    
     func requestLocationAuthorization() {
         locationService.requestLocationAuthorization()
     }
@@ -41,7 +37,7 @@ final class MapViewModel {
     }
     
     func requestCurrentStreetAddress() {
-        locationService.coordinateToStreetAddress()
+        locationService.coordinateToStreetAddress { _ in }
         currentStreetAddress = locationService.streetAddress
     }
 }

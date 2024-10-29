@@ -22,12 +22,6 @@ final class SearchStartViewModel: NSObject {
     var shazamStatus: ShazamStatus = .idle
     var showSheet: Bool = false
     
-    // 유저 위치
-    var currentlatitude: Double?
-    var currentlongitude: Double?
-    var currentStreetAddress: String?
-    var isLocationFetched: Bool = false
-    
     override init() {
         super.init()
         shazamService.delegate = self
@@ -45,24 +39,12 @@ final class SearchStartViewModel: NSObject {
     
     func searchButtonTapped() {
         currentItem = nil
-        
-        if diggingList.isEmpty {
-            isLocationFetched = false
-        }
-        
+
         if shazamStatus == .searching {
             stopRecognition()
             shazamStatus = .idle
         } else {
             startRecognition()
-            
-            if !isLocationFetched {
-                Task {
-                    print("getCurrentLocation click!")
-                    await getCurrentLocation()
-                    isLocationFetched = true
-                }
-            }
         }
     }
     
@@ -95,30 +77,6 @@ final class SearchStartViewModel: NSObject {
     func moveSong(from source: IndexSet, to destination: Int) {
         diggingList.move(fromOffsets: source, toOffset: destination)
         persistenceService.saveDiggingListOrder(diggingList)
-    }
-    
-    func getCurrentLocation() async {
-        guard let currentLocation = locationService.getCurrentLocation() else { return }
-        
-        currentlatitude = currentLocation.coordinate.latitude
-        currentlongitude = currentLocation.coordinate.longitude
-        
-        await requestCurrentStreetAddress()
-        
-        isLocationFetched = true
-    }
-    
-    func requestCurrentStreetAddress() async {
-        if let address = await locationService.coordinateToStreetAddress() {
-            currentStreetAddress = address
-        }
-    }
-    
-    private func clearLocationData() {
-        currentlatitude = nil
-        currentlongitude = nil
-        currentStreetAddress = nil
-        isLocationFetched = false
     }
 }
 

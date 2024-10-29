@@ -19,6 +19,7 @@ final class LocationService: NSObject {
     private var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var streetAddress: String?
     var locality: String?
+    var region: String?
     var placeHolderAddress: String?
     
     static let shared = LocationService()
@@ -26,24 +27,24 @@ final class LocationService: NSObject {
     weak var delegate: LocationServiceDelegate?
     
     private override init() {
-        locationManager = CLLocationManager()
-        super.init()
-        locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
-    }
+            locationManager = CLLocationManager()
+            super.init()
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        }
     
     func requestLocationAuthorization() {
-        let status = locationManager.authorizationStatus
-        
-        switch status {
-        case .notDetermined:
-            locationManager.requestWhenInUseAuthorization()
-        case .restricted, .denied, .authorizedAlways, .authorizedWhenInUse:
-            return
-        @unknown default:
-            return
-        }
-    }
+           let status = locationManager.authorizationStatus
+           
+           switch status {
+           case .notDetermined:
+               locationManager.requestWhenInUseAuthorization()
+           case .restricted, .denied, .authorizedAlways, .authorizedWhenInUse:
+               return
+           @unknown default:
+               return
+           }
+       }
     
     func requestCurrentLocation() {
         dump("service currentLocation")
@@ -61,42 +62,35 @@ final class LocationService: NSObject {
         currentLocation
     }
     
-    func coordinateToStreetAddress() async -> String? {
-        guard let currentLocation else { return nil }
+    func coordinateToStreetAddress(completion: @escaping (String?) -> Void) {
+        guard let currentLocation else { return }
         
         let geocoder = CLGeocoder()
         let locale = Locale(identifier: "ko_KR")
         
-        geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: { [weak self] (placemarks, error) in
+        geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: { [weak self] (placemarks, _) in
             if let self = self {
                 if let address: [CLPlacemark] = placemarks {
                     var currentAddress: String = ""
                     
                     if let area: String = address.last?.locality {
                         currentAddress += area
+                        locality = area
                     }
                     
                     if let name: String = address.last?.name {
                         currentAddress += "\(name)"
+                        placeHolderAddress = name
+                        region = name
                     }
                     
                     self.streetAddress = currentAddress
                     self.delegate?.locationService(self, didGetReverseGeocode: currentAddress)
                     dump("self.streetAddress = currentAddress")
+                    completion(currentAddress)
                 }
             }
-            
-            if let name = placemarks.last?.name {
-                currentAddress += "\(name)"
-                self.placeHolderAddress = name
-            }
-            
-            self.streetAddress = currentAddress
-            return currentAddress
-        } catch {
-            print("Failed to fetch address: \(error)")
-            return nil
-        }
+        })
     }
 }
 
@@ -105,6 +99,7 @@ extension LocationService: CLLocationManagerDelegate {
         if let location = locations.last {
             currentLocation = location
         }
+        
         dump("CLLocationManagerDelegate method called")
         self.delegate?.locationService(self, didUpdate: locations)
     }

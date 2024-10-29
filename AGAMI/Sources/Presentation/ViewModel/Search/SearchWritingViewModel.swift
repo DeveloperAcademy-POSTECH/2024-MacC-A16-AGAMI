@@ -27,6 +27,7 @@ final class SearchWritingViewModel {
     var currentDate: String = ""
     var currentLocality: String = ""
     var currentRegion: String = ""
+    var showSheet: Bool = false
     
     // 유저 위치
     var currentlatitude: Double?

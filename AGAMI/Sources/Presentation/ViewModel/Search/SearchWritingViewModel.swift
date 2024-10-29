@@ -164,12 +164,15 @@ final class SearchWritingViewModel {
             let songToDelete = diggingList[index]
             diggingList.remove(at: index)
             
-            let song = ModelAdapter.toSwiftDataSong(from: songToDelete)
-            do {
-                try persistenceService.deleteSong(item: song)
-                loadSavedSongs()
-            } catch {
-                print("Error deleting song: \(error)")
+            if let song = songToDelete as? SwiftDataSongModel {
+                do {
+                    try persistenceService.deleteSong(item: song)
+                    loadSavedSongs()
+                } catch {
+                    print("Error deleting song: \(error)")
+                }
+            } else {
+                print("Error: Song is not of type SwiftDataSongModel")
             }
         }
     }

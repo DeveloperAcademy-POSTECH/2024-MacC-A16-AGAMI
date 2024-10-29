@@ -20,7 +20,7 @@ struct SearchStartView: View {
             
             if viewModel.shazamStatus == .searching {
                 CustomLottieView(.search)
-                    .ignoresSafeArea(edges: [.top, .vertical])
+                    .ignoresSafeArea()
             }
             
             VStack(spacing: 0) {

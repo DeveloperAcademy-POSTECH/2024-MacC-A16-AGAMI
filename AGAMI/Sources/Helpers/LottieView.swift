@@ -38,7 +38,7 @@ enum LottieAnimationType: String {
     var filename: String {
         switch self {
         case .search:
-            "shazamLottie"
+            "shazamBounce"
         case .applemusicExporting:
             "applemusicLottie"
         case .spotifyExporting:

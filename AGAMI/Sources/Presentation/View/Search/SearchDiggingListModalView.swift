@@ -24,13 +24,13 @@ struct SearchDiggingListModalView: View {
                     Button {
                         coordinator.push(view: .writingView)
                         coordinator.dismissSheet()
+                        viewModel.shazamStatus = .idle
                     } label: {
                         Image(.nextButton)
                             .resizable()
                             .frame(width: 34, height: 34)
                     }
                 }
-                .padding(.top, 42)
                 .padding(.horizontal, 24)
                 
                 Section(header: HStack(spacing: 0) {

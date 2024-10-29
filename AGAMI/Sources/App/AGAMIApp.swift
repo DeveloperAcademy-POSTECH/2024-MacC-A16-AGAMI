@@ -14,7 +14,9 @@ struct AGAMIApp: App {
             if isSignedIn {
                 HomeView()
                     .onOpenURL { url in
-                        SpotifyService.shared.handleURL(url)
+                        if url.absoluteString.contains(SpotifyAPIKey.redirectURL) {
+                            SpotifyService.shared.handleURL(url)
+                        }
                     }
             } else {
                 SignInView()

@@ -47,8 +47,10 @@ struct ArchivePlaylistView: View {
         } message: {
             Text("삭제한 사진은 되돌릴 수 없습니다.")
         }
-        .onTapGesture {
-            hideKeyboard()
+        .onOpenURL { url in
+            if url.absoluteString.contains(SpotifyAPIKey.redirectURL) {
+                viewModel.exportingState = .none
+            }
         }
     }
 }
@@ -225,7 +227,7 @@ private struct PlaylistDescription: View {
 
     var body: some View {
         if viewModel.isEditing {
-            TextField("", text: $viewModel.playlist.playlistDescription)
+            TextField("", text: $viewModel.playlist.playlistDescription, axis: .vertical)
                 .font(.pretendard(weight: .regular400, size: 16))
                 .foregroundStyle(Color(.pBlack))
                 .kerning(-0.3)

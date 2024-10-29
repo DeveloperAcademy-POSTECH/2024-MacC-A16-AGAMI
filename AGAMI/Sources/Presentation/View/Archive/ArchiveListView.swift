@@ -39,9 +39,6 @@ struct ArchiveListView: View {
         .confirmationDialog("", isPresented: $viewModel.isDialogPresented) {
             ConfirmationDialogActions(viewModel: viewModel)
         }
-        .onTapGesture {
-            hideKeyboard()
-        }
     }
 }
 

@@ -49,7 +49,7 @@ struct SignInView: View {
                 .padding(EdgeInsets(top: 0, leading: 16, bottom: 120, trailing: 16))
             }
         }
-        .edgesIgnoringSafeArea(.all)
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 

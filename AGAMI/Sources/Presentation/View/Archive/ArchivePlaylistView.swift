@@ -93,6 +93,7 @@ private struct ListView: View {
 
         }
         .listStyle(.plain)
+        .scrollIndicators(.hidden)
     }
 }
 

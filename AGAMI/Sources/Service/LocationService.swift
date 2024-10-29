@@ -27,24 +27,24 @@ final class LocationService: NSObject {
     weak var delegate: LocationServiceDelegate?
     
     private override init() {
-            locationManager = CLLocationManager()
-            super.init()
-            locationManager.delegate = self
-            locationManager.desiredAccuracy = kCLLocationAccuracyBest
-        }
+        locationManager = CLLocationManager()
+        super.init()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+    }
     
     func requestLocationAuthorization() {
-           let status = locationManager.authorizationStatus
-           
-           switch status {
-           case .notDetermined:
-               locationManager.requestWhenInUseAuthorization()
-           case .restricted, .denied, .authorizedAlways, .authorizedWhenInUse:
-               return
-           @unknown default:
-               return
-           }
-       }
+        let status = locationManager.authorizationStatus
+        
+        switch status {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .restricted, .denied, .authorizedAlways, .authorizedWhenInUse:
+            return
+        @unknown default:
+            return
+        }
+    }
     
     func requestCurrentLocation() {
         dump("service currentLocation")

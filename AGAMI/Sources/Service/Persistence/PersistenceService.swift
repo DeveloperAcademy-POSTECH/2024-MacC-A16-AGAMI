@@ -16,6 +16,8 @@ final class PersistenceService {
     
     static let shared: PersistenceService = .init()
     
+    private let diggingListOrderKey = "diggingListOrder"
+    
     private init() {
         let schema = Schema([SwiftDataPlaylistModel.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -97,4 +99,19 @@ final class PersistenceService {
         }
         try modelContext.save()
     }
+    
+    func saveDiggingListOrder(_ list: [SongModel]) {
+        let ids = list.map { $0.songID }
+        UserDefaults.standard.set(ids, forKey: diggingListOrderKey)
+    }
+    
+    func loadDiggingListWithOrder() throws -> [SongModel] {
+        let savedOrder = UserDefaults.standard.stringArray(forKey: diggingListOrderKey) ?? []
+        let fetchedSongs = try fetchDiggingList()
+        
+        return savedOrder.compactMap { id in
+            fetchedSongs.first { $0.songID == id }
+        } + fetchedSongs.filter { !savedOrder.contains($0.songID) }
+    }
+    
 }

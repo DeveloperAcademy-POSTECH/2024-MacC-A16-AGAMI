@@ -46,7 +46,7 @@ final class SearchWritingViewModel {
     
     func loadSavedSongs() {
         do {
-            self.diggingList = try persistenceService.fetchDiggingList()
+            self.diggingList = try persistenceService.loadDiggingListWithOrder()
         } catch {
             print("Failed to load saved songs: \(error)")
         }
@@ -135,6 +135,29 @@ final class SearchWritingViewModel {
         if let locality = locationService.locality {
             currentLocality = locality
         }
+    }
+    
+    func deleteSong(indexSet: IndexSet) {
+        for index in indexSet {
+            let songToDelete = diggingList[index]
+            diggingList.remove(at: index)
+            
+            if let song = songToDelete as? SwiftDataSongModel {
+                do {
+                    try persistenceService.deleteSong(item: song)
+                    loadSavedSongs()
+                } catch {
+                    print("Error deleting song: \(error)")
+                }
+            } else {
+                print("Error: Song is not of type SwiftDataSongModel")
+            }
+        }
+    }
+    
+    func moveSong(from source: IndexSet, to destination: Int) {
+        diggingList.move(fromOffsets: source, toOffset: destination)
+        persistenceService.saveDiggingListOrder(diggingList)
     }
 }
 

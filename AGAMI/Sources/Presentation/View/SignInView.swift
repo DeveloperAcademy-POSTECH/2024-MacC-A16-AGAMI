@@ -23,14 +23,17 @@ struct SignInView: View {
                 Spacer()
                 
                 Image(.signInLogo)
-                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 24, trailing: 20))
+                    .resizable()
+                    .scaledToFit()
+                    .padding(EdgeInsets(top: 0, leading: 88, bottom: 24, trailing: 88))
                 
                 Text("순간을 놓치지 않는 즐거움,\n나만의 플라키브 생성하기")
                     .font(.pretendard(weight: .semiBold600, size: 18))
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
+                    .kerning(-0.3)
                     .foregroundStyle(Color(.pBlack))
-                    .padding(EdgeInsets(top: 0, leading: 20, bottom: 234, trailing: 20))
+                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 228, trailing: 0))
                 
                 SignInWithAppleButton(.continue) { request in
                     viewModel.signInRequest(request: request)
@@ -42,9 +45,14 @@ struct SignInView: View {
                         viewModel.handleLoginError(with: error)
                     }
                 }
-                .frame(height: 56)
-                .padding(EdgeInsets(top: 0, leading: 16, bottom: 80, trailing: 16))
+                .frame(height: 54)
+                .padding(EdgeInsets(top: 0, leading: 16, bottom: 120, trailing: 16))
             }
         }
+        .edgesIgnoringSafeArea(.all)
     }
+}
+
+#Preview {
+    SignInView()
 }

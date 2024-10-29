@@ -27,14 +27,14 @@ final class SearchWritingViewModel {
     var currentDate: String = ""
     var currentLocality: String = ""
     var currentRegion: String = ""
-    var isLoading: Bool = false
     
     // 유저 위치
     var currentlatitude: Double?
     var currentlongitude: Double?
     var currentStreetAddress: String?
     var placeHolderAddress: String = ""
-    var isLoaded: Bool = false
+    
+    var isSaving: Bool = false
     
     init() {
         loadSavedSongs()
@@ -51,55 +51,38 @@ final class SearchWritingViewModel {
         }
     }
     
-    func requestCurrentLocation() {
-        locationService.requestCurrentLocation()
-    }
-    
-    func requestCurrentStreetAddress() {
-        locationService.coordinateToStreetAddress()
-        currentStreetAddress = locationService.streetAddress
-    }
-    
-    func getCurrentLocation() {
-        guard let currentLocation = locationService.getCurrentLocation() else { return }
+    func savedPlaylist() async -> Bool {
+        isSaving = true
+                defer { isSaving = false }
         
-        currentlatitude = currentLocation.coordinate.latitude
-        currentlongitude = currentLocation.coordinate.longitude
-        
-        requestCurrentStreetAddress()
-        
-        if currentlatitude != nil && currentlongitude != nil && currentStreetAddress != nil {
-            isLoaded = true
-        }
-    }
-    
-    func savedPlaylist() async {
         do {
-            guard let currentlatitude = self.currentlatitude,
-                  let currentlongitude = self.currentlongitude,
-                  let currentStreetAddress = self.currentStreetAddress else { return }
+            let currentlatitude = self.currentlatitude
+            let currentlongitude = self.currentlongitude
+            let currentStreetAddress = self.currentStreetAddress
             
             userTitle = userTitle == "" ? "\(placeHolderAddress)에서 만난 플레이크" : userTitle
             
             try persistenceService.createPlaylist(playlistName: userTitle,
                                                   playlistDescription: userDescription,
                                                   photoURL: photoURL,
-                                                  latitude: currentlatitude,
-                                                  longitude: currentlongitude,
-                                                  streetAddress: currentStreetAddress)
+                                                  latitude: currentlatitude ?? 0,
+                                                  longitude: currentlongitude ?? 0,
+                                                  streetAddress: currentStreetAddress ?? "")
             playlist.playlistName = userTitle
             playlist.playlistDescription = userDescription
             playlist.songs = try persistenceService.fetchDiggingList()
             playlist.photoURL = photoURL
-            playlist.latitude = currentlatitude
-            playlist.longitude = currentlongitude
-            playlist.streetAddress = currentStreetAddress
-            
+            playlist.latitude = currentlatitude ?? 0
+            playlist.longitude = currentlongitude ?? 0
+            playlist.streetAddress = currentStreetAddress ?? ""
+
             await playlist.photoURL = savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") ?? ""
             try await firebaseService.savePlaylistToFirebase(userID: FirebaseAuthService.currentUID ?? "",
                                                              playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
+            return true
         } catch {
             print("Failed to create playlist: \(error)")
+            return false
         }
     }
     
@@ -127,14 +110,6 @@ final class SearchWritingViewModel {
         return photoURL
     }
     
-    func showProgress() {
-        isLoading = true
-    }
-    
-    func hideProgress() {
-        isLoading = false
-    }
-    
     func setCurrentDate() {
         let today = Date()
         let dateFormatter = DateFormatter()
@@ -144,6 +119,10 @@ final class SearchWritingViewModel {
     }
     
     func setAddress() {
+        self.currentlatitude = locationService.getCurrentLocation()?.coordinate.latitude
+        self.currentlongitude = locationService.getCurrentLocation()?.coordinate.longitude
+        self.currentStreetAddress = locationService.streetAddress
+        
         if let address = locationService.placeHolderAddress {
             if let range = address.range(of: "로") {
                 placeHolderAddress = String(address[..<range.upperBound])

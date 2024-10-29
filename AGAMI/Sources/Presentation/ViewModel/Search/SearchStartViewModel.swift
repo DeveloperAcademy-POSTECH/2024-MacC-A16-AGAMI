@@ -68,7 +68,7 @@ final class SearchStartViewModel: NSObject {
     
     func loadSavedSongs() {
         do {
-            self.diggingList = try persistenceService.fetchDiggingList()
+            self.diggingList = try persistenceService.loadDiggingListWithOrder()
         } catch {
             print("Failed to load saved songs: \(error)")
         }
@@ -94,6 +94,7 @@ final class SearchStartViewModel: NSObject {
     
     func moveSong(from source: IndexSet, to destination: Int) {
         diggingList.move(fromOffsets: source, toOffset: destination)
+        persistenceService.saveDiggingListOrder(diggingList)
     }
     
     func getCurrentLocation() async {

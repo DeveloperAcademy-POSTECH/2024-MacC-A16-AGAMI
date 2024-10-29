@@ -189,7 +189,8 @@ private struct PlaylistSongList: View {
         ForEach(viewModel.diggingList, id: \.songID) { song in
             PlaylistRow(song: song)
         }
-        .listRowInsets(.init(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)))
+        .onDelete(perform: viewModel.deleteSong)
+        .onMove(perform: viewModel.moveSong)
     }
 }
 

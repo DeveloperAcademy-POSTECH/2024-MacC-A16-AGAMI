@@ -145,7 +145,7 @@ final class SearchWritingViewModel {
     
     func setAddress() {
         if let address = locationService.placeHolderAddress {
-            if let range = address.range(of: "로") {
+            if let range = address.range(of: "로") ?? address.range(of: "길") {
                 placeHolderAddress = String(address[..<range.upperBound])
                 placeHolderAddress += "에서 만난 플레이크"
             } else {

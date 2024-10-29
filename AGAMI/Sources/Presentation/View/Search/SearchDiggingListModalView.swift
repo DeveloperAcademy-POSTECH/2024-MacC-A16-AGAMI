@@ -38,9 +38,7 @@ struct SearchDiggingListModalView: View {
                     Text("\(viewModel.diggingList.count) 플레이크")
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundStyle(Color(.pBlack))
-                        .padding(.top, 34)
-                        .padding(.bottom, 13)
-                        .padding(.leading, 24)
+                        .padding(EdgeInsets(top: 34, leading: 24, bottom: 13, trailing: 0))
                     Spacer()
                 }) {
                     List {

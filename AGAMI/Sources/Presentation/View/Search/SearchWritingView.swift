@@ -80,6 +80,7 @@ struct SearchWritingView: View {
                     Text("저장")
                         .font(.pretendard(weight: .semiBold600, size: 17))
                 }
+                .disabled(viewModel.diggingList.isEmpty)
             }
         }
         .toolbarRole(.editor)

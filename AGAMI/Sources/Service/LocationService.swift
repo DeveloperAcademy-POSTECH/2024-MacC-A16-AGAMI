@@ -18,6 +18,8 @@ final class LocationService: NSObject {
     private var locationManager: CLLocationManager = CLLocationManager()
     private var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var streetAddress: String?
+    var locality: String?
+    var placeHolderAddress: String?
     
     static let shared = LocationService()
     

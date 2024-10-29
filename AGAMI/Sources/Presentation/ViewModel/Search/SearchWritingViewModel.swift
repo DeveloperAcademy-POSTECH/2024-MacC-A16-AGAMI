@@ -24,6 +24,9 @@ final class SearchWritingViewModel {
     // 커버 이미지
     var photoURL: String = ""
     var photoUIImage: UIImage?
+    var currentDate: String = ""
+    var currentLocality: String = ""
+    var currentRegion: String = ""
     var isLoading: Bool = false
     
     // 유저 위치
@@ -36,9 +39,8 @@ final class SearchWritingViewModel {
     init() {
         loadSavedSongs()
         
-        if let address = locationService.placeHolderAddress {
-            placeHolderAddress = address
-        }
+        setAddress()
+        setCurrentDate()
     }
     
     func loadSavedSongs() {
@@ -131,6 +133,28 @@ final class SearchWritingViewModel {
     
     func hideProgress() {
         isLoading = false
+    }
+    
+    func setCurrentDate() {
+        let today = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy.MM.dd"
+        
+        self.currentDate = dateFormatter.string(from: today)
+    }
+    
+    func setAddress() {
+        if let address = locationService.placeHolderAddress {
+            if let range = address.range(of: "로") {
+                placeHolderAddress = String(address[..<range.upperBound])
+            } else {
+                placeHolderAddress = address
+            }
+            currentRegion = address
+        }
+        if let locality = locationService.locality {
+            currentLocality = locality
+        }
     }
 }
 

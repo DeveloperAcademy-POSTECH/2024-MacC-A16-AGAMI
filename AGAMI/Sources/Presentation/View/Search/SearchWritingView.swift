@@ -26,13 +26,13 @@ struct SearchWritingView: View {
                 .listRowInsets(.zero)
             
             PlaylistTitleTextField(viewModel: viewModel)
-                .padding(.top, 12)
+                .padding(.vertical, 12)
                 .padding(.horizontal, 8)
                 .listRowSeparator(.hidden)
                 .listRowInsets(.zero)
             
             PlaylistSongListHeader(viewModel: viewModel)
-                .padding(.top, 40)
+                .padding(.top, 28)
                 .padding(.horizontal, 24)
                 .listRowSeparator(.hidden)
                 .listRowInsets(.zero)
@@ -100,6 +100,19 @@ private struct PlaylistCoverImageView: View {
                     .aspectRatio(1, contentMode: .fit)
                     .frame(width: 277, height: 277)
                     .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+                    .overlay(alignment: .bottom) {
+                        VStack(spacing: 0) {
+                            Text("\(viewModel.currentRegion), \(viewModel.currentLocality)")
+                                .font(.pretendard(weight: .medium500, size: 14))
+                                .foregroundStyle(Color(.pWhite))
+                            
+                            Text(viewModel.currentDate)
+                                .font(.pretendard(weight: .medium500, size: 14))
+                                .foregroundStyle(Color(.pWhite))
+                                .padding(.top, 4)
+                        }
+                        .padding(.bottom, 16)
+                    }
             } else {
                 Image(.basicCover)
                     .resizable()

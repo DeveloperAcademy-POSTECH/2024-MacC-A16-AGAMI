@@ -25,6 +25,7 @@ struct CameraView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(height: 400)
+                        .cornerRadius(10)
                         .clipped()
                 } else {
                     viewModel.cameraPreView
@@ -64,11 +65,11 @@ struct CameraView: View {
         } label: {
             Circle()
                 .foregroundColor(.white)
-                .frame(width: 80, height: 80, alignment: .center)
+                .frame(width: 85, height: 85, alignment: .center)
                 .overlay(
                     Circle()
-                        .stroke(Color.black.opacity(0.8), lineWidth: 2)
-                        .frame(width: 65, height: 65, alignment: .center)
+                        .stroke(Color.black.opacity(0.8), lineWidth: 3)
+                        .frame(width: 72.5, height: 72.5, alignment: .center)
                 )
         }
     }
@@ -82,7 +83,7 @@ struct CameraView: View {
                 .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: "multiply")
-                        .font(.system(size: 30, weight: .medium))
+                        .font(.system(size: 24, weight: .medium))
                         .foregroundColor(.white))
         }
     }
@@ -94,20 +95,9 @@ struct CameraView: View {
             }
             coordinator.pop()
         } label: {
-            ZStack {
-                Circle()
-                    .foregroundColor(.red)
-                    .frame(width: 80, height: 80, alignment: .center)
-                
-                Image(systemName: "checkmark")
-                    .foregroundStyle(.white)
-                    .font(.system(size: 25, weight: .bold, design: .default))
-            }
-            .overlay(
-                Circle()
-                    .stroke(Color.black.opacity(0.8), lineWidth: 2)
-                    .frame(width: 65, height: 65, alignment: .center)
-            )
+            Image(.cameraButton)
+                .resizable()
+                .frame(width: 85, height: 85, alignment: .center)
         }
     }
     
@@ -120,7 +110,7 @@ struct CameraView: View {
                 .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: viewModel.isFlashOn ? "bolt.fill" : "bolt.slash.fill")
-                        .font(.system(size: 30, weight: .medium))
+                        .font(.system(size: 26, weight: .medium))
                 )
                 .accentColor(viewModel.isFlashOn ? .yellow : .white)
         }
@@ -134,9 +124,11 @@ struct CameraView: View {
                 .foregroundColor(Color.gray.opacity(0.2))
                 .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
-                    Image(systemName: "square.and.arrow.down")
-                        .font(.system(size: 30, weight: .medium))
-                        .foregroundColor(.white))
+                    Image(systemName: "square.and.arrow.down.fill")
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundColor(.white)
+                        .padding(.bottom, 4)
+                )
         }
     }
     
@@ -149,7 +141,7 @@ struct CameraView: View {
                 .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: "camera.rotate.fill")
-                        .font(.system(size: 30, weight: .medium))
+                        .font(.system(size: 24, weight: .medium))
                         .foregroundColor(.white))
         }
     }

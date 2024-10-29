@@ -33,18 +33,19 @@ struct SearchStartView: View {
                 }
                 .padding(.bottom, 68)
                 
-                Button {
-                    viewModel.searchButtonTapped()
-                } label: {
-                    Image(.diggingButtonBackground)
-                        .resizable()
-                        .frame(width: 393, height: 393)
-                        .overlay {
+                Image(.diggingButtonBackground)
+                    .resizable()
+                    .frame(width: 393, height: 393)
+                    .overlay {
+                        Button {
+                            viewModel.searchButtonTapped()
+                        } label: {
                             Image(.diggingButton)
                                 .resizable()
                                 .frame(width: 85, height: 85)
                         }
-                }
+                        
+                    }
                 
                 VStack(spacing: 5) {
                     if let title = viewModel.shazamStatus.title {

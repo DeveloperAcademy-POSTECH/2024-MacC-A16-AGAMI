@@ -16,7 +16,9 @@ extension UIImage {
         )
         let squareRect = CGRect(origin: origin, size: CGSize(width: shortLength, height: shortLength))
         
-        guard let squareImage = self.cgImage?.cropping(to: squareRect) else { return nil }
-        return UIImage(cgImage: squareImage, scale: scale, orientation: imageOrientation)
+        let renderer = UIGraphicsImageRenderer(size: squareRect.size)
+        return renderer.image { _ in
+            self.draw(at: CGPoint(x: -squareRect.origin.x, y: -squareRect.origin.y))
+        }
     }
 }

@@ -26,15 +26,12 @@ struct SearchWritingView: View {
                     .listRowInsets(.zero)
                 
                 PlaylistSongListHeader(viewModel: viewModel)
-                    .padding(.top, 28)
-                    .padding(.horizontal, 24)
+                    .padding(EdgeInsets(top: 28, leading: 24, bottom: 10, trailing: 24))
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
                 
                 PlaylistSongList(viewModel: viewModel)
-                    .padding(.top, 10)
-                    .padding(.horizontal, 8)
-                    .listRowInsets(.zero)
+                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
                 
                 PlaylistDescriptionTextField(viewModel: viewModel)
                     .padding(.horizontal, 8)
@@ -200,6 +197,7 @@ private struct PlaylistSongList: View {
         }
         .onDelete(perform: viewModel.deleteSong)
         .onMove(perform: viewModel.moveSong)
+        .padding(.horizontal, 8)
     }
 }
 

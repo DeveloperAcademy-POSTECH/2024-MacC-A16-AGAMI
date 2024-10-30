@@ -15,13 +15,7 @@ struct SearchWritingView: View {
         ZStack {
             List {
                 PlaylistCoverImageView(viewModel: viewModel)
-                    .onTapGesture {
-                        if viewModel.photoUIImage == nil {
-                            coordinator.push(view: .cameraView(viewModel: viewModel))
-                        } else {
-                            viewModel.showSheet.toggle()
-                        }
-                    }
+                    .highPriorityGesture(imageViewTapGesture())
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
                 
@@ -98,6 +92,16 @@ struct SearchWritingView: View {
         }
         .toolbarRole(.editor)
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
+    }
+    
+    private func imageViewTapGesture() -> some Gesture {
+        TapGesture().onEnded {
+            if viewModel.photoUIImage == nil {
+                coordinator.push(view: .cameraView(viewModel: viewModel))
+            } else {
+                viewModel.showSheet.toggle()
+            }
+        }
     }
 }
 

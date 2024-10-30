@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Lottie
+import Kingfisher
 
 struct ArchiveListView: View {
     @State var viewModel: ArchiveListViewModel = ArchiveListViewModel()
@@ -36,6 +37,9 @@ struct ArchiveListView: View {
         .toolbarBackground(.visible, for: .tabBar)
         .confirmationDialog("", isPresented: $viewModel.isDialogPresented) {
             ConfirmationDialogActions(viewModel: viewModel)
+        }
+        .onTapGesture {
+            hideKeyboard()
         }
         .onOpenURL { url in
             if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
@@ -132,7 +136,7 @@ private struct ArchiveList: View {
 
 private struct ArchiveListCell: View {
     @Environment(ArchiveCoordinator.self) private var coord
-    @State private var asyncImageOpacity: Double = 0
+    @State private var kfImageOpacity: Double = 0
 
     let viewModel: ArchiveListViewModel
     let playlist: PlaylistModel
@@ -144,26 +148,27 @@ private struct ArchiveListCell: View {
             coord.push(view: .playlistView(viewModel: .init(playlist: playlist)))
         } label: {
             ZStack {
-                AsyncImage(url: URL(string: playlist.photoURL)) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .clipped()
-                        .opacity(asyncImageOpacity)
-                        .background(Color(.pGray1))
-                        .onAppear {
-                            withAnimation(.easeOut(duration: 1)) {
-                                asyncImageOpacity = 1
-                            }
+                KFImage(URL(string: playlist.photoURL))
+                    .resizable()
+                    .cancelOnDisappear(true)
+                    .placeholder {
+                        Image(.archiveCellPlaceholder)
+                    }
+                    .scaledToFill()
+                    .clipped()
+                    .opacity(kfImageOpacity)
+                    .background(Color(.pGray1))
+                    .frame(width: size.width, height: verticalSize)
+                    .shadow(radius: 10, x: 2, y: 4)
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 1)) {
+                            kfImageOpacity = 1
                         }
-                        .onDisappear {
-                            asyncImageOpacity = 0
-                        }
-                } placeholder: {
-                    Image(.archiveCellPlaceholder)
-                }
-                .frame(width: size.width, height: verticalSize)
-                .shadow(radius: 10, x: 2, y: 4)
+                    }
+                    .onDisappear {
+                        kfImageOpacity = 0
+                    }
+
 
                 Image(.archiveCellOverlay)
                     .resizable()

@@ -25,6 +25,9 @@ struct ArchivePlaylistView: View {
                 EmptyView()
             }
         }
+        .onTapGesture {
+            hideKeyboard()
+        }
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -140,47 +143,30 @@ private struct ArchivePlaylistRow: View {
 
 private struct ImageAndTitleWithHeaderView: View {
     @Bindable var viewModel: ArchivePlaylistViewModel
-    @State private var asyncImageOpacity: Double = 0
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .bottom) {
-                AsyncImage(url: URL(string: viewModel.playlist.photoURL)) { image in
-                    image
-                        .resizable()
-                        .aspectRatio(1, contentMode: .fit)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: .black.opacity(0.25), radius: 10)
-                        .opacity(asyncImageOpacity)
-                        .onAppear {
-                            withAnimation(.easeOut(duration: 1)) {
-                                asyncImageOpacity = 1
-                            }
+                KFImage(URL(string: viewModel.playlist.photoURL))
+                    .resizable()
+                    .cancelOnDisappear(true)
+                    .placeholder {
+                        Image(.photoPlaceHolder)
+                            .resizable()
+                            .aspectRatio(1, contentMode: .fit)
+                            .clipShape(RoundedRectangle(cornerRadius: 16))
+                            .shadow(color: .black.opacity(0.25), radius: 10)
+                            .padding(.horizontal, viewModel.isEditing ? 50 : 0)
+                    }
+                    .aspectRatio(1, contentMode: .fit)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .shadow(color: .black.opacity(0.25), radius: 10)
+                    .overlay {
+                        if viewModel.isEditing {
+                            DeletePhotoButton(viewModel: viewModel)
                         }
-                        .overlay {
-                            if viewModel.isEditing {
-                                VStack {
-                                    HStack {
-                                        Spacer()
-                                        Image(.deletePhotoButton)
-                                            .padding(7)
-                                            .onTapGesture {
-                                                viewModel.isShowingAlert = true
-                                            }
-                                    }
-                                    Spacer()
-                                }
-                            }
-                        }
-                        .padding(.horizontal, viewModel.isEditing ? 50 : 0)
-                } placeholder: {
-                    Image(.photoPlaceHolder)
-                        .resizable()
-                        .aspectRatio(1, contentMode: .fit)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .shadow(color: .black.opacity(0.25), radius: 10)
-                        .padding(.horizontal, viewModel.isEditing ? 50 : 0)
-                }
+                    }
+                    .padding(.horizontal, viewModel.isEditing ? 50 : 0)
 
                 VStack(spacing: 0) {
                     Group {
@@ -222,6 +208,26 @@ private struct ImageAndTitleWithHeaderView: View {
                     .foregroundStyle(Color(.pPrimary))
             }
             .padding(EdgeInsets(top: 37, leading: 16, bottom: 10, trailing: 16))
+        }
+    }
+}
+
+private struct DeletePhotoButton: View {
+    let viewModel: ArchivePlaylistViewModel
+
+    var body: some View {
+        VStack {
+            HStack {
+                Spacer()
+                Image(.deletePhotoButton)
+                    .padding(7)
+                    .highPriorityGesture(
+                        TapGesture().onEnded {
+                            viewModel.isShowingAlert = true
+                        }
+                    )
+            }
+            Spacer()
         }
     }
 }
@@ -269,9 +275,11 @@ private struct ExportButton: View {
             .background(Color(.pPrimary))
             .clipShape(Capsule())
             .contentShape(Capsule())
-            .onTapGesture {
-                viewModel.isDialogPresented = true
-            }
+            .highPriorityGesture(
+                TapGesture().onEnded {
+                    viewModel.isDialogPresented = true
+                }
+            )
             Spacer()
         }
     }

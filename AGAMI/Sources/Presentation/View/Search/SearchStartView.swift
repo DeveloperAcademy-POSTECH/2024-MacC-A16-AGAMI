@@ -66,8 +66,11 @@ struct SearchStartView: View {
             }
         }
         .onAppear {
-            coordinator.presentSheet(.diggingModalView(viewModel: viewModel),
-                                     onDismiss: { viewModel.shazamStatus = .idle })
+            coordinator.presentSheet(
+                .diggingModalView(viewModel: viewModel),
+                onDismiss: {
+                    viewModel.shazamStatus = .idle
+                })
         }
         .onDisappear {
             coordinator.dismissSheet()

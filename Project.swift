@@ -14,7 +14,7 @@ let fonts = [
 
 let project = Project(
     name: "AGAMI",
-    settings: Settings
+    settings:
         .settings(
             base: [
                 "OTHER_LDFLAGS": ["-all_load -Objc"],
@@ -52,12 +52,11 @@ let project = Project(
                             "UIAppFonts": .array( fonts .map { .string( $0 ) }),
                             "LSApplicationQueriesSchemes": .array( ["spotify"] ),
                             "CFBundleURLTypes": .array([
-                                .dictionary(
-                                    [ "CFBundleURLSchemes" : .array(["plake-agami"]),
-                                      "CFBundleURLName" : .string("com.agami.plake")
-                                    ]
-                                )]
-                            ),
+                                .dictionary([
+                                    "CFBundleURLSchemes" : .array(["plake-agami"]),
+                                    "CFBundleURLName" : .string("com.agami.plake")
+                                ])
+                            ]),
                             "UIUserInterfaceStyle": "Light",
                             "CLIENT_ID": .string("$(CLIENT_ID)"),
                             "CLIENT_SECRET": .string("$(CLIENT_SECRET)"),
@@ -67,9 +66,7 @@ let project = Project(
             sources: ["AGAMI/Sources/**"],
             resources: ["AGAMI/Resources/**"],
             entitlements: "Entitlements/AGAMI.entitlements",
-            scripts: [
-                .swiftLintShell
-            ],
+            scripts: [.swiftLintShell],
             dependencies: [
                 .external(name: "FirebaseAnalytics"),
                 .external(name: "FirebaseAuth"),
@@ -89,9 +86,7 @@ let project = Project(
             infoPlist: .default,
             sources: ["AGAMI/Tests/**"],
             resources: [],
-            dependencies: [.target(
-                name: "AGAMI"
-            )]
+            dependencies: [.target(name: "AGAMI")]
         )
     ]
 )

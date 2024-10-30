@@ -79,7 +79,7 @@ final class LocationService: NSObject {
                     }
                     
                     if let name: String = address.last?.name {
-                        currentAddress += "\(name)"
+                        currentAddress += " \(name)"
                         placeHolderAddress = name
                         region = name
                     }

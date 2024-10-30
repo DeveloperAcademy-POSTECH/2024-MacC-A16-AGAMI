@@ -47,6 +47,7 @@ struct SearchDiggingListModalView: View {
                         }
                         .onDelete(perform: viewModel.deleteSong)
                         .onMove(perform: viewModel.moveSong)
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
                     }
                     .scrollIndicators(.hidden)
                     .listStyle(InsetGroupedListStyle())

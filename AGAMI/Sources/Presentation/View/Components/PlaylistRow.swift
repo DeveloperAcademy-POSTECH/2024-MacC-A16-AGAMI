@@ -7,21 +7,22 @@
 
 import SwiftUI
 
+import Kingfisher
+
 struct PlaylistRow: View {
     let song: SongModel
 
     var body: some View {
         HStack(spacing: 0) {
-            AsyncImage(url: URL(string: song.albumCoverURL)) { image in
-                image
-                    .resizable()
-                    .frame(width: 60, height: 60)
-
-            } placeholder: {
-                ProgressView()
-                    .frame(width: 60, height: 60)
-            }
-            .padding(.trailing, 20)
+            KFImage(URL(string: song.albumCoverURL))
+                .resizable()
+                .cancelOnDisappear(true)
+                .placeholder({
+                    ProgressView()
+                        .frame(width: 60, height: 60)
+                })
+                .frame(width: 60, height: 60)
+                .padding(.trailing, 20)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(song.title)

@@ -60,7 +60,8 @@ let project = Project(
                             "UIUserInterfaceStyle": "Light",
                             "CLIENT_ID": .string("$(CLIENT_ID)"),
                             "CLIENT_SECRET": .string("$(CLIENT_SECRET)"),
-                            "REDIRECT_URL": .string("$(REDIRECT_URL)")
+                            "REDIRECT_URL": .string("$(REDIRECT_URL)"),
+                            "CFBundleDisplayName": "Plake"
                         ]
                     ),
             sources: ["AGAMI/Sources/**"],

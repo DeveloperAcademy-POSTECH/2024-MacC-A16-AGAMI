@@ -42,18 +42,13 @@ struct ArchiveListView: View {
             hideKeyboard()
         }
         .onOpenURL { url in
-            if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
-               let decodedRedirectURL = redirectURL.removingPercentEncoding {
-                if url.absoluteString.contains(decodedRedirectURL) {
-                    viewModel.exportingState = .none
-                }
-            }
+            viewModel.handleURL(url)
         }
     }
 }
 
 private struct ArchiveListHeader: View {
-    var viewModel: ArchiveListViewModel
+    let viewModel: ArchiveListViewModel
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
@@ -210,7 +205,7 @@ private struct ArchiveListCell: View {
 }
 
 private struct ConfirmationDialogActions: View {
-    var viewModel: ArchiveListViewModel
+    let viewModel: ArchiveListViewModel
 
     var body: some View {
         Button("로그아웃", role: .destructive) {
@@ -222,7 +217,7 @@ private struct ConfirmationDialogActions: View {
 
 private struct ContextMenuItems: View {
     @Environment(\.openURL) private var openURL
-    var viewModel: ArchiveListViewModel
+    let viewModel: ArchiveListViewModel
     let playlist: PlaylistModel
 
     var body: some View {

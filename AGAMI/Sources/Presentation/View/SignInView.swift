@@ -7,8 +7,6 @@
 
 import SwiftUI
 import AuthenticationServices
-import FirebaseAuth
-import CryptoKit
 
 struct SignInView: View {
     @State private var viewModel: SignInViewModel = SignInViewModel()

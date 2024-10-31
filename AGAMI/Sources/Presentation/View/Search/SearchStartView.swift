@@ -10,9 +10,9 @@ import SwiftUI
 import Lottie
 
 struct SearchStartView: View {
-    @Environment(SearchCoordinator.self) var coordinator
-    @State var viewModel: SearchStartViewModel = SearchStartViewModel()
-    
+    @Environment(SearchCoordinator.self) private var coordinator
+    @State private var viewModel: SearchStartViewModel = SearchStartViewModel()
+
     var body: some View {
         ZStack {
             Color(viewModel.shazamStatus.backgroundColor)
@@ -44,7 +44,6 @@ struct SearchStartView: View {
                                 .resizable()
                                 .frame(width: 85, height: 85)
                         }
-                        
                     }
                 
                 VStack(spacing: 5) {
@@ -68,9 +67,8 @@ struct SearchStartView: View {
         .onAppear {
             coordinator.presentSheet(
                 .diggingModalView(viewModel: viewModel),
-                onDismiss: {
-                    viewModel.shazamStatus = .idle
-                })
+                onDismiss: { viewModel.shazamStatus = .idle }
+            )
         }
         .onDisappear {
             coordinator.dismissSheet()
@@ -79,6 +77,6 @@ struct SearchStartView: View {
 }
 
 #Preview {
-    SearchStartView(viewModel: SearchStartViewModel())
+    SearchStartView()
         .environment(SearchCoordinator())
 }

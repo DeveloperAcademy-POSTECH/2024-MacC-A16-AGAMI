@@ -6,7 +6,6 @@
 //
 
 import Foundation
-
 import MusicKit
 
 final class MusicService {
@@ -73,13 +72,3 @@ final class MusicService {
         songs.removeAll()
     }
 }
-
-enum MusicAuthorizationError: Error {
-    case denied
-}
-
-enum MusicServiceError: Error {
-    case playlistNotFound
-    case songNotFound
-}
-

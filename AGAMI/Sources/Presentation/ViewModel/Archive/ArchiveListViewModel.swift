@@ -21,6 +21,7 @@ final class ArchiveListViewModel {
             filterPlaylists()
         }
     }
+
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
 
@@ -131,9 +132,12 @@ final class ArchiveListViewModel {
         dateFormatter.dateFormat = "yyyy. MM. dd."
         return dateFormatter.string(from: date)
     }
-}
 
-enum SpotifyError: Error {
-    case invalidURI
-    case invalidURL
+    func handleURL(_ url: URL) {
+        if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
+           let decodedRedirectURL = redirectURL.removingPercentEncoding,
+           url.absoluteString.contains(decodedRedirectURL) {
+            exportingState = .none
+        }
+    }
 }

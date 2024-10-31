@@ -11,8 +11,7 @@ import UIKit
 
 @Observable
 final class CameraViewModel: ObservableObject {
-    private let cameraService: CameraService
-    private let session: AVCaptureSession
+    private let cameraService: CameraService = CameraService()
     private let firebaseService = FirebaseService()
     
     private var currentZoomFactor: CGFloat = 1.0
@@ -26,9 +25,7 @@ final class CameraViewModel: ObservableObject {
     var photoURL: String?
     
     init() {
-        cameraService = CameraService()
-        session = cameraService.session
-        cameraPreView = CameraPreview(session: session)
+        cameraPreView = CameraPreview(session: cameraService.session)
         cameraService.onPhotoCaptured = { [weak self] imageData in
             if let image = UIImage(data: imageData) {
                 self?.photoUIImage = image

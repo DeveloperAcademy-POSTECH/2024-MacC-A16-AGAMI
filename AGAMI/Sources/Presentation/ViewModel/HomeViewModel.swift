@@ -11,9 +11,3 @@ import Foundation
 final class HomeViewModel {
     var selectedTab: TabSelection = .plake
 }
-
-enum TabSelection: Hashable {
-    case plake
-    case plakive
-    case map
-}

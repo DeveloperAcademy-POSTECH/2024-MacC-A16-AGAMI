@@ -39,28 +39,18 @@ struct ArchivePlaylistView: View {
             ConfirmationDialogActions(viewModel: viewModel)
         }
         .alert("커버 사진 삭제", isPresented: $viewModel.isShowingAlert) {
-            Button("취소", role: .cancel) {
-                viewModel.isShowingAlert = false
-            }
-            Button("삭제", role: .destructive) {
-                viewModel.deletePhotoURL()
-            }
+            AlertActions(viewModel: viewModel)
         } message: {
             Text("삭제한 사진은 되돌릴 수 없습니다.")
         }
         .onOpenURL { url in
-            if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
-               let decodedRedirectURL = redirectURL.removingPercentEncoding {
-                if url.absoluteString.contains(decodedRedirectURL) {
-                    viewModel.exportingState = .none
-                }
-            }
+            viewModel.handleURL(url)
         }
     }
 }
 
 private struct ListView: View {
-    var viewModel: ArchivePlaylistViewModel
+    let viewModel: ArchivePlaylistViewModel
 
     var body: some View {
         List {
@@ -256,8 +246,8 @@ private struct PlaylistDescription: View {
 }
 
 private struct ExportButton: View {
-    var viewModel: ArchivePlaylistViewModel
-    
+    let viewModel: ArchivePlaylistViewModel
+
     var body: some View {
         HStack {
             Spacer()
@@ -286,8 +276,8 @@ private struct ExportButton: View {
 }
 
 private struct ConfirmationDialogActions: View {
-    @Environment(\.openURL) var openURL
-    var viewModel: ArchivePlaylistViewModel
+    @Environment(\.openURL) private var openURL
+    let viewModel: ArchivePlaylistViewModel
 
     var body: some View {
         Button {
@@ -316,7 +306,7 @@ private struct ConfirmationDialogActions: View {
 }
 
 private struct TopBarTrailingItems: View {
-    var viewModel: ArchivePlaylistViewModel
+    let viewModel: ArchivePlaylistViewModel
 
     var body: some View {
         HStack {
@@ -351,7 +341,7 @@ private struct TopBarTrailingItems: View {
 
 private struct MenuContents: View {
     @Environment(ArchiveCoordinator.self) private var coordinator
-    var viewModel: ArchivePlaylistViewModel
+    let viewModel: ArchivePlaylistViewModel
 
     var body: some View {
         Button {
@@ -367,6 +357,19 @@ private struct MenuContents: View {
             }
         } label: {
             Label("삭제하기", systemImage: "trash")
+        }
+    }
+}
+
+private struct AlertActions: View {
+    let viewModel: ArchivePlaylistViewModel
+
+    var body: some View {
+        Button("취소", role: .cancel) {
+            viewModel.isShowingAlert = false
+        }
+        Button("삭제", role: .destructive) {
+            viewModel.deletePhotoURL()
         }
     }
 }

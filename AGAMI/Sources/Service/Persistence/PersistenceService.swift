@@ -13,7 +13,7 @@ import SwiftData
 final class PersistenceService {
     let modelContainer: ModelContainer
     let modelContext: ModelContext
-    
+
     static let shared: PersistenceService = .init()
     
     private let diggingListOrderKey = "diggingListOrder"

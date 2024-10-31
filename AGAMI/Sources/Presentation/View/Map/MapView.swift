@@ -8,8 +8,6 @@
 import SwiftUI
 import MapKit
 
-
-
 struct MapView: View {
     @State private var viewModel: MapViewModel = MapViewModel()
 

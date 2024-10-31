@@ -23,7 +23,7 @@ final class SearchWritingViewModel {
     
     // 커버 이미지
     var photoURL: String = ""
-    var photoUIImage: UIImage? = nil
+    var photoUIImage: UIImage?
     var currentDate: String = ""
     var currentLocality: String = ""
     var currentRegion: String = ""

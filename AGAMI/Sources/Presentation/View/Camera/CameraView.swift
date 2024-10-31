@@ -12,8 +12,8 @@ import UIKit
 struct CameraView: View {
     @Environment(SearchCoordinator.self) private var coordinator
     @State var viewModel = CameraViewModel()
-    var searchWritingViewModel: SearchWritingViewModel
-    
+    let searchWritingViewModel: SearchWritingViewModel
+
     var body: some View {
         ZStack {
             Color.black.edgesIgnoringSafeArea(.all)
@@ -34,13 +34,15 @@ struct CameraView: View {
                         .onAppear {
                             viewModel.configure()
                         }
-                        .gesture(MagnificationGesture()
-                            .onChanged { val in
-                                viewModel.zoom(factor: val)
-                            }
-                            .onEnded { _ in
-                                viewModel.zoomInitialize()
-                            })
+                        .gesture(
+                            MagnificationGesture()
+                                .onChanged { val in
+                                    viewModel.zoom(factor: val)
+                                }
+                                .onEnded { _ in
+                                    viewModel.zoomInitialize()
+                                }
+                        )
                 }
                 
                 HStack(spacing: 44) {
@@ -60,7 +62,7 @@ struct CameraView: View {
         .toolbar(.hidden, for: .tabBar)
     }
     
-    var captureButton: some View {
+    private var captureButton: some View {
         Button {
             viewModel.capturePhoto()
         } label: {
@@ -75,7 +77,7 @@ struct CameraView: View {
         }
     }
     
-    var resetPhotoButton: some View {
+    private var resetPhotoButton: some View {
         Button {
             viewModel.resetPhoto()
         } label: {
@@ -89,7 +91,7 @@ struct CameraView: View {
         }
     }
     
-    var usedPhotoButton: some View {
+    private var usedPhotoButton: some View {
         Button {
             if let croppedImage = viewModel.photoUIImage?.cropSquare() {
                 searchWritingViewModel.savePhotoUIImage(photoUIImage: croppedImage)
@@ -102,7 +104,7 @@ struct CameraView: View {
         }
     }
     
-    var switchFlashButton: some View {
+    private var switchFlashButton: some View {
         Button {
             viewModel.switchFlash()
         } label: {
@@ -117,7 +119,7 @@ struct CameraView: View {
         }
     }
     
-    var savePhotoButton: some View {
+    private var savePhotoButton: some View {
         Button {
             viewModel.savePhoto()
         } label: {
@@ -133,7 +135,7 @@ struct CameraView: View {
         }
     }
     
-    var changeCameraButton: some View {
+    private var changeCameraButton: some View {
         Button {
             viewModel.changeCamera()
         } label: {

@@ -10,14 +10,14 @@ import AVFoundation
 import UIKit
 
 final class CameraService: NSObject {
-    var session = AVCaptureSession()
-    var videoDeviceInput: AVCaptureDeviceInput?
-    let output = AVCapturePhotoOutput()
-    var lastScale: CGFloat = 1.0
-    
-    var currentCameraPosition: AVCaptureDevice.Position = .back
+    let session = AVCaptureSession()
+    private var videoDeviceInput: AVCaptureDeviceInput?
+    private let output = AVCapturePhotoOutput()
+    private var lastScale: CGFloat = 1.0
+
+    private var currentCameraPosition: AVCaptureDevice.Position = .back
     var onPhotoCaptured: ((Data) -> Void)?
-    
+
     func setUpCamera() {
         if let currentInput = videoDeviceInput {
             session.removeInput(currentInput)
@@ -136,9 +136,7 @@ final class CameraService: NSObject {
 }
 
 extension CameraService: AVCapturePhotoCaptureDelegate {
-    func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
-        //        self.isCameraBusy = true
-    }
+    func photoOutput(_ output: AVCapturePhotoOutput, willBeginCaptureFor resolvedSettings: AVCaptureResolvedPhotoSettings) { }
     
     func photoOutput(_ output: AVCapturePhotoOutput, willCapturePhotoFor resolvedSettings: AVCaptureResolvedPhotoSettings) {
         // 카메라 무음

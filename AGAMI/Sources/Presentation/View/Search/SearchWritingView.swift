@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SearchWritingView: View {
-    @Environment(SearchCoordinator.self) var coordinator
+    @Environment(SearchCoordinator.self) private var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
     
     var body: some View {
@@ -103,8 +103,8 @@ struct SearchWritingView: View {
 }
 
 private struct PlaylistCoverImageView: View {
-    var viewModel: SearchWritingViewModel
-    
+    let viewModel: SearchWritingViewModel
+
     var body: some View {
         HStack(spacing: 0) {
             Spacer()
@@ -155,8 +155,8 @@ private struct PlaylistCoverImageView: View {
 
 private struct PlaylistTitleTextField: View {
     @Bindable var viewModel: SearchWritingViewModel
-    @FocusState var isFocused: Bool
-    
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
             .font(.pretendard(weight: .semiBold600, size: 24))
@@ -173,8 +173,8 @@ private struct PlaylistTitleTextField: View {
 }
 
 private struct PlaylistSongListHeader: View {
-    var viewModel: SearchWritingViewModel
-    
+    let viewModel: SearchWritingViewModel
+
     var body: some View {
         HStack(spacing: 0) {
             Text("수집한 플레이크")
@@ -189,8 +189,8 @@ private struct PlaylistSongListHeader: View {
 }
 
 private struct PlaylistSongList: View {
-    var viewModel: SearchWritingViewModel
-    
+    let viewModel: SearchWritingViewModel
+
     var body: some View {
         ForEach(viewModel.diggingList, id: \.songID) { song in
             PlaylistRow(song: song)
@@ -203,7 +203,7 @@ private struct PlaylistSongList: View {
 
 private struct PlaylistDescriptionTextField: View {
     @Bindable var viewModel: SearchWritingViewModel
-    @FocusState var isFocused: Bool
+    @FocusState private var isFocused: Bool
     
     var body: some View {
         RoundedRectangle(cornerRadius: 10)

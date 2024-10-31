@@ -120,5 +120,14 @@ final class ArchivePlaylistViewModel: Hashable {
         try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
         isUpdating = false
     }
+
+    func handleURL(_ url: URL) {
+        if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
+           let decodedRedirectURL = redirectURL.removingPercentEncoding,
+           url.absoluteString.contains(decodedRedirectURL) {
+
+            exportingState = .none
+        }
+    }
 }
 

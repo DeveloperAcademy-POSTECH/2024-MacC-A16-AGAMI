@@ -15,16 +15,16 @@ let fonts = [
 let project = Project(
     name: "AGAMI",
     settings:
-        .settings(
-            base: [
-                "OTHER_LDFLAGS": ["-all_load -Objc"],
-                "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor"
-            ],
-            configurations: [
-                .debug(name: "Debug", xcconfig: "Configurations/Debug.xcconfig"),
-                .release(name: "Release", xcconfig: "Configurations/Release.xcconfig")
-            ]
-        ),
+            .settings(
+                base: [
+                    "OTHER_LDFLAGS": ["-all_load -Objc"],
+                    "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor"
+                ],
+                configurations: [
+                    .debug(name: "Debug", xcconfig: "Configurations/Debug.xcconfig"),
+                    .release(name: "Release", xcconfig: "Configurations/Release.xcconfig")
+                ]
+            ),
     targets: [
         .target(
             name: "AGAMI",
@@ -78,16 +78,6 @@ let project = Project(
                 .external(name: "Lottie"),
                 .external(name: "Kingfisher")
             ]
-        ),
-        .target(
-            name: "AGAMITests",
-            destinations: [.iPhone],
-            product: .unitTests,
-            bundleId: "io.tuist.AGAMITests",
-            infoPlist: .default,
-            sources: ["AGAMI/Tests/**"],
-            resources: [],
-            dependencies: [.target(name: "AGAMI")]
         )
     ]
 )

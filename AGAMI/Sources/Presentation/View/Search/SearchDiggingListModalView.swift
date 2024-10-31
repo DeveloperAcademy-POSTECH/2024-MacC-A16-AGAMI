@@ -8,9 +8,9 @@
 import SwiftUI
 
 struct SearchDiggingListModalView: View {
-    @Environment(SearchCoordinator.self) var coordinator
+    @Environment(SearchCoordinator.self) private var coordinator
     var viewModel: SearchStartViewModel
-    
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {

@@ -18,23 +18,26 @@ final class MapViewModel {
     var currentlongitude: Double?
     var currentStreetAddress: String?
     var isLoaded: Bool = false
-    
+
+    var goToDetail: Bool = false
+
     var playlists: [PlaylistModel] = []
-    
+
+    var selectedPlaylists: [PlaylistModel] = []
+
     func fecthPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는데 실패했습니다.")
             return
         }
-        
         Task {
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 playlists = playlistModels
             }
-            // 플레이리스트 위경도 좌표찍는 코드(추후 제거예정)
-            for playlist in playlists {
-                dump("\(playlist.latitude), \(playlist.longitude)")
-            }
+        }
+        // 플레이리스트 위경도 좌표찍는 코드(추후 제거예정)
+        for playlist in playlists {
+            dump("\(playlist.latitude), \(playlist.longitude)")
         }
     }
     

@@ -87,14 +87,14 @@ struct MKMapViewWrapper: UIViewRepresentable {
                 let playlistAnnotations = clusterAnnotation.memberAnnotations.compactMap { $0 as? PlaylistAnnotation }
                 let playlists = playlistAnnotations.map { $0.playlist }
 
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.parent.viewModel.selectedPlaylists = playlists
                     self.parent.viewModel.goToDetail = true
                 }
             } else if let playlistAnnotation = view.annotation as? PlaylistAnnotation {
                 let playlist = playlistAnnotation.playlist
 
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     self.parent.viewModel.selectedPlaylists = [playlist]
                     self.parent.viewModel.goToDetail = true
                 }

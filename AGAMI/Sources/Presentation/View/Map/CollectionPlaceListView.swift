@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct CollectionPlaceListView: View {
-    let viewModel: CollectionPlaceViewModel
+    let viewModel: MapViewModel
+    let playlist: PlaylistModel
 
     private let columnWidth: CGFloat = 176
     private let columnSpacing: CGFloat = 12
@@ -22,7 +23,7 @@ struct CollectionPlaceListView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("울산 울주군 상북면 명촌길천로 23")
+                Text("\(viewModel.playlists.count)")
                     .font(.system(size: 16, weight: .regular))
                 
                 Spacer()
@@ -30,19 +31,26 @@ struct CollectionPlaceListView: View {
             .padding(.leading, 12)
             
             LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(viewModel.playList, id: \.self) { place in
+                ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                     ZStack {
-                        Image(.bear)
-                            .resizable()
-                            .aspectRatio(1.0, contentMode: .fit)
-                            .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 4)
+                        AsyncImage(url: URL(string: playlist.photoURL)) { image in
+                            image
+                                .image?.resizable()
+                                .aspectRatio(1.0, contentMode: .fit)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 4)
+                        }
+//                        Image()
+//                            .resizable()
+//                            .aspectRatio(1.0, contentMode: .fit)
+//                            .clipShape(RoundedRectangle(cornerRadius: 10))
+//                            .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 4)
                         
                         VStack(alignment: .center, spacing: 5) {
                             Spacer()
-                            
-                            Text(place.address)
-                            Text("\(place.date) \(place.time)")
+//                            viewModel.formatDateToString(playlist.generationTime
+                            Text("\(playlist.streetAddress)")
+                            Text(viewModel.formatDateToString(playlist.generationTime))
                         }
                         .foregroundStyle(.white)
                         .font(.system(size: 14))

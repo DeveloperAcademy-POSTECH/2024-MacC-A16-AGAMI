@@ -9,31 +9,37 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
-    @State private var viewModel = MapViewModel()
+    @State private var viewModel: MapViewModel = MapViewModel()
+//    let playlist: PlaylistModel
     
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottom) {
                 Map {
-//                    ForEach(viewModel.places) { place in
-//                        Annotation("", coordinate: place.location) {
-//                            NavigationLink(destination: CollectionPlaceView()) {
-//                                PlaceMarkerView()
-//                            }
-//                        }
-//                    }
+                    ForEach(viewModel.playlists, id: \.playlistID) { playlist in
+                        let location = CLLocationCoordinate2D(latitude: playlist.latitude, longitude: playlist.longitude)
+                        
+                        Annotation("", coordinate: location) {
+                            NavigationLink(destination: CollectionPlaceView(viewModel: viewModel, playlist: playlist)) {
+                                PlaceMarkerView(
+                                    viewModel: viewModel,
+                                    playlist: playlist
+                                )
+                            }
+                        }
+                    }
                     
                     UserAnnotation()
                 }
                 .mapStyle(.standard)
             }
             .onAppear {
-                viewModel.requestCurrentLocation()
+                viewModel.fecthPlaylists()
             }
         }
     }
 }
 
-#Preview {
-    MapView()
-}
+//#Preview {
+//    MapView()
+//}

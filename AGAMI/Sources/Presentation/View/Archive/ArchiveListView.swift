@@ -169,7 +169,6 @@ private struct ArchiveListCell: View {
                         kfImageOpacity = 0
                     }
 
-
                 Image(.archiveCellOverlay)
                     .resizable()
 

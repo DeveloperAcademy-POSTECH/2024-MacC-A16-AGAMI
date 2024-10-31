@@ -10,12 +10,33 @@ import MapKit
 
 @Observable
 final class MapViewModel {
-    let locationService = LocationService.shared
+    private let firebaseService = FirebaseService()
+    private let authService = FirebaseAuthService()
+    private let locationService = LocationService.shared
     
     var currentlatitude: Double?
     var currentlongitude: Double?
     var currentStreetAddress: String?
     var isLoaded: Bool = false
+    
+    var playlists: [PlaylistModel] = []
+    
+    func fecthPlaylists() {
+        guard let uid = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는데 실패했습니다.")
+            return
+        }
+        
+        Task {
+            if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
+                playlists = playlistModels
+            }
+            // 플레이리스트 위경도 좌표찍는 코드(추후 제거예정)
+            for playlist in playlists {
+                dump("\(playlist.latitude), \(playlist.longitude)")
+            }
+        }
+    }
     
     func requestLocationAuthorization() {
         locationService.requestLocationAuthorization()
@@ -39,6 +60,12 @@ final class MapViewModel {
     func requestCurrentStreetAddress() {
         locationService.coordinateToStreetAddress { _ in }
         currentStreetAddress = locationService.streetAddress
+    }
+    
+    func formatDateToString(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd."
+        return dateFormatter.string(from: date)
     }
 }
 

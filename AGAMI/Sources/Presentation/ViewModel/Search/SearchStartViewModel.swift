@@ -7,45 +7,25 @@
 
 import SwiftUI
 
-import ShazamKit
+import CoreLocation
 
-@MainActor
 @Observable
-final class SearchStartViewModel: NSObject {
+final class SearchStartViewModel {
     private let persistenceService = PersistenceService.shared
-    private let shazamService = ShazamService()
     private let locationService = LocationService.shared
     
-    var currentItem: SHMediaItem?
+    // 플레이크 타이틀
+    var currentStreetAddress: String?
+    var placeHolderAddress: String = ""
+    var isLoaded: Bool = false
+    var userTitle: String = ""
+    
+    // 수집한 노래
     var diggingList: [SongModel] = []
     
-    var shazamStatus: ShazamStatus = .idle
-    var showSheet: Bool = false
-    
-    override init() {
-        super.init()
-        shazamService.delegate = self
+    init() {
         loadSavedSongs()
-    }
-    
-    private func startRecognition() {
-        shazamStatus = .searching
-        shazamService.startRecognition()
-    }
-    
-    func stopRecognition() {
-        shazamService.stopRecognition()
-    }
-    
-    func searchButtonTapped() {
-        currentItem = nil
-
-        if shazamStatus == .searching {
-            stopRecognition()
-            shazamStatus = .idle
-        } else {
-            startRecognition()
-        }
+        locationService.delegate = self
     }
     
     func loadSavedSongs() {
@@ -53,6 +33,36 @@ final class SearchStartViewModel: NSObject {
             self.diggingList = try persistenceService.loadDiggingListWithOrder()
         } catch {
             dump("Failed to load saved songs: \(error)")
+        }
+    }
+    
+    func requestCurrentLocation() {
+        dump("viewmodel requestCurrentLocation")
+        locationService.requestCurrentLocation()
+    }
+    
+    func getCurrentLocation() {
+        locationService.coordinateToStreetAddress { [weak self] address in
+            guard let self = self else { return }
+            
+            self.currentStreetAddress = address
+            self.setPlaceHolderAddress()
+            
+            if currentStreetAddress != nil {
+                isLoaded = true
+            }
+        }
+    }
+    
+    func setPlaceHolderAddress() {
+        if let address = locationService.placeHolderAddress {
+            if let range = address.range(of: "로") ?? address.range(of: "길") {
+                placeHolderAddress = String(address[..<range.upperBound])
+                placeHolderAddress += "에서 만난 플레이크"
+            } else {
+                placeHolderAddress = address
+                placeHolderAddress += "에서 만난 플레이크"
+            }
         }
     }
     
@@ -80,35 +90,12 @@ final class SearchStartViewModel: NSObject {
     }
 }
 
-extension SearchStartViewModel: ShazamServiceDelegate {
-    func shazamService(_ service: ShazamService, didFind match: SHMatch) {
-        dump(#function)
-        guard let mediaItem = match.mediaItems.first else { return }
-        dump("title: \(mediaItem.title ?? "")")
-        stopRecognition()
-        currentItem = mediaItem
-        shazamStatus = .found
-        
-        if let item = currentItem {
-            do {
-                try persistenceService.saveSongToDiggingList(from: item)
-                loadSavedSongs()
-            } catch {
-                dump("Failed to save song: \(error)")
-            }
-        }
+extension SearchStartViewModel: LocationServiceDelegate {
+    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
+        getCurrentLocation()
     }
     
-    func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
-        dump(#function)
-        dump("didNotFindMatch | signature: \(signature) | error: \(String(describing: error))")
-        shazamStatus = .failed
-        stopRecognition()
-    }
-    
-    func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
-        dump(#function)
-        shazamStatus = .failed
-        stopRecognition()
+    func locationService(_ service: LocationService, didGetReverseGeocode location: String) {
+        self.currentStreetAddress = location
     }
 }

@@ -10,7 +10,7 @@ import AVFoundation
 import UIKit
 
 @Observable
-final class CameraViewModel: ObservableObject {
+final class CameraViewModel {
     private let cameraService: CameraService = CameraService()
     private let firebaseService = FirebaseService()
     

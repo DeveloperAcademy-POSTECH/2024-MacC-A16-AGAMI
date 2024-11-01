@@ -14,12 +14,10 @@ struct MapView: View {
     var body: some View {
         NavigationStack {
             MKMapViewWrapper(viewModel: viewModel)
-                .background(ignoresSafeAreaEdges: .top)
+                .ignoresSafeArea(edges: .top)
+//                .background(ignoresSafeAreaEdges: .top)
                 .onAppear {
                     viewModel.fecthPlaylists()
-                }
-                .navigationDestination(isPresented: $viewModel.goToDetail) {
-                    MapDetailTestView(playlists: viewModel.selectedPlaylists)
                 }
         }
     }

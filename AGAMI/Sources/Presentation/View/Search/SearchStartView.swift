@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-import Lottie
-
 struct SearchStartView: View {
     @Environment(SearchCoordinator.self) private var coordinator
     @State private var viewModel: SearchStartViewModel = SearchStartViewModel()

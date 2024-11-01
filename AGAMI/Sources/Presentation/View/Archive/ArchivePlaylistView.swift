@@ -7,7 +7,6 @@
 
 import SwiftUI
 import Kingfisher
-import Lottie
 
 struct ArchivePlaylistView: View {
     @State var viewModel: ArchivePlaylistViewModel

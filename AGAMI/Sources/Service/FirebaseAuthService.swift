@@ -34,7 +34,7 @@ final class FirebaseAuthService {
     
     func registerAuthStateHandler() {
         if authStateHandler == nil {
-            authStateHandler = Auth.auth().addStateDidChangeListener { auth, user in
+            authStateHandler = Auth.auth().addStateDidChangeListener { _, user in
                 self.user = user
             }
         }
@@ -109,12 +109,12 @@ final class FirebaseAuthService {
     func deleteAccount() async -> Bool {
         guard let user = user else { return false }
         guard let lastSignInDate = user.metadata.lastSignInDate else { return false }
-        let needsReauth = !lastSignInDate.isWithinPast(minutes: 5)
+        let needsReAuth = !lastSignInDate.isWithinPast(minutes: 5)
         
         let needsTokenRevocation = user.providerData.contains { $0.providerID == "apple.com" }
         
         do {
-            if needsReauth || needsTokenRevocation {
+            if needsReAuth || needsTokenRevocation {
                 let signInWithApple = await SignInWithApple()
                 let appleIDCredential = try await signInWithApple()
                 
@@ -132,7 +132,7 @@ final class FirebaseAuthService {
                                                           idToken: idTokenString,
                                                           rawNonce: nonce)
                 
-                if needsReauth {
+                if needsReAuth {
                     try await user.reauthenticate(with: credential)
                 }
                 if needsTokenRevocation {

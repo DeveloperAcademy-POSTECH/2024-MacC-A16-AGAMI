@@ -67,10 +67,8 @@ final class PlakeListViewModel {
         }
     }
     
-    func deleteAccountAndSignOut() async throws {
-        let deleteSuccess = await authService.deleteAccount()
-        
-        if deleteSuccess {
+    func deleteAccountAndSignOut() async {
+        if await authService.deleteAccount() {
             logout()
         } else {
             dump("계정 삭제에 실패했습니다.")

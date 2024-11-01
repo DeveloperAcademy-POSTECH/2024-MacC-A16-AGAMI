@@ -8,8 +8,8 @@
 import SwiftUI
 import Kingfisher
 
-struct ArchivePlaylistView: View {
-    @State var viewModel: ArchivePlaylistViewModel
+struct PlakePlaylistView: View {
+    @State var viewModel: PlakePlaylistViewModel
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -49,7 +49,7 @@ struct ArchivePlaylistView: View {
 }
 
 private struct ListView: View {
-    let viewModel: ArchivePlaylistViewModel
+    let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         List {
@@ -90,7 +90,7 @@ private struct ListView: View {
 }
 
 private struct ArchivePlaylistRow: View {
-    let viewModel: ArchivePlaylistViewModel
+    let viewModel: PlakePlaylistViewModel
     let song: SongModel
 
     var body: some View {
@@ -131,7 +131,7 @@ private struct ArchivePlaylistRow: View {
 }
 
 private struct ImageAndTitleWithHeaderView: View {
-    @Bindable var viewModel: ArchivePlaylistViewModel
+    @Bindable var viewModel: PlakePlaylistViewModel
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -202,7 +202,7 @@ private struct ImageAndTitleWithHeaderView: View {
 }
 
 private struct DeletePhotoButton: View {
-    let viewModel: ArchivePlaylistViewModel
+    let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         VStack {
@@ -222,7 +222,7 @@ private struct DeletePhotoButton: View {
 }
 
 private struct PlaylistDescription: View {
-    @Bindable var viewModel: ArchivePlaylistViewModel
+    @Bindable var viewModel: PlakePlaylistViewModel
 
     var body: some View {
         if viewModel.isEditing {
@@ -245,7 +245,7 @@ private struct PlaylistDescription: View {
 }
 
 private struct ExportButton: View {
-    let viewModel: ArchivePlaylistViewModel
+    let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         HStack {
@@ -276,7 +276,7 @@ private struct ExportButton: View {
 
 private struct ConfirmationDialogActions: View {
     @Environment(\.openURL) private var openURL
-    let viewModel: ArchivePlaylistViewModel
+    let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         Button {
@@ -305,7 +305,7 @@ private struct ConfirmationDialogActions: View {
 }
 
 private struct TopBarTrailingItems: View {
-    let viewModel: ArchivePlaylistViewModel
+    let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         HStack {
@@ -339,8 +339,8 @@ private struct TopBarTrailingItems: View {
 }
 
 private struct MenuContents: View {
-    @Environment(ArchiveCoordinator.self) private var coordinator
-    let viewModel: ArchivePlaylistViewModel
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         Button {
@@ -361,12 +361,13 @@ private struct MenuContents: View {
 }
 
 private struct AlertActions: View {
-    let viewModel: ArchivePlaylistViewModel
+    let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         Button("취소", role: .cancel) {
             viewModel.isShowingAlert = false
         }
+
         Button("삭제", role: .destructive) {
             viewModel.deletePhotoURL()
         }

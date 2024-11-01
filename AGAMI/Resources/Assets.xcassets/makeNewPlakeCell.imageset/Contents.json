@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "archiveCellOverlay.png",
+      "filename" : "makeNewPlakeCell.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "archiveCellOverlay@2x.png",
+      "filename" : "makeNewPlakeCell@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "archiveCellOverlay@3x.png",
+      "filename" : "makeNewPlakeCell@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

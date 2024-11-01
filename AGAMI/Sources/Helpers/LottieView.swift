@@ -22,10 +22,10 @@ struct CustomLottieView: View {
     
     var body: some View {
         LottieView(animation: .named(lottie.filename, bundle: .module))
-            .configure({ lottieView in
+            .configure { lottieView in
                 lottieView.animationSpeed = speed
                 lottieView.loopMode = loopMode
-            })
+            }
             .playing()
     }
 }

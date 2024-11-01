@@ -8,30 +8,30 @@
 import Foundation
 import SwiftUI
 
-enum ArchiveView: Hashable {
+enum PlakeView: Hashable {
     case listView
-    case playlistView(viewModel: ArchivePlaylistViewModel)
+    case playlistView(viewModel: PlakePlaylistViewModel)
 }
 
-enum ArchiveSheet: String, Identifiable {
+enum PlakeSheet: String, Identifiable {
     var id: String { self.rawValue }
 
     case dummySheet
 }
 
-enum ArchiveFullScreenCover: String, Identifiable {
+enum PlakeFullScreenCover: String, Identifiable {
     var id: String { self.rawValue }
 
     case dummyFullScreenCover
 }
 
 @Observable
-final class ArchiveCoordinator {
+final class PlakeCoordinator {
     var path: NavigationPath = .init()
-    var sheet: ArchiveSheet?
-    var fullScreenCover: ArchiveFullScreenCover?
+    var sheet: PlakeSheet?
+    var fullScreenCover: PlakeFullScreenCover?
 
-    func push(view: ArchiveView) {
+    func push(view: PlakeView) {
         path.append(view)
     }
 
@@ -43,11 +43,11 @@ final class ArchiveCoordinator {
         path.removeLast(path.count)
     }
 
-    func presentSheet(_ sheet: ArchiveSheet) {
+    func presentSheet(_ sheet: PlakeSheet) {
         self.sheet = sheet
     }
 
-    func presentFullScreenCover(_ cover: ArchiveFullScreenCover) {
+    func presentFullScreenCover(_ cover: PlakeFullScreenCover) {
         self.fullScreenCover = cover
     }
 
@@ -60,17 +60,17 @@ final class ArchiveCoordinator {
     }
 
     @ViewBuilder
-    func build(view: ArchiveView) -> some View {
+    func build(view: PlakeView) -> some View {
         switch view {
         case .listView:
-            ArchiveListView()
+            PlakeListView()
         case let .playlistView(viewModel):
-            ArchivePlaylistView(viewModel: viewModel)
+            PlakePlaylistView(viewModel: viewModel)
         }
     }
 
     @ViewBuilder
-    func buildSheet(sheet: ArchiveSheet) -> some View {
+    func buildSheet(sheet: PlakeSheet) -> some View {
         switch sheet {
         case .dummySheet:
             EmptyView()
@@ -78,7 +78,7 @@ final class ArchiveCoordinator {
     }
 
     @ViewBuilder
-    func buildFullScreenCover(cover: ArchiveFullScreenCover) -> some View {
+    func buildFullScreenCover(cover: PlakeFullScreenCover) -> some View {
         switch cover {
         case .dummyFullScreenCover:
             EmptyView()

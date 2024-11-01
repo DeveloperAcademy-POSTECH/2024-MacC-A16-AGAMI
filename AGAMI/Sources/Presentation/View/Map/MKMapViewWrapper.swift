@@ -9,7 +9,7 @@ import SwiftUI
 import MapKit
 import Kingfisher
 
-//MARK: - MKMapView 래퍼
+// MARK: - MKMapView 래퍼
 struct MKMapViewWrapper: UIViewRepresentable {
     @Environment(MapCoordinator.self) var coordinator
     var viewModel: MapViewModel
@@ -90,21 +90,21 @@ struct MKMapViewWrapper: UIViewRepresentable {
 
                 Task { @MainActor in
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: playlists)
-                    self.parent.coordinator.push(view: .placeListView(viewModel: collectionPlaceViewModel))
+                    self.parent.coordinator.push(route: .placeListView(viewModel: collectionPlaceViewModel))
                 }
             } else if let playlistAnnotation = view.annotation as? PlaylistAnnotation {
                 let playlist = playlistAnnotation.playlist
 
                 Task { @MainActor in
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: [playlist])
-                    self.parent.coordinator.push(view: .placeListView(viewModel: collectionPlaceViewModel))
+                    self.parent.coordinator.push(route: .placeListView(viewModel: collectionPlaceViewModel))
                 }
             }
         }
     }
 }
 
-//MARK: - MKAnnotation
+// MARK: - MKAnnotation
 final class PlaylistAnnotation: MKPointAnnotation {
     let playlist: PlaylistModel
 
@@ -116,7 +116,7 @@ final class PlaylistAnnotation: MKPointAnnotation {
     }
 }
 
-//MARK: - Clustering되지 않은 Annotation 래퍼
+// MARK: - Clustering되지 않은 Annotation 래퍼
 final class BubbleAnnotationView: MKAnnotationView {
     private var hostingController: UIHostingController<BubbleView>?
 
@@ -152,7 +152,7 @@ final class BubbleAnnotationView: MKAnnotationView {
     }
 }
 
-//MARK: - Clusteringe된 Annotation 래퍼
+// MARK: - Clusteringe된 Annotation 래퍼
 final class ClusterBubbleAnnotationView: MKAnnotationView {
     private var hostingController: UIHostingController<ClusterBubbleView>?
 
@@ -192,7 +192,7 @@ final class ClusterBubbleAnnotationView: MKAnnotationView {
     }
 }
 
-//MARK: - 클러스터링 되지 않은 SwiftUI 어노테이션 뷰
+// MARK: - 클러스터링 되지 않은 SwiftUI 어노테이션 뷰
 struct BubbleView: View {
     let playlist: PlaylistModel
 
@@ -221,7 +221,7 @@ struct BubbleView: View {
     }
 }
 
-//MARK: - 클러스터링된 SwiftUI 어노테이션 뷰
+// MARK: - 클러스터링된 SwiftUI 어노테이션 뷰
 struct ClusterBubbleView: View {
     let playlists: [PlaylistModel]
     let count: Int

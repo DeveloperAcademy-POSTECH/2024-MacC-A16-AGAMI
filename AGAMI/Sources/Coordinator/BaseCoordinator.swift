@@ -1,5 +1,5 @@
 //
-//  AppCoordinator.swift
+//  BaseCoordinator.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/10/24.
@@ -8,30 +8,15 @@
 import Foundation
 import SwiftUI
 
-enum AppView: Hashable {
-    case dummyView
-}
-
-enum AppSheet: String, Identifiable {
-    var id: String { self.rawValue }
-
-    case dummySheet
-}
-
-enum AppFullScreenCover: String, Identifiable {
-    var id: String { self.rawValue }
-
-    case dummyFullScreenCover
-}
-
 @Observable
-final class AppCoordinator {
-    var path: NavigationPath = .init()
-    var sheet: AppSheet?
-    var fullScreenCover: AppFullScreenCover?
+class BaseCoordinator<Route: Hashable, Sheet: Identifiable, FullScreenCover: Identifiable> {
+     var path: NavigationPath = .init()
+     var sheet: Sheet?
+     var fullScreenCover: FullScreenCover?
+    var onDismiss: (() -> Void)?
 
-    func push(view: AppView) {
-        path.append(view)
+    func push(route: Route) {
+        path.append(route)
     }
 
     func pop() {
@@ -42,11 +27,11 @@ final class AppCoordinator {
         path.removeLast(path.count)
     }
 
-    func presentSheet(_ sheet: AppSheet) {
+    func presentSheet(_ sheet: Sheet) {
         self.sheet = sheet
     }
 
-    func presentFullScreenCover(_ cover: AppFullScreenCover) {
+    func presentFullScreenCover(_ cover: FullScreenCover) {
         self.fullScreenCover = cover
     }
 

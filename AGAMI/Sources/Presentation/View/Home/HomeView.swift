@@ -19,9 +19,9 @@ struct HomeView: View {
             TabView(selection: $viewModel.selectedTab) {
                 Tab("Plake", systemImage: "rectangle.stack.fill", value: .plake) {
                     NavigationStack(path: $plakeCoordinator.path) {
-                        plakeCoordinator.build(view: .listView)
-                            .navigationDestination(for: PlakeView.self) { view in
-                                plakeCoordinator.build(view: view)
+                        plakeCoordinator.build(route: .listView)
+                            .navigationDestination(for: PlakeRoute.self) { view in
+                                plakeCoordinator.build(route: view)
                             }
                             .sheet(item: $plakeCoordinator.sheet) { sheet in
                                 plakeCoordinator.buildSheet(sheet: sheet)
@@ -35,9 +35,9 @@ struct HomeView: View {
                 
                 Tab("Map", systemImage: "map.fill", value: .map) {
                     NavigationStack(path: $mapCoordinator.path) {
-                        mapCoordinator.build(view: .mapView)
-                            .navigationDestination(for: PlaceMapView.self) { view in
-                                mapCoordinator.build(view: view)
+                        mapCoordinator.build(route: .mapView)
+                            .navigationDestination(for: MapRoute.self) { view in
+                                mapCoordinator.build(route: view)
                             }
                             .sheet(item: $mapCoordinator.sheet) { sheet in
                                 mapCoordinator.buildSheet(sheet: sheet)
@@ -56,9 +56,9 @@ struct HomeView: View {
         } else {
             TabView {
                 NavigationStack(path: $plakeCoordinator.path) {
-                    plakeCoordinator.build(view: .listView)
-                        .navigationDestination(for: PlakeView.self) { view in
-                            plakeCoordinator.build(view: view)
+                    plakeCoordinator.build(route: .listView)
+                        .navigationDestination(for: PlakeRoute.self) { view in
+                            plakeCoordinator.build(route: view)
                         }
                         .sheet(item: $plakeCoordinator.sheet) { sheet in
                             plakeCoordinator.buildSheet(sheet: sheet)
@@ -77,9 +77,9 @@ struct HomeView: View {
                 .tag(TabSelection.plake)
                 
                 NavigationStack(path: $mapCoordinator.path) {
-                    mapCoordinator.build(view: .mapView)
-                        .navigationDestination(for: PlaceMapView.self) { view in
-                            mapCoordinator.build(view: view)
+                    mapCoordinator.build(route: .mapView)
+                        .navigationDestination(for: MapRoute.self) { view in
+                            mapCoordinator.build(route: view)
                         }
                         .sheet(item: $mapCoordinator.sheet) { sheet in
                             mapCoordinator.buildSheet(sheet: sheet)

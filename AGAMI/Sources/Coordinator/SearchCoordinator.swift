@@ -49,15 +49,10 @@ enum SearchView: Hashable, Identifiable {
     }
 }
 
-enum SearchSheet: Identifiable {
-    var id: String {
-        switch self {
-        case .diggingModalView:
-            return "diggingModalView"
-        }
-    }
-    
-    case diggingModalView(viewModel: SearchStartViewModel)
+enum SearchSheet: String, Identifiable {
+    var id: String { self.rawValue }
+
+    case dummySheet
 }
 
 enum SearchFullScreenCover: String, Identifiable {
@@ -117,15 +112,8 @@ final class SearchCoordinator {
     @ViewBuilder
     func buildSheet(sheet: SearchSheet) -> some View {
         switch sheet {
-        case .diggingModalView(let viewModel):
-            SearchDiggingListModalView(viewModel: viewModel)
-                .presentationDragIndicator(.visible)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .presentationDetents([.height(60), .medium, .large])
-                .presentationCornerRadius(20)
-                .presentationBackgroundInteraction(.enabled(upThrough: .large))
-                .interactiveDismissDisabled()
-                .bottomMaskForSheet()
+        case .dummySheet:
+            EmptyView()
         }
     }
     

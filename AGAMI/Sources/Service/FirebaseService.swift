@@ -12,7 +12,8 @@ import FirebaseStorage
 final class FirebaseService {
     private let firestore = Firestore.firestore()
     private let firestorage = Storage.storage()
-
+    private let batch = Firestore.firestore().batch()
+    
     func savePlaylistToFirebase(userID: String, playlist: FirestorePlaylistModel) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             do {
@@ -60,7 +61,6 @@ final class FirebaseService {
         }
 
         let uniqueID = UUID().uuidString
-
         let storageRef = firestorage.reference()
             .child("\(userID)/\(uniqueID)/image.jpg")
 
@@ -73,7 +73,8 @@ final class FirebaseService {
 
     func deletePlaylist(userID: String, playlistID: String) async throws {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
-            firestore.collection("UserID")
+            firestore
+                .collection("UserID")
                 .document(userID)
                 .collection("PlaylistID")
                 .document(playlistID)
@@ -85,6 +86,43 @@ final class FirebaseService {
                         continuation.resume(returning: ())
                     }
                 }
+        }
+    }
+
+    func deleteAllPlaylists(userID: String) async throws {
+        let playlists = try await firestore.collection("UserID")
+            .document(userID)
+            .collection("PlaylistID")
+            .getDocuments()
+            .documents
+        
+        for playlist in playlists {
+            batch.deleteDocument(playlist.reference)
+        }
+        
+        try await batch.commit()
+        dump("All playlists successfully deleted")
+        
+        try await firestore.collection("UserID").document(userID).delete()
+        dump("document(\(userID)) successfully deleted")
+    }
+    
+    func deleteAllPhotoInStorage(userID: String) async throws {
+        let userIDFolder = firestorage.reference().child(userID)
+        
+        try await deleteFilesRecursively(in: userIDFolder)
+        dump("All files in storage successfully deleted")
+    }
+    
+    private func deleteFilesRecursively(in folder: StorageReference) async throws {
+        let items = try await folder.listAll()
+        
+        for item in items.items {
+            try await item.delete()
+        }
+        
+        for prefix in items.prefixes {
+            try await deleteFilesRecursively(in: prefix)
         }
     }
 }

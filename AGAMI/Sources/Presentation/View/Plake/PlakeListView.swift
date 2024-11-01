@@ -1,5 +1,5 @@
 //
-//  ArchiveListView.swift
+//  PlakeListView.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/14/24.
@@ -52,7 +52,7 @@ private struct ListHeader: View {
             Image(.plakeTabLogo)
             Spacer()
             Button {
-                coordinator.push(view: .newPlakeView)
+                coordinator.push(route: .newPlakeView)
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "plus.circle.fill")
@@ -216,7 +216,7 @@ private struct MakeNewPlakeCell: View {
     private var verticalSize: CGFloat { size.width * 176 / 377 }
     var body: some View {
         Button {
-            coordinator.push(view: .newPlakeView)
+            coordinator.push(route: .newPlakeView)
         } label: {
             ZStack {
                 Image(.makeNewPlakeCell)

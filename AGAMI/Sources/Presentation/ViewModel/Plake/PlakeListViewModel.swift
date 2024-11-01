@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import AuthenticationServices
 
 @Observable
 final class PlakeListViewModel {
@@ -49,6 +50,30 @@ final class PlakeListViewModel {
             case .failure(let err):
                 dump(err.localizedDescription)
             }
+        }
+    }
+
+    func deleteAllDataInFirebase() async throws {
+        guard let userID = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        
+        do {
+            try await firebaseService.deleteAllPhotoInStorage(userID: userID)
+            try await firebaseService.deleteAllPlaylists(userID: userID)
+        } catch {
+            dump("\(error.localizedDescription) while deleting account")
+        }
+    }
+    
+    func deleteAccountAndSignOut() async throws {
+        let deleteSuccess = await authService.deleteAccount()
+        
+        if deleteSuccess {
+            logout()
+        } else {
+            dump("계정 삭제에 실패했습니다.")
         }
     }
 
@@ -103,7 +128,6 @@ final class PlakeListViewModel {
     }
 
     func exportPlaylistToSpotify(playlist: PlaylistModel, completion: @escaping (Result<URL, Error>) -> Void) {
-
         exportingState = .isSpotifyExporting
         let musicList = playlist.songs.map { ($0.title, $0.artist) }
         SpotifyService.shared.addPlayList(name: playlist.playlistName,

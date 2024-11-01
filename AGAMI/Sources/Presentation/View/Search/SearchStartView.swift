@@ -44,7 +44,7 @@ struct SearchStartView: View {
                         SearchShazamingView()
                     } label: {
                         PlakeCTAButton(type: .addSong)
-                        .padding(.bottom, 26)
+                            .padding(.bottom, 26)
                     }
                 }
                 .frame(height: 47)
@@ -67,66 +67,66 @@ struct SearchStartView: View {
             }
         }
     }
+}
+
+private struct SearchPlakeTitleTextField: View {
+    @Bindable var viewModel: SearchStartViewModel
+    @FocusState private var isFocused: Bool
     
-    private struct SearchPlakeTitleTextField: View {
-        @Bindable var viewModel: SearchStartViewModel
-        @FocusState private var isFocused: Bool
-        
-        var body: some View {
-            VStack(alignment: .leading, spacing: 0) {
-                Text("플레이크 타이틀")
-                    .font(.pretendard(weight: .semiBold600, size: 20))
-                    .foregroundStyle(Color(.pBlack))
-                    .padding(.leading, 16)
-                    .padding(.bottom, 14)
-                
-                TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
-                    .font(.pretendard(weight: .medium500, size: 20))
-                    .foregroundStyle(.black)
-                    .focused($isFocused)
-                    .padding(16)
-                    .background(Color(.pWhite))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
-                    }
-                    .padding(.horizontal, 8)
-                    .padding(.bottom, 37)
-            }
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("플레이크 타이틀")
+                .font(.pretendard(weight: .semiBold600, size: 20))
+                .foregroundStyle(Color(.pBlack))
+                .padding(.leading, 16)
+                .padding(.bottom, 14)
+            
+            TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
+                .font(.pretendard(weight: .medium500, size: 20))
+                .foregroundStyle(.black)
+                .focused($isFocused)
+                .padding(16)
+                .background(Color(.pWhite))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
+                }
+                .padding(.horizontal, 8)
+                .padding(.bottom, 37)
         }
     }
+}
+
+private struct SearchSongListHeader: View {
+    var viewModel: SearchStartViewModel
     
-    private struct SearchSongListHeader: View {
-        var viewModel: SearchStartViewModel
-        
-        var body: some View {
-            HStack(spacing: 0) {
-                Text("수집한 노래")
-                    .font(.pretendard(weight: .semiBold600, size: 20))
-                    .foregroundStyle(Color(.pBlack))
-                
-                Spacer()
-                
-                Text("\(viewModel.diggingList.count)곡")
-                    .font(.pretendard(weight: .medium500, size: 16))
-                    .foregroundStyle(Color(.pPrimary))
-            }
-            .padding(.horizontal, 16)
+    var body: some View {
+        HStack(spacing: 0) {
+            Text("수집한 노래")
+                .font(.pretendard(weight: .semiBold600, size: 20))
+                .foregroundStyle(Color(.pBlack))
+            
+            Spacer()
+            
+            Text("\(viewModel.diggingList.count)곡")
+                .font(.pretendard(weight: .medium500, size: 16))
+                .foregroundStyle(Color(.pPrimary))
         }
+        .padding(.horizontal, 16)
     }
+}
+
+private struct SearchPlakeSongList: View {
+    var viewModel: SearchStartViewModel
     
-    private struct SearchPlakeSongList: View {
-        var viewModel: SearchStartViewModel
-        
-        var body: some View {
-            ForEach(viewModel.diggingList, id: \.songID) { song in
-                PlaylistRow(song: song)
-            }
-            .onDelete(perform: viewModel.deleteSong)
-            .onMove(perform: viewModel.moveSong)
-            .padding(.horizontal, 8)
+    var body: some View {
+        ForEach(viewModel.diggingList, id: \.songID) { song in
+            PlaylistRow(song: song)
         }
+        .onDelete(perform: viewModel.deleteSong)
+        .onMove(perform: viewModel.moveSong)
+        .padding(.horizontal, 8)
     }
 }
 

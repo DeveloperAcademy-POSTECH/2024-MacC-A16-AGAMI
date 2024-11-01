@@ -43,9 +43,6 @@ struct CollectionPlaceListView: View {
                                 .font(.pretendard(weight: .regular400, size: 14))
                                 .padding(.bottom, 14)
                         }
-                        .border(.red)
-                        .border(.blue)
-
                     }
                 }
             }

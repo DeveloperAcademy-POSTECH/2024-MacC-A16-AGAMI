@@ -10,8 +10,6 @@ import MapKit
 
 @Observable
 final class MapViewModel {
-    let id: UUID = .init()
-    
     private let firebaseService = FirebaseService()
     private let authService = FirebaseAuthService()
     private let locationService = LocationService.shared
@@ -30,14 +28,11 @@ final class MapViewModel {
             dump("UID를 가져오는데 실패했습니다.")
             return
         }
+        
         Task {
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 playlists = playlistModels
             }
-        }
-        // 플레이리스트 위경도 좌표찍는 코드(추후 제거예정)
-        for playlist in playlists {
-            dump("\(playlist.latitude), \(playlist.longitude)")
         }
     }
     

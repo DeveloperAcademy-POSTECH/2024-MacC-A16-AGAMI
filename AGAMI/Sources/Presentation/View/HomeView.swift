@@ -128,7 +128,7 @@ struct HomeView: View {
                         Image(systemName: "map.fill")
                     }
                 }
-                .tag(TabSelection.plakive)
+                .tag(TabSelection.map)
             }
         }
     }

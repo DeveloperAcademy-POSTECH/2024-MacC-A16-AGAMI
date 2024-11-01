@@ -72,16 +72,16 @@ final class LocationService: NSObject {
             if let self = self {
                 if let address: [CLPlacemark] = placemarks {
                     var currentAddress: String = ""
-                    
-                    if let area: String = address.last?.locality {
-                        currentAddress += area
-                        locality = area
-                    }
-                    
+                                        
                     if let name: String = address.last?.name {
-                        currentAddress += " \(name)"
+                        currentAddress += name
                         placeHolderAddress = name
                         region = name
+                    }
+                    
+                    if let area: String = address.last?.locality {
+                        currentAddress += (", \(area)")
+                        locality = area
                     }
                     
                     self.streetAddress = currentAddress

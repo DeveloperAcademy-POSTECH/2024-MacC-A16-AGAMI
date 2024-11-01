@@ -10,51 +10,64 @@ import FirebaseAuth
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel = .init()
-    @State var plakeCoord: PlakeCoordinator = .init()
-    @State var searchCoordinator: SearchCoordinator = .init()
-
+    @State private var plakeCoordinator: PlakeCoordinator = .init()
+    @State private var searchCoordinator: SearchCoordinator = .init()
+    @State private var mapCoordinator: MapCoordinator = .init()
+    
     var body: some View {
         if #available(iOS 18.0, *) {
             TabView(selection: $viewModel.selectedTab) {
                 Tab("Plake", systemImage: "rectangle.stack.fill", value: .plake) {
-                    NavigationStack(path: $plakeCoord.path) {
-                        plakeCoord.build(view: .listView)
+                    NavigationStack(path: $plakeCoordinator.path) {
+                        plakeCoordinator.build(view: .listView)
                             .navigationDestination(for: PlakeView.self) { view in
-                                plakeCoord.build(view: view)
+                                plakeCoordinator.build(view: view)
                             }
-                            .sheet(item: $plakeCoord.sheet) { sheet in
-                                plakeCoord.buildSheet(sheet: sheet)
+                            .sheet(item: $plakeCoordinator.sheet) { sheet in
+                                plakeCoordinator.buildSheet(sheet: sheet)
                             }
-                            .fullScreenCover(item: $plakeCoord.fullScreenCover) { cover in
-                                plakeCoord.buildFullScreenCover(cover: cover)
+                            .fullScreenCover(item: $plakeCoordinator.fullScreenCover) { cover in
+                                plakeCoordinator.buildFullScreenCover(cover: cover)
                             }
                     }
-                    .environment(plakeCoord)
+                    .environment(plakeCoordinator)
                 }
-
+                
                 Tab("Map", systemImage: "map.fill", value: .map) {
-                    MapView()
+                    NavigationStack(path: $mapCoordinator.path) {
+                        mapCoordinator.build(view: .mapView)
+                            .navigationDestination(for: PlaceMapView.self) { view in
+                                mapCoordinator.build(view: view)
+                            }
+                            .sheet(item: $mapCoordinator.sheet) { sheet in
+                                mapCoordinator.buildSheet(sheet: sheet)
+                            }
+                            .fullScreenCover(item: $mapCoordinator.fullScreenCover) { cover in
+                                mapCoordinator.buildFullScreenCover(cover: cover)
+                            }
+                    }
+                    .environment(mapCoordinator)
                 }
-
+                
                 Tab("Archive", systemImage: "person.fill", value: .account) {
                     EmptyView()
                 }
             }
         } else {
             TabView {
-                NavigationStack(path: $plakeCoord.path) {
-                    plakeCoord.build(view: .listView)
+                NavigationStack(path: $plakeCoordinator.path) {
+                    plakeCoordinator.build(view: .listView)
                         .navigationDestination(for: PlakeView.self) { view in
-                            plakeCoord.build(view: view)
+                            plakeCoordinator.build(view: view)
                         }
-                        .sheet(item: $plakeCoord.sheet) { sheet in
-                            plakeCoord.buildSheet(sheet: sheet)
+                        .sheet(item: $plakeCoordinator.sheet) { sheet in
+                            plakeCoordinator.buildSheet(sheet: sheet)
                         }
-                        .fullScreenCover(item: $plakeCoord.fullScreenCover) { cover in
-                            plakeCoord.buildFullScreenCover(cover: cover)
+                        .fullScreenCover(item: $plakeCoordinator.fullScreenCover) { cover in
+                            plakeCoordinator.buildFullScreenCover(cover: cover)
                         }
                 }
-                .environment(plakeCoord)
+                .environment(plakeCoordinator)
                 .tabItem {
                     VStack {
                         Text("Plakive")
@@ -62,16 +75,28 @@ struct HomeView: View {
                     }
                 }
                 .tag(TabSelection.plake)
-
-                MapView()
-                    .tabItem {
-                        VStack {
-                            Text("Map")
-                            Image(systemName: "map.fill")
+                
+                NavigationStack(path: $mapCoordinator.path) {
+                    mapCoordinator.build(view: .mapView)
+                        .navigationDestination(for: PlaceMapView.self) { view in
+                            mapCoordinator.build(view: view)
                         }
+                        .sheet(item: $mapCoordinator.sheet) { sheet in
+                            mapCoordinator.buildSheet(sheet: sheet)
+                        }
+                        .fullScreenCover(item: $mapCoordinator.fullScreenCover) { cover in
+                            mapCoordinator.buildFullScreenCover(cover: cover)
+                        }
+                }
+                .environment(mapCoordinator)
+                .tabItem {
+                    VStack {
+                        Text("Map")
+                        Image(systemName: "map.fill")
                     }
-                    .tag(TabSelection.map)
-
+                }
+                .tag(TabSelection.map)
+                
                 EmptyView()
                     .tabItem {
                         VStack {

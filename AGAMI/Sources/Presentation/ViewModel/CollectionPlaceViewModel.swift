@@ -7,18 +7,26 @@
 
 import Foundation
 
-struct PlayList: Identifiable, Hashable {
-    var id = UUID()
-    var address: String
-    var date: String
-    var time: String
-}
-
 @Observable
-final class CollectionPlaceViewModel {    
-    var playList: [PlayList] = [
-        PlayList(address: "포항시", date: "2024-03-02", time: "17:00"),
-        PlayList(address: "천안시", date: "2023-03-01", time: "13:00"),
-        PlayList(address: "서울시", date: "2020-05-05", time: "10:00")
-    ]
+final class CollectionPlaceViewModel: Hashable {
+    let id = UUID()
+    let playlists: [PlaylistModel]
+    
+    init(playlists: [PlaylistModel]) {
+        self.playlists = playlists
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: CollectionPlaceViewModel, rhs: CollectionPlaceViewModel) -> Bool {
+        lhs.id == rhs.id
+    }
+    
+    func formatDateToString(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd."
+        return dateFormatter.string(from: date)
+    }
 }

@@ -10,6 +10,8 @@ import MapKit
 
 @Observable
 final class MapViewModel {
+    let id: UUID = .init()
+    
     private let firebaseService = FirebaseService()
     private let authService = FirebaseAuthService()
     private let locationService = LocationService.shared
@@ -22,9 +24,7 @@ final class MapViewModel {
     var goToDetail: Bool = false
 
     var playlists: [PlaylistModel] = []
-
-    var selectedPlaylists: [PlaylistModel] = []
-
+    
     func fecthPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는데 실패했습니다.")
@@ -63,12 +63,6 @@ final class MapViewModel {
     func requestCurrentStreetAddress() {
         locationService.coordinateToStreetAddress { _ in }
         currentStreetAddress = locationService.streetAddress
-    }
-    
-    func formatDateToString(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy. MM. dd."
-        return dateFormatter.string(from: date)
     }
 }
 

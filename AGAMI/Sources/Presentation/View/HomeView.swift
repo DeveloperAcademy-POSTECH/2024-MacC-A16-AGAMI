@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var viewModel: HomeViewModel = .init()
     @State var archiveCoord: ArchiveCoordinator = .init()
     @State var searchCoordinator: SearchCoordinator = .init()
+    @State var mapCoordinator: MapCoordinator = .init()
 
     var body: some View {
         if #available(iOS 18.0, *) {
@@ -49,7 +50,19 @@ struct HomeView: View {
                 }
 
                 Tab("Map", systemImage: "map.fill", value: .map) {
-                    MapView()
+                    NavigationStack(path: $mapCoordinator.path) {
+                        mapCoordinator.build(view: .mapView)
+                            .navigationDestination(for: PlaceMapView.self) { view in
+                                mapCoordinator.build(view: view)
+                            }
+                            .sheet(item: $mapCoordinator.sheet) { sheet in
+                                mapCoordinator.buildSheet(sheet: sheet)
+                            }
+                            .fullScreenCover(item: $mapCoordinator.fullScreenCover) { cover in
+                                mapCoordinator.buildFullScreenCover(cover: cover)
+                            }
+                    }
+                    .environment(mapCoordinator)
                 }
             }
         } else {
@@ -96,14 +109,26 @@ struct HomeView: View {
                 }
                 .tag(TabSelection.plakive)
 
-                MapView()
-                    .tabItem {
-                        VStack {
-                            Text("Map")
-                            Image(systemName: "map.fill")
+                NavigationStack(path: $mapCoordinator.path) {
+                    mapCoordinator.build(view: .mapView)
+                        .navigationDestination(for: PlaceMapView.self) { view in
+                            mapCoordinator.build(view: view)
                         }
+                        .sheet(item: $mapCoordinator.sheet) { sheet in
+                            mapCoordinator.buildSheet(sheet: sheet)
+                        }
+                        .fullScreenCover(item: $mapCoordinator.fullScreenCover) { cover in
+                            mapCoordinator.buildFullScreenCover(cover: cover)
+                        }
+                }
+                .environment(mapCoordinator)
+                .tabItem {
+                    VStack {
+                        Text("Map")
+                        Image(systemName: "map.fill")
                     }
-                    .tag(TabSelection.map)
+                }
+                .tag(TabSelection.plakive)
             }
         }
     }

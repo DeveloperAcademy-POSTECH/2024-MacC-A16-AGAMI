@@ -89,12 +89,22 @@ final class FirebaseService {
         }
     }
 
+    func deleteImageInFirebase(userID: String, photoURL: String) async throws {
+        let imageIDFolder = firestorage
+                                .reference()
+                                .child("\(userID)/\(photoURL)")
+        
+        try await deleteFilesRecursively(in: imageIDFolder)
+        dump("Image files in storage successfully deleted")
+    }
+    
     func deleteAllPlaylists(userID: String) async throws {
-        let playlists = try await firestore.collection("UserID")
-            .document(userID)
-            .collection("PlaylistID")
-            .getDocuments()
-            .documents
+        let playlists = try await firestore
+                                    .collection("UserID")
+                                    .document(userID)
+                                    .collection("PlaylistID")
+                                    .getDocuments()
+                                    .documents
         
         for playlist in playlists {
             batch.deleteDocument(playlist.reference)
@@ -108,7 +118,9 @@ final class FirebaseService {
     }
     
     func deleteAllPhotoInStorage(userID: String) async throws {
-        let userIDFolder = firestorage.reference().child(userID)
+        let userIDFolder = firestorage
+                                .reference()
+                                .child(userID)
         
         try await deleteFilesRecursively(in: userIDFolder)
         dump("All files in storage successfully deleted")

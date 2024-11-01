@@ -11,7 +11,7 @@ import MapKit
 struct MapView: View {
     @State private var viewModel: MapViewModel = MapViewModel()
 
-    var body: some View {
+    var body: some View 
         NavigationStack {
             MKMapViewWrapper(viewModel: viewModel)
                 .ignoresSafeArea(edges: .top)

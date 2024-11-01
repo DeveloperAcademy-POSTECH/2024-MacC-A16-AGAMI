@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct CollectionPlaceListView: View {
-    let viewModel: MapViewModel
-    let playlist: PlaylistModel
-
+    let viewModel: CollectionPlaceViewModel
+    
     private let columnWidth: CGFloat = 176
-    private let columnSpacing: CGFloat = 12
+    private let columnSpacing: CGFloat = 9
     private var columns: [GridItem] {
         [
             GridItem(.flexible(minimum: columnWidth), spacing: columnSpacing),
@@ -21,44 +20,35 @@ struct CollectionPlaceListView: View {
     }
     
     var body: some View {
-        VStack {
-            HStack {
-                Text("\(viewModel.playlists.count)")
-                    .font(.system(size: 16, weight: .regular))
-                
-                Spacer()
-            }
-            .padding(.leading, 12)
-            
-            LazyVGrid(columns: columns, spacing: 12) {
+        ScrollView {
+            LazyVGrid(columns: columns, spacing: 9) {
                 ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                     ZStack {
                         AsyncImage(url: URL(string: playlist.photoURL)) { image in
                             image
                                 .image?.resizable()
                                 .aspectRatio(1.0, contentMode: .fit)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 4)
+                                .clipShape(RoundedRectangle(cornerRadius: 13))
                         }
-//                        Image()
-//                            .resizable()
-//                            .aspectRatio(1.0, contentMode: .fit)
-//                            .clipShape(RoundedRectangle(cornerRadius: 10))
-//                            .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 4)
                         
-                        VStack(alignment: .center, spacing: 5) {
+                        VStack(alignment: .center, spacing: 0) {
                             Spacer()
-//                            viewModel.formatDateToString(playlist.generationTime
+                            
                             Text("\(playlist.streetAddress)")
+                                .foregroundStyle(Color(.pGray2))
+                                .font(.pretendard(weight: .regular400, size: 14))
+                            
                             Text(viewModel.formatDateToString(playlist.generationTime))
+                                .foregroundStyle(Color(.pGray2))
+                                .font(.pretendard(weight: .regular400, size: 14))
+                                .padding(.bottom, 14)
                         }
-                        .foregroundStyle(.white)
-                        .font(.system(size: 14))
-                        .padding(EdgeInsets(top: 0, leading: 20, bottom: 10, trailing: 20))
+                        .border(.red)
+                        .border(.blue)
+
                     }
                 }
             }
         }
-        .padding(EdgeInsets(top: 0, leading: 24, bottom: 0, trailing: 24))
     }
 }

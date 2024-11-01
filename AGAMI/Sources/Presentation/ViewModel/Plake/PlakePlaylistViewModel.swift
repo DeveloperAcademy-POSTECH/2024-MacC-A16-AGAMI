@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-final class ArchivePlaylistViewModel: Hashable {
+final class PlakePlaylistViewModel: Hashable {
     let id: UUID = .init()
 
     var playlist: PlaylistModel
@@ -29,7 +29,7 @@ final class ArchivePlaylistViewModel: Hashable {
         self.playlist = playlist
     }
 
-    static func == (lhs: ArchivePlaylistViewModel, rhs: ArchivePlaylistViewModel) -> Bool {
+    static func == (lhs: PlakePlaylistViewModel, rhs: PlakePlaylistViewModel) -> Bool {
         return lhs.id == rhs.id
     }
 
@@ -125,7 +125,6 @@ final class ArchivePlaylistViewModel: Hashable {
         if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
            let decodedRedirectURL = redirectURL.removingPercentEncoding,
            url.absoluteString.contains(decodedRedirectURL) {
-
             exportingState = .none
         }
     }

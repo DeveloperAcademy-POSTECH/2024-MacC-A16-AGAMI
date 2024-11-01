@@ -7,6 +7,6 @@
 
 enum TabSelection: Hashable {
     case plake
-    case plakive
     case map
+    case account
 }

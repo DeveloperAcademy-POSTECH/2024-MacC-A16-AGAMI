@@ -8,16 +8,16 @@
 import SwiftUI
 import Kingfisher
 
-struct ArchiveListView: View {
-    @State var viewModel: ArchiveListViewModel = ArchiveListViewModel()
+struct PlakeListView: View {
+    @State var viewModel: PlakeListViewModel = PlakeListViewModel()
 
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                ArchiveListHeader(viewModel: viewModel)
-                ArchiveSearchBar(viewModel: viewModel)
+                ListHeader(viewModel: viewModel)
+                SearchBar(viewModel: viewModel)
                 GeometryReader { proxy in
-                    ArchiveList(viewModel: viewModel, size: proxy.size)
+                    ListView(viewModel: viewModel, size: proxy.size)
                 }
                 .safeAreaPadding(.horizontal, 16)
             }
@@ -34,9 +34,6 @@ struct ArchiveListView: View {
             viewModel.fetchPlaylists()
         }
         .toolbarBackground(.visible, for: .tabBar)
-        .confirmationDialog("", isPresented: $viewModel.isDialogPresented) {
-            ConfirmationDialogActions(viewModel: viewModel)
-        }
         .onTapGesture {
             hideKeyboard()
         }
@@ -46,25 +43,31 @@ struct ArchiveListView: View {
     }
 }
 
-private struct ArchiveListHeader: View {
-    let viewModel: ArchiveListViewModel
+private struct ListHeader: View {
+    let viewModel: PlakeListViewModel
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
-            Image(.archiveLogo)
+            Image(.plakeTabLogo)
             Spacer()
             Button {
-                viewModel.isDialogPresented = true
+                // TODO: - 새로운 플레이크 뷰 코디네이터 통해 연결
             } label: {
-                Image(.mypageIcon)
+                HStack(spacing: 4) {
+                    Image(systemName: "plus.circle.fill")
+                        .renderingMode(.template)
+                        .font(.system(size: 18))
+                    Text("새로운 플레이크")
+                        .font(.pretendard(weight: .medium500, size: 18))
+                }
             }
         }
-        .padding(EdgeInsets(top: 24, leading: 24, bottom: 12, trailing: 20))
+        .padding(EdgeInsets(top: 24, leading: 16, bottom: 12, trailing: 16))
     }
 }
 
-private struct ArchiveSearchBar: View {
-    @Bindable var viewModel: ArchiveListViewModel
+private struct SearchBar: View {
+    @Bindable var viewModel: PlakeListViewModel
     @FocusState var isFocused: Bool
 
     var body: some View {
@@ -98,22 +101,27 @@ private struct ArchiveSearchBar: View {
     }
 }
 
-private struct ArchiveList: View {
-    @Bindable var viewModel: ArchiveListViewModel
+private struct ListView: View {
+    @Bindable var viewModel: PlakeListViewModel
     let size: CGSize
-    var verticalSpacingValue: CGFloat {
+    private var verticalSpacingValue: CGFloat {
         size.width / 377 * 12
     }
 
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
-                ForEach(viewModel.playlists, id: \.playlistID) { playlist in
-                    ArchiveListCell(
-                        viewModel: viewModel,
-                        playlist: playlist,
-                        size: size
-                    )
+                Group {
+                    if viewModel.playlists.isEmpty {
+                        MakeNewPlakeCell(size: size)
+                    }
+                    ForEach(viewModel.playlists, id: \.playlistID) { playlist in
+                        PlakeListCell(
+                            viewModel: viewModel,
+                            playlist: playlist,
+                            size: size
+                        )
+                    }
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in
                     content
@@ -128,14 +136,14 @@ private struct ArchiveList: View {
     }
 }
 
-private struct ArchiveListCell: View {
-    @Environment(ArchiveCoordinator.self) private var coord
+private struct PlakeListCell: View {
+    @Environment(PlakeCoordinator.self) private var coord
     @State private var kfImageOpacity: Double = 0
 
-    let viewModel: ArchiveListViewModel
+    let viewModel: PlakeListViewModel
     let playlist: PlaylistModel
     let size: CGSize
-    var verticalSize: CGFloat { size.width * 176 / 377 }
+    private var verticalSize: CGFloat { size.width * 176 / 377 }
 
     var body: some View {
         Button {
@@ -163,13 +171,10 @@ private struct ArchiveListCell: View {
                         kfImageOpacity = 0
                     }
 
-                Image(.archiveCellOverlay)
-                    .resizable()
-
                 VStack(alignment: .leading, spacing: 0) {
                     Group {
                         Text(playlist.playlistName)
-                            .font(.pretendard(weight: .bold700, size: 24))
+                            .font(.pretendard(weight: .bold700, size: 22))
                             .kerning(-0.5)
                             .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
                         Text(playlist.streetAddress)
@@ -183,6 +188,7 @@ private struct ArchiveListCell: View {
                     Spacer()
 
                     HStack(spacing: 0) {
+
                         Spacer()
                         Text(viewModel.formatDateToString(playlist.generationTime))
                             .font(.pretendard(weight: .regular400, size: 14))
@@ -203,20 +209,38 @@ private struct ArchiveListCell: View {
     }
 }
 
-private struct ConfirmationDialogActions: View {
-    let viewModel: ArchiveListViewModel
-
+private struct MakeNewPlakeCell: View {
+    let size: CGSize
+    private var verticalSize: CGFloat { size.width * 176 / 377 }
     var body: some View {
-        Button("로그아웃", role: .destructive) {
-            viewModel.logout()
+        Button {
+            // TODO: - 새로운 플레이크 뷰 코디네이터 통해 연결
+        } label: {
+            ZStack {
+                Image(.makeNewPlakeCell)
+                    .resizable()
+                VStack {
+                    HStack {
+                        Text("새로운 플레이크를 디깅해보세요")
+                            .font(.pretendard(weight: .bold700, size: 22))
+                            .kerning(-0.5)
+                            .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
+                            .foregroundStyle(Color(.pWhite))
+                        Spacer()
+                    }
+                    Spacer()
+                }
+            }
         }
-        Button("취소", role: .cancel) { }
+        .frame(width: size.width, height: verticalSize)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(radius: 10, x: 2, y: 4)
     }
 }
 
 private struct ContextMenuItems: View {
     @Environment(\.openURL) private var openURL
-    let viewModel: ArchiveListViewModel
+    let viewModel: PlakeListViewModel
     let playlist: PlaylistModel
 
     var body: some View {

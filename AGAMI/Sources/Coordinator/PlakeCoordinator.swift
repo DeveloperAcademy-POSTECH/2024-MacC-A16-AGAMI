@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum PlakeView: Hashable {
+enum PlakeRoute: Hashable {
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
 }
@@ -26,42 +26,10 @@ enum PlakeFullScreenCover: String, Identifiable {
 }
 
 @Observable
-final class PlakeCoordinator {
-    var path: NavigationPath = .init()
-    var sheet: PlakeSheet?
-    var fullScreenCover: PlakeFullScreenCover?
-
-    func push(view: PlakeView) {
-        path.append(view)
-    }
-
-    func pop() {
-        path.removeLast()
-    }
-
-    func popToRoot() {
-        path.removeLast(path.count)
-    }
-
-    func presentSheet(_ sheet: PlakeSheet) {
-        self.sheet = sheet
-    }
-
-    func presentFullScreenCover(_ cover: PlakeFullScreenCover) {
-        self.fullScreenCover = cover
-    }
-
-    func dismissSheet() {
-        self.sheet = nil
-    }
-
-    func dismissFullScreenCover() {
-        self.fullScreenCover = nil
-    }
-
+final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
     @ViewBuilder
-    func build(view: PlakeView) -> some View {
-        switch view {
+    func build(route: PlakeRoute) -> some View {
+        switch route {
         case .listView:
             PlakeListView()
         case let .playlistView(viewModel):

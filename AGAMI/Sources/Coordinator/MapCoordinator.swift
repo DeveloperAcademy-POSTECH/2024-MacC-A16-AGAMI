@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum PlaceMapView: Hashable {
+enum MapRoute: Hashable {
     var id: String {
         switch self {
         case .mapView:
@@ -35,43 +35,10 @@ enum MapFullScreenCover: String, Identifiable {
 }
 
 @Observable
-final class MapCoordinator {
-    var path: NavigationPath = .init()
-    var sheet: MapSheet?
-    var fullScreenCover: MapFullScreenCover?
-    var onDismiss: (() -> Void)?
-    
-    func push(view: PlaceMapView) {
-        path.append(view)
-    }
-    
-    func pop() {
-        path.removeLast()
-    }
-    
-    func popToRoot() {
-        path.removeLast(path.count)
-    }
-    
-    func presentSheet(_ sheet: MapSheet) {
-        self.sheet = sheet
-    }
-    
-    func presentFullScreenCover(_ cover: MapFullScreenCover) {
-        self.fullScreenCover = cover
-    }
-    
-    func dismissSheet() {
-        self.sheet = nil
-    }
-    
-    func dismissFullScreenCover() {
-        self.fullScreenCover = nil
-    }
-    
+final class MapCoordinator: BaseCoordinator<MapRoute, MapSheet, MapFullScreenCover> {
     @ViewBuilder
-    func build(view: PlaceMapView) -> some View {
-        switch view {
+    func build(route: MapRoute) -> some View {
+        switch route {
         case .mapView:
             MapView()
         case let .placeListView(viewModel):

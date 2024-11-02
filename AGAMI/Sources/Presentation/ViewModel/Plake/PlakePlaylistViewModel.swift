@@ -148,7 +148,7 @@ final class PlakePlaylistViewModel: Hashable {
 
     func handleAndUploadPhoto() async {
         presentationState.isUploadingPhoto = true
-        // TODO: ㅎ- photourl 존재 시 갈아끼우기
+        // TODO: photourl 존재 시 갈아끼우기
         do {
             guard let item = selectedItem,
                   let data = try await item.loadTransferable(type: Data.self),

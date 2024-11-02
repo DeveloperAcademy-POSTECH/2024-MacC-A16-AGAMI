@@ -18,7 +18,7 @@ enum ShazamStatus {
         case .idle: return "플레이크를 눌러 디깅하기"
         case .searching: return "플레이킹 중 ..."
         case .found: return "노래를 찾았습니다. 확인해보세요!"
-        case .failed: return "플레이크로 다시 디깅하기"
+        case .failed: return "플레이크를 눌러 다시 디깅하기"
         }
     }
 
@@ -30,10 +30,10 @@ enum ShazamStatus {
         }
     }
 
-    var backgroundColor: Color {
+    var backgroundColor: [Color] {
         switch self {
-        case .idle, .searching, .found: return Color(.pPrimary)
-        case .failed: return Color(.pGray1)
+        case .idle, .searching, .found: return GradientColors.pink
+        case .failed: return GradientColors.gray
         }
     }
 }

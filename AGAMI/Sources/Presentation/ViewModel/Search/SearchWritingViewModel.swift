@@ -5,9 +5,10 @@
 //  Created by Seoyeon Choi on 10/16/24.
 //
 
-import Foundation
-import UIKit
+import SwiftUI
 import CoreLocation
+import UIKit
+import PhotosUI
 
 @Observable
 final class SearchWritingViewModel {
@@ -28,6 +29,11 @@ final class SearchWritingViewModel {
     var currentLocality: String = ""
     var currentRegion: String = ""
     var showSheet: Bool = false
+    
+    // 커버 이미지 - 앨범에서 가져오기
+    var selectedItem: PhotosPickerItem?
+    var selectedImageData: Data?
+    var showPhotoPicker: Bool = false
     
     // 유저 위치
     var currentlatitude: Double?
@@ -180,6 +186,14 @@ final class SearchWritingViewModel {
     func moveSong(from source: IndexSet, to destination: Int) {
         diggingList.move(fromOffsets: source, toOffset: destination)
         persistenceService.saveDiggingListOrder(diggingList)
+    }
+    
+    // 앨범에서 불러오기
+    func loadImageFromGallery() async {
+        if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
+            selectedImageData = data
+            photoUIImage = UIImage(data: data)?.cropSquare()
+        }
     }
 }
 

@@ -11,6 +11,10 @@ import SwiftUI
 enum PlakeRoute: Hashable {
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
+    
+    case newPlakeView
+    case searchShazamingView
+    case searchWritingView
 }
 
 enum PlakeSheet: String, Identifiable {
@@ -34,6 +38,12 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             PlakeListView()
         case let .playlistView(viewModel):
             PlakePlaylistView(viewModel: viewModel)
+        case .newPlakeView:
+            SearchStartView()
+        case .searchShazamingView:
+            SearchShazamingView()
+        case .searchWritingView:
+            SearchWritingView()
         }
     }
 

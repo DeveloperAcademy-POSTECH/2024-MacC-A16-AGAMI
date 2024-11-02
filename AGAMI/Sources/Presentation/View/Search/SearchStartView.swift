@@ -47,11 +47,14 @@ struct SearchStartView: View {
                         .padding(.bottom, 26)
                 }
             }
-            .frame(height: 47)
             .background(Color(.pLightGray))
+            .frame(height: 47)
         }
         .onAppear {
             viewModel.loadSavedSongs()
+        }
+        .onTapGesture {
+            hideKeyboard()
         }
         .navigationTitle("새로운 플레이크")
         .navigationBarTitleDisplayMode(.large)

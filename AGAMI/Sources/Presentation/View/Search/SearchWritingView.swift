@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SearchWritingView: View {
-    @Environment(SearchCoordinator.self) private var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
     
     var body: some View {
@@ -48,7 +47,7 @@ struct SearchWritingView: View {
         }
         .confirmationDialog("", isPresented: $viewModel.showSheet) {
             Button("다시 찍기") {
-                coordinator.push(view: .cameraView(viewModel: viewModel))
+                //TODO: link Cameraview
             }
             Button("기본 이미지로 변경", role: .destructive) {
                 viewModel.photoUIImage = nil
@@ -73,7 +72,7 @@ struct SearchWritingView: View {
                     Task {
                         if await viewModel.savedPlaylist() {
                             viewModel.clearDiggingList()
-                            coordinator.popToRoot()
+                            //TODO: link PopToRoot
                             
                             viewModel.isLoaded = false
                         } else {
@@ -94,7 +93,7 @@ struct SearchWritingView: View {
     private func imageViewTapGesture() -> some Gesture {
         TapGesture().onEnded {
             if viewModel.photoUIImage == nil {
-                coordinator.push(view: .cameraView(viewModel: viewModel))
+                
             } else {
                 viewModel.showSheet.toggle()
             }

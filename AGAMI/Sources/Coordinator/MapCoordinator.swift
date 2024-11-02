@@ -34,7 +34,6 @@ enum MapFullScreenCover: String, Identifiable {
     case dummyFullScreenCover
 }
 
-@Observable
 final class MapCoordinator: BaseCoordinator<MapRoute, MapSheet, MapFullScreenCover> {
     @ViewBuilder
     func build(route: MapRoute) -> some View {

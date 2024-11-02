@@ -49,7 +49,7 @@ struct HomeView: View {
                     .environment(mapCoordinator)
                 }
                 
-                Tab("Archive", systemImage: "person.fill", value: .account) {
+                Tab("Account", systemImage: "person.fill", value: .account) {
                     EmptyView()
                 }
             }

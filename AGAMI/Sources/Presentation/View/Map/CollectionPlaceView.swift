@@ -36,7 +36,7 @@ struct CollectionPlaceView: View {
                             Circle()
                                 .frame(width: 34, height: 34)
                                 .foregroundStyle(Color(.pGray2))
-                                .shadow(color: Color(rgbHex: "000000").opacity(0.2), radius: 2, x: 0, y: 1)
+                                .shadow(color: Color(.pBlack).opacity(0.2), radius: 2, x: 0, y: 1)
                             
                             Image(systemName: "xmark")
                                 .foregroundStyle(Color(.pPrimary))

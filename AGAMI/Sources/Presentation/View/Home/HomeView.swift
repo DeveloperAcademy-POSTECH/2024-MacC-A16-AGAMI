@@ -33,7 +33,7 @@ struct HomeView: View {
                     .environment(plakeCoordinator)
                 }
                 
-                Tab("Map", systemImage: "map.fill", value: .map) {
+                Tab("Map", systemImage: "bubble.middle.bottom.fill", value: .map) {
                     NavigationStack(path: $mapCoordinator.path) {
                         mapCoordinator.build(route: .mapView)
                             .navigationDestination(for: MapRoute.self) { view in
@@ -92,7 +92,7 @@ struct HomeView: View {
                 .tabItem {
                     VStack {
                         Text("Map")
-                        Image(systemName: "map.fill")
+                        Image(systemName: "bubble.middle.bottom.fill")
                     }
                 }
                 .tag(TabSelection.map)

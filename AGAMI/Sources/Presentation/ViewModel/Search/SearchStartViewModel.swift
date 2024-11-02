@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-
 import CoreLocation
 
 @Observable
@@ -39,7 +38,6 @@ final class SearchStartViewModel {
     }
     
     func requestCurrentLocation() {
-        dump("viewmodel requestCurrentLocation")
         locationService.requestCurrentLocation()
     }
     

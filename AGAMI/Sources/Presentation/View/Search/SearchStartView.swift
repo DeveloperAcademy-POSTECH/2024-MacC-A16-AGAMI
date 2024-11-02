@@ -66,7 +66,6 @@ struct SearchStartView: View {
                     if viewModel.diggingList.isEmpty {
                         viewModel.showBackButtonAlert = false
                         coordinator.pop()
-                        
                     } else {
                         viewModel.showBackButtonAlert = true
                     }

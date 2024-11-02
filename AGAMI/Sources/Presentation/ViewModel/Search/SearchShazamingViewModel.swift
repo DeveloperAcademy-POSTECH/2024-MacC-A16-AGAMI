@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-
 import ShazamKit
 
 @MainActor
@@ -48,7 +47,6 @@ extension SearchShazamingViewModel: ShazamServiceDelegate {
     func shazamService(_ service: ShazamService, didFind match: SHMatch) {
         dump(#function)
         guard let mediaItem = match.mediaItems.first else { return }
-        dump("title: \(mediaItem.title ?? "")")
         stopRecognition()
         currentItem = mediaItem
         shazamStatus = .found
@@ -64,7 +62,6 @@ extension SearchShazamingViewModel: ShazamServiceDelegate {
     
     func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
         dump(#function)
-        dump("didNotFindMatch | signature: \(signature) | error: \(String(describing: error))")
         shazamStatus = .failed
         stopRecognition()
     }

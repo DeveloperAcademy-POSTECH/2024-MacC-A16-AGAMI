@@ -17,7 +17,7 @@ struct SearchShazamingView: View {
                            center: .center,
                            startRadius: 0,
                            endRadius: 530)
-                .ignoresSafeArea()
+            .ignoresSafeArea()
             
             ZStack {
                 if viewModel.shazamStatus == .searching {
@@ -69,6 +69,14 @@ struct SearchShazamingView: View {
             }
         }
         .navigationBarBackButtonHidden()
+        .onAppear {
+            viewModel.startRecognition()
+        }
+        .onChange(of: viewModel.shazamStatus) { _, newStatus in
+            if newStatus == .found {
+                coordinator.pop()
+            }
+        }
     }
 }
 

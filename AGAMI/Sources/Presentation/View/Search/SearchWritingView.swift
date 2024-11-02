@@ -12,9 +12,6 @@ import PhotosUI
 struct SearchWritingView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
-    @State private var selectedImageData: Data?
-    @State private var selectedItem: PhotosPickerItem?
-    @State private var showPhotoPicker = false
     
     var body: some View {
         ZStack {
@@ -23,9 +20,6 @@ struct SearchWritingView: View {
             
             List {
                 PlaylistCoverImageView(viewModel: viewModel)
-                    .onTapGesture {
-                        viewModel.showSheet.toggle()
-                    }
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
                     .listRowBackground(Color(.pLightGray))
@@ -66,27 +60,23 @@ struct SearchWritingView: View {
                 coordinator.push(view: .cameraView(viewModel: viewModel))
             }
             Button("앨범에서 가져오기") {
-                showPhotoPicker.toggle()
+                viewModel.showPhotoPicker.toggle()
             }
             Button("기본 이미지로 변경", role: .destructive) {
                 viewModel.photoUIImage = nil
             }
             Button("취소", role: .cancel) {}
         }
-        .photosPicker(isPresented: $showPhotoPicker, selection: $selectedItem)
-        .onChange(of: selectedItem) { _, newItem in
-                Task {
-                    if let data = try? await newItem?.loadTransferable(type: Data.self) {
-                        selectedImageData = data
-                        if let data = selectedImageData {
-                            viewModel.photoUIImage = UIImage(data: data)?.cropSquare()
-                        }
-                    }
-                }
+        .photosPicker(isPresented: $viewModel.showPhotoPicker,
+                      selection: $viewModel.selectedItem)
+        .onChange(of: viewModel.selectedItem) {
+            Task {
+                await viewModel.loadImageFromGallery()
             }
-        //        .onTapGesture {
-        //            hideKeyboard()
-        //        }
+        }
+        .onTapGesture {
+            hideKeyboard()
+        }
         .listStyle(PlainListStyle())
         .scrollDisabled(viewModel.isSaving)
         .allowsHitTesting(!viewModel.isSaving)
@@ -114,16 +104,6 @@ struct SearchWritingView: View {
         }
         .toolbarRole(.editor)
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
-    }
-    
-    private func imageViewTapGesture() -> some Gesture {
-        TapGesture().onEnded {
-            if viewModel.photoUIImage == nil {
-                
-            } else {
-                viewModel.showSheet.toggle()
-            }
-        }
     }
 }
 
@@ -180,7 +160,14 @@ private struct PlaylistCoverImageView: View {
                 }
                 Spacer()
             }
+            .highPriorityGesture(imageViewTapGesture())
             .padding(.vertical, 36)
+        }
+    }
+    
+    private func imageViewTapGesture() -> some Gesture {
+        TapGesture().onEnded {
+            viewModel.showSheet.toggle()
         }
     }
 }

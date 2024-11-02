@@ -54,7 +54,6 @@ enum PlakeFullScreenCover: String, Identifiable {
     case dummyFullScreenCover
 }
 
-@Observable
 final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
     @ViewBuilder
     func build(route: PlakeRoute) -> some View {

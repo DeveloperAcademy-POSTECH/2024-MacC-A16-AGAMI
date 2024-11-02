@@ -10,9 +10,9 @@ import SwiftUI
 
 @Observable
 class BaseCoordinator<Route: Hashable, Sheet: Identifiable, FullScreenCover: Identifiable> {
-     var path: NavigationPath = .init()
-     var sheet: Sheet?
-     var fullScreenCover: FullScreenCover?
+    var path: NavigationPath = .init()
+    var sheet: Sheet?
+    var fullScreenCover: FullScreenCover?
     var onDismiss: (() -> Void)?
 
     func push(route: Route) {

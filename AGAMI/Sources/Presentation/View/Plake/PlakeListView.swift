@@ -44,6 +44,7 @@ struct PlakeListView: View {
 }
 
 private struct ListHeader: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakeListViewModel
 
     var body: some View {
@@ -51,7 +52,7 @@ private struct ListHeader: View {
             Image(.plakeTabLogo)
             Spacer()
             Button {
-                // TODO: - 새로운 플레이크 뷰 코디네이터 통해 연결
+                coordinator.push(view: .newPlakeView)
             } label: {
                 HStack(spacing: 4) {
                     Image(systemName: "plus.circle.fill")
@@ -210,11 +211,12 @@ private struct PlakeListCell: View {
 }
 
 private struct MakeNewPlakeCell: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let size: CGSize
     private var verticalSize: CGFloat { size.width * 176 / 377 }
     var body: some View {
         Button {
-            // TODO: - 새로운 플레이크 뷰 코디네이터 통해 연결
+            coordinator.push(view: .newPlakeView)
         } label: {
             ZStack {
                 Image(.makeNewPlakeCell)

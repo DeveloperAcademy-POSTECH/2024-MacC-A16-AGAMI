@@ -59,8 +59,22 @@ struct SearchStartView: View {
         .navigationTitle("새로운 플레이크")
         .navigationBarTitleDisplayMode(.large)
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
-        .toolbarRole(.editor)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    if viewModel.diggingList.isEmpty {
+                        viewModel.showBackButtonAlert = false
+                        coordinator.pop()
+                        
+                    } else {
+                        viewModel.showBackButtonAlert = true
+                    }
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.system(size: 17, weight: .semibold))
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     coordinator.push(view: .searchWritingView)
@@ -70,6 +84,23 @@ struct SearchStartView: View {
                 }
                 .disabled(viewModel.diggingList.isEmpty || !viewModel.isLoaded)
             }
+        }
+        .alert(isPresented: $viewModel.showBackButtonAlert) {
+            Alert(
+                title: Text("플레이크 그만두기")
+                    .font(.pretendard(weight: .semiBold600, size: 16))
+                    .kerning(-0.43),
+                message: Text("만들던 플레이크는 사라집니다.")
+                    .font(.pretendard(weight: .regular400, size: 14))
+                    .kerning(-0.08),
+                primaryButton: .default(Text("취소")) {
+                    viewModel.showBackButtonAlert = false
+                },
+                secondaryButton: .default(Text("확인")) {
+                    viewModel.clearDiggingList()
+                    coordinator.pop()
+                }
+            )
         }
     }
 }

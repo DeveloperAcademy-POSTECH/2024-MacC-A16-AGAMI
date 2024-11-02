@@ -23,6 +23,8 @@ final class SearchStartViewModel {
     // 수집한 노래
     var diggingList: [SongModel] = []
     
+    var showBackButtonAlert: Bool = false
+    
     init() {
         loadSavedSongs()
         locationService.delegate = self
@@ -87,6 +89,15 @@ final class SearchStartViewModel {
     func moveSong(from source: IndexSet, to destination: Int) {
         diggingList.move(fromOffsets: source, toOffset: destination)
         persistenceService.saveDiggingListOrder(diggingList)
+    }
+    
+    func clearDiggingList() {
+        do {
+            diggingList.removeAll()
+            try persistenceService.deleteAllSongs()
+        } catch {
+            print("Failed to clear songs: \(error)")
+        }
     }
 }
 

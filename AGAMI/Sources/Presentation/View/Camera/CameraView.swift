@@ -11,7 +11,7 @@ import UIKit
 
 struct CameraView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
-    @State var viewModel = CameraViewModel()
+    @State private var viewModel = CameraViewModel()
     let searchWritingViewModel: SearchWritingViewModel
 
     var body: some View {

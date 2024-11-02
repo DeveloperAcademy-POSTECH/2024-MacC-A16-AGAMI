@@ -148,10 +148,12 @@ final class PlakePlaylistViewModel: Hashable {
 
     func handleAndUploadPhoto() async {
         presentationState.isUploadingPhoto = true
+        // TODO: ㅎ- photourl 존재 시 갈아끼우기
         do {
             guard let item = selectedItem,
                   let data = try await item.loadTransferable(type: Data.self),
-                  let image = UIImage(data: data),
+                  let rawImage = UIImage(data: data),
+                  let image = rawImage.cropSquare(),
                   let userID = FirebaseAuthService.currentUID else { return }
             let url = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             await MainActor.run { playlist.photoURL = url }

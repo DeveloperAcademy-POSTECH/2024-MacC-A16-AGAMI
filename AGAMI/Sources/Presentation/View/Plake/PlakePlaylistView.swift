@@ -1,3 +1,5 @@
+// swiftlint:disable file_length
+
 //
 //  ArchivePlaylistView.swift
 //  AGAMI
@@ -7,6 +9,7 @@
 
 import SwiftUI
 import Kingfisher
+import PhotosUI
 
 struct PlakePlaylistView: View {
     @State var viewModel: PlakePlaylistViewModel
@@ -23,7 +26,9 @@ struct PlakePlaylistView: View {
             case .none:
                 EmptyView()
             }
+            if viewModel.presentationState.isUploadingPhoto { ProgressView() }
         }
+        .background(Color(.pLightGray))
         .onTapGesture {
             hideKeyboard()
         }
@@ -33,15 +38,28 @@ struct PlakePlaylistView: View {
                 TopBarTrailingItems(viewModel: viewModel)
             }
         }
-        .navigationTitle("플라키브")
-        .confirmationDialog("", isPresented: $viewModel.isDialogPresented) {
-            ConfirmationDialogActions(viewModel: viewModel)
+        .navigationTitle(viewModel.presentationState.isEditing ? "편집하기" : "")
+        .confirmationDialog("", isPresented: $viewModel.presentationState.isExportDialogPresented) {
+            ExportConfirmationDialogActions(viewModel: viewModel)
         }
-        .alert("커버 사진 삭제", isPresented: $viewModel.isShowingAlert) {
-            AlertActions(viewModel: viewModel)
+        .confirmationDialog("", isPresented: $viewModel.presentationState.isPhotoDialogPresented) {
+            PhotoConfirmationDialogActions(viewModel: viewModel)
+        }
+        .alert("플레이크 삭제", isPresented: $viewModel.presentationState.isShowingDeletePlakeAlert) {
+            DeletePlakeAlertActions(viewModel: viewModel)
+        } message: {
+            Text("삭제한 플레이크는 되돌릴 수 없습니다.")
+        }
+        .alert("커버 사진 삭제", isPresented: $viewModel.presentationState.isShowingDeletePhotoAlert) {
+            DeletePhotoAlertActions(viewModel: viewModel)
         } message: {
             Text("삭제한 사진은 되돌릴 수 없습니다.")
         }
+        .photosPicker(
+            isPresented: $viewModel.presentationState.isShowingPicker,
+            selection: $viewModel.selectedItem,
+            matching: .images
+        )
         .onOpenURL { url in
             viewModel.handleURL(url)
         }
@@ -53,36 +71,58 @@ private struct ListView: View {
 
     var body: some View {
         List {
-            ImageAndTitleWithHeaderView(viewModel: viewModel)
-                .listRowInsets(EdgeInsets())
-                .listRowSeparator(.hidden)
-
-            ForEach(viewModel.playlist.songs, id: \.songID) { song in
-                ArchivePlaylistRow(viewModel: viewModel, song: song)
-            }
-            .conditionalModifier(viewModel.isEditing) { view in
-                view
-                    .onDelete { indexSet in
-                        viewModel.deleteMusic(indexSet: indexSet)
+            Group {
+                if viewModel.presentationState.isEditing {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("편집하기")
+                            .font(.pretendard(weight: .bold700, size: 32))
+                            .foregroundStyle(Color(.pBlack))
+                            .listRowInsets(EdgeInsets())
+                        Text("플레이크를 편집해보세요.")
+                            .font(.pretendard(weight: .regular400, size: 16))
+                            .foregroundStyle(Color(.pGray1))
+                            .listRowInsets(EdgeInsets())
                     }
-                    .onMove { indices, newOffset in
-                        viewModel.moveMusic(from: indices, to: newOffset)
-                    }
+                    .listRowInsets(EdgeInsets(top: 13, leading: 16, bottom: 10, trailing: 16))
+                    .listRowSeparator(.hidden)
+                }
+
+                ImageAndTitleWithHeaderView(viewModel: viewModel)
+                    .listRowInsets(EdgeInsets())
+                    .listRowSeparator(.hidden)
+
+                ForEach(viewModel.playlist.songs, id: \.songID) { song in
+                    ArchivePlaylistRow(viewModel: viewModel, song: song)
+                }
+                .conditionalModifier(viewModel.presentationState.isEditing) { view in
+                    view
+                        .onDelete { indexSet in
+                            viewModel.deleteMusic(indexSet: indexSet)
+                        }
+                        .onMove { indices, newOffset in
+                            viewModel.moveMusic(from: indices, to: newOffset)
+                        }
+                }
+                .listRowInsets(EdgeInsets(top: 1, leading: 8, bottom: 1, trailing: 8))
+
+                if viewModel.presentationState.isEditing {
+                    AddSongsButton(viewModel: viewModel)
+                        .listRowInsets(EdgeInsets(top: 12, leading: 8, bottom: 5, trailing: 8))
+                        .listRowSeparator(.hidden)
+
+                }
+
+                PlaylistDescription(viewModel: viewModel)
+                    .listRowInsets(EdgeInsets(top: 20, leading: 8, bottom: 0, trailing: 8))
+                    .listRowSeparator(.hidden)
+
+                if !viewModel.presentationState.isEditing {
+                    ExportButton(viewModel: viewModel)
+                        .listRowInsets(EdgeInsets(top: 54, leading: 0, bottom: 82, trailing: 0))
+                        .listRowSeparator(.hidden)
+                }
             }
-            .listRowInsets(
-                EdgeInsets(top: 1, leading: 8, bottom: 1, trailing: 8)
-            )
-
-            PlaylistDescription(viewModel: viewModel)
-                .listRowInsets(
-                    EdgeInsets(top: 25, leading: 8, bottom: 0, trailing: 8)
-                )
-
-            ExportButton(viewModel: viewModel)
-                .listRowInsets(
-                    EdgeInsets(top: 54, leading: 0, bottom: 82, trailing: 0)
-                )
-                .listRowSeparator(.hidden)
+            .listRowBackground(Color(.pLightGray))
         }
         .listStyle(.plain)
         .scrollIndicators(.hidden)
@@ -95,13 +135,13 @@ private struct ArchivePlaylistRow: View {
 
     var body: some View {
         HStack(spacing: 0) {
+
             KFImage(URL(string: song.albumCoverURL))
                 .resizable()
                 .cancelOnDisappear(true)
-                .placeholder({
+                .placeholder {
                     ProgressView()
-                        .frame(width: 60, height: 60)
-                })
+                }
                 .frame(width: 60, height: 60)
                 .padding(.trailing, 12)
 
@@ -121,12 +161,14 @@ private struct ArchivePlaylistRow: View {
 
             Spacer()
 
-            if viewModel.isEditing {
+            if viewModel.presentationState.isEditing {
                 Image(systemName: "line.3.horizontal")
                     .foregroundStyle(.gray)
                     .font(.system(size: 16, weight: .regular))
+                Spacer().frame(width: 16)
             }
         }
+        .background(Color(.pWhite))
     }
 }
 
@@ -140,45 +182,47 @@ private struct ImageAndTitleWithHeaderView: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Image(.photoPlaceHolder)
+                        Image(.editPhotoPlaceholder)
                             .resizable()
-                            .aspectRatio(1, contentMode: .fit)
-                            .clipShape(RoundedRectangle(cornerRadius: 16))
-                            .shadow(color: .black.opacity(0.25), radius: 10)
-                            .padding(.horizontal, viewModel.isEditing ? 50 : 0)
                     }
                     .aspectRatio(1, contentMode: .fit)
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .shadow(color: .black.opacity(0.25), radius: 10)
-                    .overlay {
-                        if viewModel.isEditing {
-                            DeletePhotoButton(viewModel: viewModel)
-                        }
-                    }
-                    .padding(.horizontal, viewModel.isEditing ? 50 : 0)
+
+                if viewModel.presentationState.isEditing {
+                    DeletePhotoButton(viewModel: viewModel)
+                }
 
                 VStack(spacing: 0) {
-                    Group {
-                        Text(viewModel.playlist.streetAddress)
-                            .padding(.bottom, viewModel.isEditing ? 9 : 12)
-                        Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
-                            .padding(.bottom, viewModel.isEditing ? 16 : 22)
+                    if !viewModel.playlist.photoURL.isEmpty {
+                        Group {
+                            Text(viewModel.playlist.streetAddress)
+                                .padding(.bottom, viewModel.presentationState.isEditing ? 9 : 12)
+                            Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
+                                .padding(.bottom, viewModel.presentationState.isEditing ? 16 : 22)
+                        }
+                        .font(.pretendard(weight: .medium500, size: viewModel.presentationState.isEditing ? 15 : 20))
+                        .foregroundStyle(Color(.pWhite))
                     }
-                    .font(.pretendard(weight: .medium500, size: viewModel.isEditing ? 15 : 20))
-                    .foregroundStyle(Color(.pWhite))
+
                 }
             }
+            .padding(.horizontal, viewModel.presentationState.isEditing ? 50 : 0)
             .padding(EdgeInsets(top: 20, leading: 8, bottom: 0, trailing: 8))
 
-            if viewModel.isEditing {
-                TextField("", text: $viewModel.playlist.playlistName)
-                    .font(.pretendard(weight: .semiBold600, size: 28))
+            if viewModel.presentationState.isEditing {
+                Text("플레이크 타이틀")
+                    .font(.pretendard(weight: .semiBold600, size: 20))
                     .foregroundStyle(Color(.pBlack))
-                    .padding(16)
-                    .background(Color(.pLightGray))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .padding(EdgeInsets(top: 30, leading: 8, bottom: 0, trailing: 8))
+                    .padding(EdgeInsets(top: 30, leading: 16, bottom: 11, trailing: 16))
 
+                TextField("", text: $viewModel.playlist.playlistName)
+                    .font(.pretendard(weight: .medium500, size: 20))
+                    .foregroundStyle(Color(.pGray1))
+                    .padding(EdgeInsets(top: 13, leading: 16, bottom: 13, trailing: 16))
+                    .background(Color(.pWhite))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .padding(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
             } else {
                 Text(viewModel.playlist.playlistName)
                     .font(.pretendard(weight: .bold700, size: 30))
@@ -188,12 +232,12 @@ private struct ImageAndTitleWithHeaderView: View {
             }
 
             HStack(spacing: 0) {
-                Text("수집한 플레이크")
-                    .font(.pretendard(weight: .semiBold600, size: 23))
+                Text("수집한 노래")
+                    .font(.pretendard(weight: .semiBold600, size: 20))
                     .foregroundStyle(Color(.pBlack))
                 Spacer()
-                Text("\(viewModel.playlist.songs.count) 플레이크")
-                    .font(.pretendard(weight: .medium500, size: 18))
+                Text("\(viewModel.playlist.songs.count)곡")
+                    .font(.pretendard(weight: .medium500, size: 16))
                     .foregroundStyle(Color(.pPrimary))
             }
             .padding(EdgeInsets(top: 37, leading: 16, bottom: 10, trailing: 16))
@@ -209,10 +253,10 @@ private struct DeletePhotoButton: View {
             HStack {
                 Spacer()
                 Image(.deletePhotoButton)
-                    .padding(7)
+                    .padding(EdgeInsets(top: 9, leading: 7, bottom: 9, trailing: 7))
                     .highPriorityGesture(
                         TapGesture().onEnded {
-                            viewModel.isShowingAlert = true
+                            viewModel.presentationState.isPhotoDialogPresented = true
                         }
                     )
             }
@@ -225,19 +269,22 @@ private struct PlaylistDescription: View {
     @Bindable var viewModel: PlakePlaylistViewModel
 
     var body: some View {
-        if viewModel.isEditing {
-            TextField("", text: $viewModel.playlist.playlistDescription, axis: .vertical)
-                .font(.pretendard(weight: .regular400, size: 18))
+        if viewModel.presentationState.isEditing {
+            TextField("플레이크에 대한 설명 추가하기", text: $viewModel.playlist.playlistDescription, axis: .vertical)
+                .font(.pretendard(weight: .regular400, size: 16))
                 .foregroundStyle(Color(.pBlack))
                 .kerning(-0.3)
+                .lineSpacing(3)
                 .multilineTextAlignment(.leading)
                 .padding(EdgeInsets(top: 16, leading: 8, bottom: 16, trailing: 8))
-                .background(Color(.pLightGray))
+                .background(Color(.pWhite))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
+                .padding(.bottom, 133)
         } else {
             Text(viewModel.playlist.playlistDescription)
-                .font(.pretendard(weight: .regular400, size: 18))
+                .font(.pretendard(weight: .regular400, size: 16))
                 .kerning(-0.3)
+                .lineSpacing(3)
                 .foregroundStyle(Color(.pBlack))
                 .multilineTextAlignment(.leading)
         }
@@ -251,11 +298,11 @@ private struct ExportButton: View {
         HStack {
             Spacer()
             HStack(spacing: 5) {
-                Text("플라키브 내보내기")
+                Text("내보내기")
                     .font(.pretendard(weight: .medium500, size: 20))
                     .foregroundColor(Color(.pWhite))
                     .kerning(-0.41)
-                
+
                 Image(systemName: "square.and.arrow.up.on.square.fill")
                     .font(.pretendard(weight: .medium500, size: 18))
                     .foregroundColor(Color(.pWhite))
@@ -266,7 +313,7 @@ private struct ExportButton: View {
             .contentShape(Capsule())
             .highPriorityGesture(
                 TapGesture().onEnded {
-                    viewModel.isDialogPresented = true
+                    viewModel.presentationState.isExportDialogPresented = true
                 }
             )
             Spacer()
@@ -274,7 +321,30 @@ private struct ExportButton: View {
     }
 }
 
-private struct ConfirmationDialogActions: View {
+private struct AddSongsButton: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakePlaylistViewModel
+
+    var body: some View {
+        Button {
+            // TODO: - 플레이킹 더하기 연결
+        } label: {
+            HStack(spacing: 6) {
+                Spacer()
+                Image(.playlistRedPlakeLogo)
+                Text("플레이킹 더하기")
+                    .font(.pretendard(weight: .medium500, size: 20))
+                    .foregroundStyle(Color(.pPrimary))
+                Spacer()
+            }
+            .padding(.vertical, 13)
+            .background(Color(.pGray2))
+            .clipShape(RoundedRectangle(cornerRadius: 13))
+        }
+    }
+}
+
+private struct ExportConfirmationDialogActions: View {
     @Environment(\.openURL) private var openURL
     let viewModel: PlakePlaylistViewModel
 
@@ -304,28 +374,41 @@ private struct ConfirmationDialogActions: View {
     }
 }
 
+private struct PhotoConfirmationDialogActions: View {
+    let viewModel: PlakePlaylistViewModel
+
+    var body: some View {
+        Button("앨범에서 가져오기") {
+            viewModel.presentationState.isShowingPicker = true
+        }
+        Button("기본 이미지로 변경", role: .destructive) {
+            viewModel.presentationState.isShowingDeletePhotoAlert = true
+        }
+    }
+}
+
 private struct TopBarTrailingItems: View {
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         HStack {
-            if viewModel.isEditing {
+            if viewModel.presentationState.isEditing {
                 Button(role: .cancel) {
                     Task {
                         await viewModel.applyChangesToFirestore()
-                        viewModel.isEditing = false
+                        viewModel.presentationState.isEditing = false
                     }
                 } label: {
-                    if viewModel.isUpdating {
+                    if viewModel.presentationState.isUpdating {
                         ProgressView()
                     } else {
-                        Text("완료")
+                        Text("저장")
                     }
                 }
-                .disabled(viewModel.isUpdating)
+                .disabled(viewModel.presentationState.isUpdating)
             } else {
                 Button("편집") {
-                    viewModel.isEditing = true
+                    viewModel.presentationState.isEditing = true
                 }
                 Menu {
                     MenuContents(viewModel: viewModel)
@@ -339,37 +422,63 @@ private struct TopBarTrailingItems: View {
 }
 
 private struct MenuContents: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         Button {
 
         } label: {
+            Label("플레이킹 더하기", image: .menuBlackPlakeLogo)
+        }
+
+        Button {
+
+        } label: {
             Label("공유하기", systemImage: "square.and.arrow.up")
         }
 
+        Button {
+
+        } label: {
+            Label("사진 저장", systemImage: "square.and.arrow.down.fill")
+        }
+
         Button(role: .destructive) {
-            Task {
-                await viewModel.deletePlaylist()
-                coordinator.pop()
-            }
+            viewModel.presentationState.isShowingDeletePlakeAlert = true
         } label: {
             Label("삭제하기", systemImage: "trash")
         }
     }
 }
 
-private struct AlertActions: View {
+private struct DeletePhotoAlertActions: View {
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.isShowingAlert = false
+            viewModel.presentationState.isShowingDeletePhotoAlert = false
         }
 
         Button("삭제", role: .destructive) {
             viewModel.deletePhotoURL()
+        }
+    }
+}
+
+private struct DeletePlakeAlertActions: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakePlaylistViewModel
+
+    var body: some View {
+        Button("취소", role: .cancel) {
+            viewModel.presentationState.isShowingDeletePlakeAlert = false
+        }
+
+        Button("삭제", role: .destructive) {
+            Task {
+                await viewModel.deletePlaylist()
+                coordinator.pop()
+            }
         }
     }
 }

@@ -6,9 +6,21 @@
 //
 
 import Foundation
+import _PhotosUI_SwiftUI
 
 @Observable
 final class PlakePlaylistViewModel: Hashable {
+    struct PlaylistPresentationState {
+        var isEditing: Bool = false
+        var isExportDialogPresented: Bool = false
+        var isPhotoDialogPresented: Bool = false
+        var isShowingDeletePhotoAlert: Bool = false
+        var isShowingDeletePlakeAlert: Bool = false
+        var isShowingPicker: Bool = false
+        var isUpdating: Bool = false
+        var isUploadingPhoto: Bool = false
+    }
+
     let id: UUID = .init()
 
     var playlist: PlaylistModel
@@ -16,13 +28,18 @@ final class PlakePlaylistViewModel: Hashable {
     private let musicService: MusicService = MusicService()
 
     var exportingState: ExportingState = .none
-    var isEditing: Bool = false
-    var isDialogPresented: Bool = false
-    var isShowingAlert: Bool = false
-    var isUpdating: Bool = false
+    var presentationState: PlaylistPresentationState = .init()
+
+    var selectedItem: PhotosPickerItem? {
+        didSet {
+            Task {
+                await handleAndUploadPhoto()
+            }
+        }
+    }
 
     var showDeleteButton: Bool {
-        !playlist.photoURL.isEmpty && isEditing
+        !playlist.photoURL.isEmpty && presentationState.isEditing
     }
 
     init(playlist: PlaylistModel) {
@@ -112,13 +129,13 @@ final class PlakePlaylistViewModel: Hashable {
     }
 
     func applyChangesToFirestore() async {
-        isUpdating = true
+        presentationState.isUpdating = true
         guard let userID = FirebaseAuthService.currentUID else {
             return
         }
         let firestoreModel = ModelAdapter.toFirestorePlaylist(from: playlist)
         try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
-        isUpdating = false
+        presentationState.isUpdating = false
     }
 
     func handleURL(_ url: URL) {
@@ -127,6 +144,21 @@ final class PlakePlaylistViewModel: Hashable {
            url.absoluteString.contains(decodedRedirectURL) {
             exportingState = .none
         }
+    }
+
+    func handleAndUploadPhoto() async {
+        presentationState.isUploadingPhoto = true
+        do {
+            guard let item = selectedItem,
+                  let data = try await item.loadTransferable(type: Data.self),
+                  let image = UIImage(data: data),
+                  let userID = FirebaseAuthService.currentUID else { return }
+            let url = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
+            await MainActor.run { playlist.photoURL = url }
+        } catch {
+            dump("handleAndUploadPhoto Error: \(error.localizedDescription)")
+        }
+        presentationState.isUploadingPhoto = false
     }
 }
 

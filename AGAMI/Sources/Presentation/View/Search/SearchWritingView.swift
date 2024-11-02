@@ -7,27 +7,41 @@
 
 import SwiftUI
 
+import PhotosUI
+
 struct SearchWritingView: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
+    @State private var selectedImageData: Data?
+    @State private var selectedItem: PhotosPickerItem?
+    @State private var showPhotoPicker = false
     
     var body: some View {
         ZStack {
+            Color(.pLightGray)
+                .ignoresSafeArea()
+            
             List {
                 PlaylistCoverImageView(viewModel: viewModel)
-                    .highPriorityGesture(imageViewTapGesture())
+                    .onTapGesture {
+                        viewModel.showSheet.toggle()
+                    }
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
+                    .listRowBackground(Color(.pLightGray))
                 
                 PlaylistTitleTextField(viewModel: viewModel)
                     .padding(.vertical, 12)
                     .padding(.horizontal, 8)
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
+                    .listRowBackground(Color(.pLightGray))
                 
                 PlaylistSongListHeader(viewModel: viewModel)
                     .padding(EdgeInsets(top: 28, leading: 24, bottom: 10, trailing: 24))
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
+                    .listRowBackground(Color(.pLightGray))
                 
                 PlaylistSongList(viewModel: viewModel)
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
@@ -37,6 +51,7 @@ struct SearchWritingView: View {
                     .padding(.vertical, 13)
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
+                    .listRowBackground(Color(.pLightGray))
                     .padding(.bottom, 56)
             }
             
@@ -44,27 +59,39 @@ struct SearchWritingView: View {
                 ProgressView("저장 중입니다...")
                     .padding()
             }
+            
         }
         .confirmationDialog("", isPresented: $viewModel.showSheet) {
-            Button("다시 찍기") {
-                //TODO: link Cameraview
+            Button("카메라") {
+                coordinator.push(view: .cameraView(viewModel: viewModel))
+            }
+            Button("앨범에서 가져오기") {
+                showPhotoPicker.toggle()
             }
             Button("기본 이미지로 변경", role: .destructive) {
                 viewModel.photoUIImage = nil
             }
             Button("취소", role: .cancel) {}
         }
-        .onAppear {
-            viewModel.requestCurrentLocation()
-        }
-        .onTapGesture {
-            hideKeyboard()
-        }
+        .photosPicker(isPresented: $showPhotoPicker, selection: $selectedItem)
+        .onChange(of: selectedItem) { _, newItem in
+                Task {
+                    if let data = try? await newItem?.loadTransferable(type: Data.self) {
+                        selectedImageData = data
+                        if let data = selectedImageData {
+                            viewModel.photoUIImage = UIImage(data: data)?.cropSquare()
+                        }
+                    }
+                }
+            }
+        //        .onTapGesture {
+        //            hideKeyboard()
+        //        }
         .listStyle(PlainListStyle())
         .scrollDisabled(viewModel.isSaving)
         .allowsHitTesting(!viewModel.isSaving)
-        .navigationTitle("플리카빙")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("커버 사진")
+        .navigationBarTitleDisplayMode(.large)
         .scrollIndicators(.hidden)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -72,8 +99,7 @@ struct SearchWritingView: View {
                     Task {
                         if await viewModel.savedPlaylist() {
                             viewModel.clearDiggingList()
-                            //TODO: link PopToRoot
-                            
+                            coordinator.popToRoot()
                             viewModel.isLoaded = false
                         } else {
                             print("Failed to save playlist. Please try again.")
@@ -103,84 +129,98 @@ struct SearchWritingView: View {
 
 private struct PlaylistCoverImageView: View {
     let viewModel: SearchWritingViewModel
-
+    
     var body: some View {
-        HStack(spacing: 0) {
-            Spacer()
-            if let uiImage = viewModel.photoUIImage {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .aspectRatio(1, contentMode: .fit)
-                    .frame(width: 277, height: 277)
-                    .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-                    .overlay(alignment: .bottom) {
-                        VStack(spacing: 0) {
-                            Text("\(viewModel.currentRegion), \(viewModel.currentLocality)")
-                                .font(.pretendard(weight: .medium500, size: 14))
-                                .foregroundStyle(Color(.pWhite))
-                            
-                            Text(viewModel.currentDate)
-                                .font(.pretendard(weight: .medium500, size: 14))
-                                .foregroundStyle(Color(.pWhite))
-                                .padding(.top, 4)
+        VStack(alignment: .leading, spacing: 0) {
+            Text("어떤 곳에서 만난 플레이크인가요?")
+                .font(.pretendard(weight: .regular400, size: 16))
+                .foregroundStyle(Color(.pGray1))
+                .padding(.leading, 16)
+            
+            HStack(spacing: 0) {
+                Spacer()
+                if let uiImage = viewModel.photoUIImage {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .aspectRatio(1, contentMode: .fit)
+                        .frame(width: 277, height: 277)
+                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+                        .overlay(alignment: .bottom) {
+                            VStack(spacing: 0) {
+                                Text("\(viewModel.currentRegion), \(viewModel.currentLocality)")
+                                    .font(.pretendard(weight: .medium500, size: 14))
+                                    .foregroundStyle(Color(.pWhite))
+                                
+                                Text(viewModel.currentDate)
+                                    .font(.pretendard(weight: .medium500, size: 14))
+                                    .foregroundStyle(Color(.pWhite))
+                                    .padding(.top, 4)
+                            }
+                            .padding(.bottom, 16)
                         }
-                        .padding(.bottom, 16)
-                    }
-            } else {
-                Image(.basicCover)
-                    .resizable()
-                    .clipShape(RoundedRectangle(cornerRadius: 13))
-                    .frame(width: 277, height: 277)
-                    .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-                    .overlay {
-                        HStack(spacing: 0) {
-                            Image(systemName: "photo.fill")
-                                .font(.system(size: 17, weight: .regular))
-                                .foregroundStyle(Color(.pPrimary))
-                            
-                            Text("커버 설정하기")
-                                .font(.pretendard(weight: .semiBold600, size: 20))
-                                .foregroundStyle(Color(.pPrimary))
-                                .padding(.leading, 5)
+                } else {
+                    Image(.coverImageThumbnail)
+                        .resizable()
+                        .clipShape(RoundedRectangle(cornerRadius: 13))
+                        .frame(width: 277, height: 277)
+                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
+                        .overlay {
+                            HStack(spacing: 0) {
+                                Image(systemName: "camera.viewfinder")
+                                    .font(.system(size: 17, weight: .regular))
+                                    .foregroundStyle(Color(.pPrimary))
+                                
+                                Text("사진으로 기록")
+                                    .font(.pretendard(weight: .medium500, size: 20))
+                                    .foregroundStyle(Color(.pPrimary))
+                                    .padding(.leading, 5)
+                            }
                         }
-                    }
+                }
+                Spacer()
             }
-            Spacer()
+            .padding(.vertical, 36)
         }
-        .padding(.vertical, 18)
     }
 }
 
 private struct PlaylistTitleTextField: View {
     @Bindable var viewModel: SearchWritingViewModel
     @FocusState private var isFocused: Bool
-
+    
     var body: some View {
-        TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
-            .font(.pretendard(weight: .semiBold600, size: 24))
-            .foregroundStyle(.black)
-            .focused($isFocused)
-            .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 8))
-            .background(Color(.pLightGray))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .overlay {
-                RoundedRectangle(cornerRadius: 10)
-                    .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
-            }
+        VStack(alignment: .leading, spacing: 0) {
+            Text("플레이크 타이틀")
+                .font(.pretendard(weight: .semiBold600, size: 20))
+                .foregroundStyle(Color(.pBlack))
+                .padding(EdgeInsets(top: 0, leading: 16, bottom: 14, trailing: 0))
+            
+            TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
+                .font(.pretendard(weight: .semiBold600, size: 24))
+                .foregroundStyle(.black)
+                .focused($isFocused)
+                .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 8))
+                .background(Color(.pWhite))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
+                }
+        }
     }
 }
 
 private struct PlaylistSongListHeader: View {
     let viewModel: SearchWritingViewModel
-
+    
     var body: some View {
         HStack(spacing: 0) {
-            Text("수집한 플레이크")
+            Text("수집한 노래")
                 .font(.pretendard(weight: .semiBold600, size: 20))
                 .foregroundStyle(Color(.pBlack))
             Spacer()
-            Text("\(viewModel.diggingList.count) 플레이크")
+            Text("\(viewModel.diggingList.count)곡")
                 .font(.pretendard(weight: .medium500, size: 16))
                 .foregroundStyle(Color(.pPrimary))
         }
@@ -189,13 +229,11 @@ private struct PlaylistSongListHeader: View {
 
 private struct PlaylistSongList: View {
     let viewModel: SearchWritingViewModel
-
+    
     var body: some View {
         ForEach(viewModel.diggingList, id: \.songID) { song in
             PlaylistRow(song: song)
         }
-        .onDelete(perform: viewModel.deleteSong)
-        .onMove(perform: viewModel.moveSong)
         .padding(.horizontal, 8)
     }
 }
@@ -206,7 +244,7 @@ private struct PlaylistDescriptionTextField: View {
     
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            .foregroundStyle(Color(.pLightGray))
+            .foregroundStyle(Color(.pWhite))
             .overlay(alignment: .topLeading) {
                 TextField("플레이크에 대한 설명 추가하기", text: $viewModel.userDescription, axis: .vertical)
                     .background(.clear)

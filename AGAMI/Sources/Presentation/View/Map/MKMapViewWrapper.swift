@@ -206,7 +206,7 @@ struct BubbleView: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Image(.basicCover)
+                        Image(.coverImageThumbnail)
                             .resizable()
                             .frame(width: 60, height: 60)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -237,7 +237,7 @@ struct ClusterBubbleView: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Image(.basicCover)
+                        Image(.coverImageThumbnail)
                             .resizable()
                             .frame(width: 60, height: 60)
                             .clipShape(RoundedRectangle(cornerRadius: 4))

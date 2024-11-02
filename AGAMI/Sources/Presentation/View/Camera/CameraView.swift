@@ -10,7 +10,7 @@ import AVFoundation
 import UIKit
 
 struct CameraView: View {
-    @Environment(SearchCoordinator.self) private var coordinator
+    @Environment(PlakeCoordinator.self) private var coordinator
     @State var viewModel = CameraViewModel()
     let searchWritingViewModel: SearchWritingViewModel
 

@@ -15,6 +15,39 @@ enum PlakeRoute: Hashable {
     case newPlakeView
     case searchShazamingView
     case searchWritingView
+    case cameraView(viewModel: SearchWritingViewModel)
+    
+    // Hashable 직접 구현
+    func hash(into hasher: inout Hasher) {
+        switch self {
+        case .listView:
+            hasher.combine("listView")
+        case .playlistView:
+            hasher.combine("playlistView")
+        case .newPlakeView:
+            hasher.combine("newPlakeView")
+        case .searchShazamingView:
+            hasher.combine("searchShazamingView")
+        case .searchWritingView:
+            hasher.combine("searchWritingView")
+        case .cameraView:
+            hasher.combine("cameraView")
+        }
+    }
+    
+    static func == (lhs: PlakeView, rhs: PlakeView) -> Bool {
+        switch (lhs, rhs) {
+        case (.listView, .listView),
+            (.playlistView, .playlistView),
+            (.newPlakeView, .newPlakeView),
+            (.searchShazamingView, .searchShazamingView),
+            (.searchWritingView, .searchWritingView),
+            (.cameraView, .cameraView):
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 enum PlakeSheet: String, Identifiable {
@@ -44,6 +77,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             SearchShazamingView()
         case .searchWritingView:
             SearchWritingView()
+        case .cameraView(let viewModel):
+            CameraView(searchWritingViewModel: viewModel)
         }
     }
 

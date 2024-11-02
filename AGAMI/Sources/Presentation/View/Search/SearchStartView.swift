@@ -47,8 +47,8 @@ struct SearchStartView: View {
                         .padding(.bottom, 26)
                 }
             }
-            .background(Color(.pLightGray))
             .frame(height: 47)
+            .background(Color(.pLightGray))
         }
         .onAppear {
             viewModel.loadSavedSongs()

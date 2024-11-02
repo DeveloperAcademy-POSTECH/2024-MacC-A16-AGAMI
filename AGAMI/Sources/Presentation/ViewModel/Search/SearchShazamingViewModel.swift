@@ -23,7 +23,7 @@ final class SearchShazamingViewModel: NSObject {
         shazamService.delegate = self
     }
     
-    private func startRecognition() {
+    func startRecognition() {
         shazamStatus = .searching
         shazamService.startRecognition()
     }
@@ -75,4 +75,3 @@ extension SearchShazamingViewModel: ShazamServiceDelegate {
         stopRecognition()
     }
 }
-

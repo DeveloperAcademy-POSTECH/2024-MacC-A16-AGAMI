@@ -51,6 +51,7 @@ struct SearchStartView: View {
             .background(Color(.pLightGray))
         }
         .onAppear {
+            viewModel.requestCurrentLocation()
             viewModel.loadSavedSongs()
         }
         .onTapGesture {

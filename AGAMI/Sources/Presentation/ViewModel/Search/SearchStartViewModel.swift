@@ -13,8 +13,14 @@ final class SearchStartViewModel {
     private let persistenceService = PersistenceService.shared
     private let locationService = LocationService.shared
     
-    // 플레이크 타이틀
+    // 유저 위치
+    var currentLatitude: Double?
+    var currentLongitude: Double?
     var currentStreetAddress: String?
+    var currentLocality: String?
+    var currentRegion: String?
+    
+    // 플레이크 타이틀
     var placeHolderAddress: String = ""
     var isLoaded: Bool = false
     var userTitle: String = ""
@@ -42,13 +48,17 @@ final class SearchStartViewModel {
     }
     
     func getCurrentLocation() {
+        guard let currentLocation = locationService.getCurrentLocation() else { return }
+        currentLatitude = currentLocation.coordinate.latitude
+        currentLongitude = currentLocation.coordinate.longitude
+        
         locationService.coordinateToStreetAddress { [weak self] address in
             guard let self = self else { return }
             
             self.currentStreetAddress = address
             self.setPlaceHolderAddress()
             
-            if currentStreetAddress != nil {
+            if currentLatitude != nil && currentLongitude != nil && currentStreetAddress != nil {
                 isLoaded = true
             }
         }
@@ -62,6 +72,11 @@ final class SearchStartViewModel {
             } else {
                 placeHolderAddress = address
                 placeHolderAddress += "에서 만난 플레이크"
+            }
+            self.currentRegion = address
+            
+            if let locality = locationService.locality {
+                self.currentLocality = locality
             }
         }
     }

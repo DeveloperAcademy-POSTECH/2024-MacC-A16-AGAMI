@@ -38,7 +38,7 @@ struct PlakePlaylistView: View {
         .onTapGesture {
             hideKeyboard()
         }
-        .toolbar() {
+        .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 TopBarTrailingItems(viewModel: viewModel)
             }
@@ -112,21 +112,19 @@ private struct ListView: View {
                 }
                 .listRowInsets(EdgeInsets(top: 1, leading: 8, bottom: 1, trailing: 8))
 
-                if viewModel.presentationState.isEditing {
-                    AddSongsButton(viewModel: viewModel)
-                        .listRowInsets(EdgeInsets(top: 12, leading: 8, bottom: 5, trailing: 8))
-                        .listRowSeparator(.hidden)
+                Group {
+                    if viewModel.presentationState.isEditing {
+                        AddSongsButton(viewModel: viewModel)
+                    } else {
+                        ExportButton(viewModel: viewModel)
+                    }
                 }
+                .listRowInsets(EdgeInsets(top: 12, leading: 8, bottom: 5, trailing: 8))
+                .listRowSeparator(.hidden)
 
                 PlaylistDescription(viewModel: viewModel)
                     .listRowInsets(EdgeInsets(top: 20, leading: 8, bottom: 0, trailing: 8))
                     .listRowSeparator(.hidden)
-
-                if !viewModel.presentationState.isEditing {
-                    ExportButton(viewModel: viewModel)
-                        .listRowInsets(EdgeInsets(top: 54, leading: 0, bottom: 82, trailing: 0))
-                        .listRowSeparator(.hidden)
-                }
             }
             .listRowBackground(Color(.pLightGray))
         }
@@ -304,28 +302,20 @@ private struct ExportButton: View {
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
-        HStack {
-            Spacer()
-            HStack(spacing: 5) {
-                Text("내보내기")
+        Button {
+            viewModel.presentationState.isExportDialogPresented = true
+        } label: {
+            HStack(spacing: 6) {
+                Spacer()
+                Image(.exportPlakeIcon)
+                Text("플레이크 내보내기")
                     .font(.pretendard(weight: .medium500, size: 20))
-                    .foregroundColor(Color(.pWhite))
-                    .kerning(-0.41)
-
-                Image(systemName: "square.and.arrow.up.on.square.fill")
-                    .font(.pretendard(weight: .medium500, size: 18))
-                    .foregroundColor(Color(.pWhite))
+                    .foregroundStyle(Color(.pPrimary))
+                    .padding(.vertical, 14)
+                Spacer()
             }
-            .padding(EdgeInsets(top: 13, leading: 50, bottom: 13, trailing: 50))
-            .background(Color(.pPrimary))
-            .clipShape(Capsule())
-            .contentShape(Capsule())
-            .highPriorityGesture(
-                TapGesture().onEnded {
-                    viewModel.presentationState.isExportDialogPresented = true
-                }
-            )
-            Spacer()
+            .background(Color(.pGray2))
+            .clipShape(RoundedRectangle(cornerRadius: 13))
         }
     }
 }
@@ -344,9 +334,9 @@ private struct AddSongsButton: View {
                 Text("플레이킹 더하기")
                     .font(.pretendard(weight: .medium500, size: 20))
                     .foregroundStyle(Color(.pPrimary))
+                    .padding(.vertical, 14)
                 Spacer()
             }
-            .padding(.vertical, 13)
             .background(Color(.pGray2))
             .clipShape(RoundedRectangle(cornerRadius: 13))
         }

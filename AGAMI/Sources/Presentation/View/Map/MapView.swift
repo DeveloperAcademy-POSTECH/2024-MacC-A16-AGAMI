@@ -15,7 +15,6 @@ struct MapView: View {
         NavigationStack {
             MKMapViewWrapper(viewModel: viewModel)
                 .ignoresSafeArea(edges: .top)
-//                .background(ignoresSafeAreaEdges: .top)
                 .onAppear {
                     viewModel.fecthPlaylists()
                 }

@@ -15,6 +15,10 @@ struct PlakePlaylistView: View {
     @State var viewModel: PlakePlaylistViewModel
     @Environment(\.openURL) private var openURL
 
+    init(viewModel: PlakePlaylistViewModel) {
+        _viewModel = State(wrappedValue: viewModel)
+    }
+
     var body: some View {
         ZStack {
             ListView(viewModel: viewModel)
@@ -26,18 +30,21 @@ struct PlakePlaylistView: View {
             case .none:
                 EmptyView()
             }
-            if viewModel.presentationState.isUploadingPhoto { ProgressView() }
+            if viewModel.presentationState.isUploadingPhoto {
+                ProgressView()
+            }
         }
         .background(Color(.pLightGray))
         .onTapGesture {
             hideKeyboard()
         }
-        .toolbarVisibilityForVersion(.hidden, for: .tabBar)
-        .toolbar {
+        .toolbar() {
             ToolbarItem(placement: .topBarTrailing) {
                 TopBarTrailingItems(viewModel: viewModel)
             }
         }
+        .toolbarVisibilityForVersion(.hidden, for: .tabBar)
+        .toolbarRole(.editor)
         .navigationTitle(viewModel.presentationState.isEditing ? "편집하기" : "")
         .confirmationDialog("", isPresented: $viewModel.presentationState.isExportDialogPresented) {
             ExportConfirmationDialogActions(viewModel: viewModel)
@@ -109,7 +116,6 @@ private struct ListView: View {
                     AddSongsButton(viewModel: viewModel)
                         .listRowInsets(EdgeInsets(top: 12, leading: 8, bottom: 5, trailing: 8))
                         .listRowSeparator(.hidden)
-
                 }
 
                 PlaylistDescription(viewModel: viewModel)
@@ -135,7 +141,6 @@ private struct ArchivePlaylistRow: View {
 
     var body: some View {
         HStack(spacing: 0) {
-
             KFImage(URL(string: song.albumCoverURL))
                 .resizable()
                 .cancelOnDisappear(true)
@@ -190,7 +195,11 @@ private struct ImageAndTitleWithHeaderView: View {
                     .shadow(color: .black.opacity(0.25), radius: 10)
 
                 if viewModel.presentationState.isEditing {
-                    DeletePhotoButton(viewModel: viewModel)
+                    if viewModel.playlist.photoURL.isEmpty {
+                        AddPhotoButton(viewModel: viewModel)
+                    } else {
+                        DeletePhotoButton(viewModel: viewModel)
+                    }
                 }
 
                 VStack(spacing: 0) {
@@ -225,7 +234,7 @@ private struct ImageAndTitleWithHeaderView: View {
                     .padding(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
             } else {
                 Text(viewModel.playlist.playlistName)
-                    .font(.pretendard(weight: .bold700, size: 30))
+                    .font(.pretendard(weight: .bold700, size: 26))
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(Color(.pBlack))
                     .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 16))
@@ -340,6 +349,29 @@ private struct AddSongsButton: View {
             .padding(.vertical, 13)
             .background(Color(.pGray2))
             .clipShape(RoundedRectangle(cornerRadius: 13))
+        }
+    }
+}
+
+private struct AddPhotoButton: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakePlaylistViewModel
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack(spacing: 0) {
+                Image(systemName: "camera.viewfinder")
+                    .font(.system(size: 17))
+                Text(" 사진으로 기록")
+                    .font(.pretendard(weight: .medium500, size: 20))
+            }
+            .foregroundStyle(Color(.pPrimary))
+            .highPriorityGesture(
+                TapGesture().onEnded {
+                    coordinator.push(route: .cameraView(viewModelContainer: .plakePlaylist(viewModel: viewModel)))
+                }
+            )
+            Spacer()
         }
     }
 }

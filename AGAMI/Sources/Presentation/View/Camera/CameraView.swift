@@ -12,7 +12,7 @@ import UIKit
 struct CameraView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     @State private var viewModel = CameraViewModel()
-    let searchWritingViewModel: SearchWritingViewModel
+    let viewModelContainer: CoordinatorViewModelContainer?
 
     var body: some View {
         ZStack {
@@ -93,8 +93,15 @@ struct CameraView: View {
     
     private var usedPhotoButton: some View {
         Button {
-            if let croppedImage = viewModel.photoUIImage?.cropSquare() {
-                searchWritingViewModel.savePhotoUIImage(photoUIImage: croppedImage)
+            guard let croppedImage = viewModel.photoUIImage?.cropSquare() else { return }
+
+            switch viewModelContainer {
+            case let .searchWriting(viewModel):
+                viewModel.savePhotoUIImage(photoUIImage: croppedImage)
+            case let .plakePlaylist(viewModel):
+                viewModel.setPhotoFromCamera(photo: croppedImage)
+            case nil:
+                return
             }
             coordinator.pop()
         } label: {
@@ -148,9 +155,4 @@ struct CameraView: View {
                         .foregroundColor(.white))
         }
     }
-}
-
-#Preview {
-    CameraView(searchWritingViewModel: SearchWritingViewModel())
-        .environment(PlakeCoordinator())
 }

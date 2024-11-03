@@ -31,8 +31,8 @@ enum PlakeRoute: Hashable {
     case newPlakeView
     case searchShazamingView
     case searchWritingView(viewModel: SearchWritingViewModel)
-    case cameraView(viewModel: SearchWritingViewModel)
-    
+    case cameraView(viewModelContainer: CoordinatorViewModelContainer)
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -68,8 +68,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             SearchShazamingView()
         case .searchWritingView(let viewModel):
             SearchWritingView(viewModel: viewModel)
-        case .cameraView(let viewModel):
-            CameraView(searchWritingViewModel: viewModel)
+        case let .cameraView(viewModelContainer):
+            CameraView(viewModelContainer: viewModelContainer)
         }
     }
 

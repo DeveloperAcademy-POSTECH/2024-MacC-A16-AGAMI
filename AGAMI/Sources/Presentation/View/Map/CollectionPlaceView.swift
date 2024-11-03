@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CollectionPlaceView: View {
     @State var viewModel: CollectionPlaceViewModel
-    @Environment(\.dismiss) var dismiss
-    
+    @Environment(MapCoordinator.self) private var coordinator
+
     init(viewModel: CollectionPlaceViewModel) {
         _viewModel = State(wrappedValue: viewModel)
     }
@@ -29,8 +29,7 @@ struct CollectionPlaceView: View {
                     Spacer()
                     
                     Button {
-                        dismiss() // 코디네이터 pop으로 수정해야 됨
-                        
+                        coordinator.pop()
                     } label: {
                         ZStack(alignment: .center) {
                             Circle()

@@ -13,7 +13,7 @@ import PhotosUI
 final class SearchWritingViewModel {
     private let persistenceService = PersistenceService.shared
     private let firebaseService = FirebaseService()
-    
+
     // 플레이리스트 정보
     var playlist = SwiftDataPlaylistModel()
     var diggingList: [SongModel] = []

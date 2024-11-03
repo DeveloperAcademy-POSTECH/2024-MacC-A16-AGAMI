@@ -160,6 +160,7 @@ final class PlakePlaylistViewModel: Hashable {
 
     func handleAndUploadPhotoFromAlbum() async {
         presentationState.isLoading = true
+        defer { presentationState.isLoading = false }
         // TODO: photourl 존재 시 갈아끼우기
         do {
             guard let item = selectedItem,
@@ -170,13 +171,14 @@ final class PlakePlaylistViewModel: Hashable {
             let url = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             await MainActor.run { playlist.photoURL = url }
         } catch {
-            dump("handleAndUploadPhotoFromAlbum Error: \(error.localizedDescription)")
+            dump("handleAndUplgoadPhotoFromAlbum Error: \(error.localizedDescription)")
         }
-        presentationState.isLoading = false
     }
 
     func uploadPhotoFromCamera() async {
         presentationState.isLoading = true
+        defer { presentationState.isLoading = false }
+
         guard let userID = FirebaseAuthService.currentUID,
               let image = photoFromCamera else { return }
         do {
@@ -190,6 +192,8 @@ final class PlakePlaylistViewModel: Hashable {
 
     func downloadPhotoAndSaveToAlbum() async {
         presentationState.isLoading = true
+        defer { presentationState.isLoading = false }
+
         guard let url = URL(string: playlist.photoURL) else { return }
 
         do {
@@ -214,7 +218,6 @@ final class PlakePlaylistViewModel: Hashable {
         } catch {
             dump("downloadPhotoAndSaveToAlbum Error: \(error.localizedDescription)")
         }
-        presentationState.isLoading = false
     }
 }
 

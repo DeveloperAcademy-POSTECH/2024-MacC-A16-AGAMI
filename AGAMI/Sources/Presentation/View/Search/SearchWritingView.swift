@@ -33,30 +33,24 @@ struct SearchWritingView: View {
                 .ignoresSafeArea()
             
             List {
-                PlaylistCoverImageView(viewModel: viewModel)
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(.zero)
-                    .listRowBackground(Color(.pLightGray))
-                
-                PlaylistTitleTextField(viewModel: viewModel)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 8)
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(.zero)
-                    .listRowBackground(Color(.pLightGray))
-                
-                PlaylistSongListHeader(viewModel: viewModel)
-                    .padding(EdgeInsets(top: 28, leading: 24, bottom: 10, trailing: 24))
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(.zero)
-                    .listRowBackground(Color(.pLightGray))
+                Group {
+                    PlaylistCoverImageView(viewModel: viewModel)
+                    
+                    PlaylistTitleTextField(viewModel: viewModel)
+                        .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 8))
+                    
+                    PlaylistSongListHeader(viewModel: viewModel)
+                        .padding(EdgeInsets(top: 28, leading: 24, bottom: 10, trailing: 24))
+                }
+                .listRowSeparator(.hidden)
+                .listRowInsets(.zero)
+                .listRowBackground(Color(.pLightGray))
                 
                 PlaylistSongList(viewModel: viewModel)
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
                 
                 PlaylistDescriptionTextField(viewModel: viewModel)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 13)
+                    .padding(EdgeInsets(top: 13, leading: 8, bottom: 13, trailing: 8))
                     .listRowSeparator(.hidden)
                     .listRowInsets(.zero)
                     .listRowBackground(Color(.pLightGray))

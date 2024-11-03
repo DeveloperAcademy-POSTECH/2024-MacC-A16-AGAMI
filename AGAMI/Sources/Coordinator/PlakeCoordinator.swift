@@ -14,7 +14,7 @@ enum PlakeRoute: Hashable {
     
     case newPlakeView
     case searchShazamingView
-    case searchWritingView
+    case searchWritingView(viewModel: SearchStartViewModel)
     case cameraView(viewModel: SearchWritingViewModel)
     
     // Hashable 직접 구현
@@ -75,8 +75,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             SearchStartView()
         case .searchShazamingView:
             SearchShazamingView()
-        case .searchWritingView:
-            SearchWritingView()
+        case .searchWritingView(let viewModel):
+            SearchWritingView(searchStartViewModel: viewModel)
         case .cameraView(let viewModel):
             CameraView(searchWritingViewModel: viewModel)
         }

@@ -12,6 +12,7 @@ import PhotosUI
 struct SearchWritingView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
+    let searchStartViewModel: SearchStartViewModel
     
     var body: some View {
         ZStack {

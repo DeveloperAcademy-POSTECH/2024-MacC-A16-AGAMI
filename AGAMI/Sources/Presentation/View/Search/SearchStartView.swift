@@ -76,7 +76,7 @@ struct SearchStartView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    coordinator.push(route: .searchWritingView)
+                    coordinator.push(route: .searchWritingView(viewModel: viewModel))
                 } label: {
                     Text("다음")
                         .font(.pretendard(weight: .medium500, size: 17))

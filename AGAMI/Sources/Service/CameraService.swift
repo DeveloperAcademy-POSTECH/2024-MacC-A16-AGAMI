@@ -116,7 +116,7 @@ final class CameraService: NSObject {
             
             session.commitConfiguration()
         } catch {
-            print("카메라 전환 실패: \(error.localizedDescription)")
+            dump("카메라 전환 실패: \(error.localizedDescription)")
         }
     }
     

@@ -35,7 +35,7 @@ enum PlakeRoute: Hashable {
         }
     }
     
-    static func == (lhs: PlakeView, rhs: PlakeView) -> Bool {
+    static func == (lhs: PlakeRoute, rhs: PlakeRoute) -> Bool {
         switch (lhs, rhs) {
         case (.listView, .listView),
             (.playlistView, .playlistView),

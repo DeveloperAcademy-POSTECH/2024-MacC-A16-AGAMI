@@ -86,7 +86,6 @@ final class LocationService: NSObject {
                     
                     self.streetAddress = currentAddress
                     self.delegate?.locationService(self, didGetReverseGeocode: currentAddress)
-                    dump("self.streetAddress = currentAddress")
                     completion(currentAddress)
                 }
             }
@@ -99,8 +98,7 @@ extension LocationService: CLLocationManagerDelegate {
         if let location = locations.last {
             currentLocation = location
         }
-        
-        dump("CLLocationManagerDelegate method called")
+
         self.delegate?.locationService(self, didUpdate: locations)
     }
     

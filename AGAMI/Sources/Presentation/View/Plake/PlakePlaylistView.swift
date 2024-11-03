@@ -330,7 +330,7 @@ private struct AddSongsButton: View {
         } label: {
             HStack(spacing: 6) {
                 Spacer()
-                Image(.playlistRedPlakeLogo)
+                Image(.addPlakingIcon)
                 Text("플레이킹 더하기")
                     .font(.pretendard(weight: .medium500, size: 20))
                     .foregroundStyle(Color(.pPrimary))
@@ -427,6 +427,7 @@ private struct TopBarTrailingItems: View {
                         ProgressView()
                     } else {
                         Text("저장")
+                            .font(.pretendard(weight: .semiBold600, size: 17))
                     }
                 }
                 .disabled(viewModel.presentationState.isUpdating)

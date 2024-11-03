@@ -14,6 +14,19 @@ struct SearchWritingView: View {
     @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
     let searchStartViewModel: SearchStartViewModel
     
+    init(searchStartViewModel: SearchStartViewModel) {
+        self.searchStartViewModel = searchStartViewModel
+        _viewModel = State(initialValue: SearchWritingViewModel(
+            currentLatitude: searchStartViewModel.currentLatitude,
+            currentLongitude: searchStartViewModel.currentLongitude,
+            currentStreetAddress: searchStartViewModel.currentStreetAddress,
+            placeHolderAddress: searchStartViewModel.placeHolderAddress,
+            userTitle: searchStartViewModel.userTitle,
+            currentLocality: searchStartViewModel.currentLocality,
+            currentRegion: searchStartViewModel.currentRegion
+        ))
+    }
+    
     var body: some View {
         ZStack {
             Color(.pLightGray)
@@ -91,7 +104,6 @@ struct SearchWritingView: View {
                         if await viewModel.savedPlaylist() {
                             viewModel.clearDiggingList()
                             coordinator.popToRoot()
-                            viewModel.isLoaded = false
                         } else {
                             print("Failed to save playlist. Please try again.")
                         }
@@ -100,7 +112,7 @@ struct SearchWritingView: View {
                     Text("저장")
                         .font(.pretendard(weight: .semiBold600, size: 17))
                 }
-                .disabled(viewModel.diggingList.isEmpty || viewModel.isSaving || !viewModel.isLoaded)
+                .disabled(viewModel.isSaving)
             }
         }
         .toolbarRole(.editor)

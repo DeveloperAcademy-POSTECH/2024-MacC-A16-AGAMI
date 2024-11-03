@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import _PhotosUI_SwiftUI
+import SwiftUI
+import PhotosUI
 
 @Observable
 final class PlakePlaylistViewModel: Hashable {
@@ -20,7 +21,6 @@ final class PlakePlaylistViewModel: Hashable {
         var isUpdating: Bool = false
         var isLoading: Bool = false
     }
-
     let id: UUID = .init()
 
     var playlist: PlaylistModel

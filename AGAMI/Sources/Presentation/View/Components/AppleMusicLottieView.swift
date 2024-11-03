@@ -1,5 +1,5 @@
 //
-//  SpotifyLottieView.swift
+//  AppleMusicLottieView.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/29/24.
@@ -16,7 +16,7 @@ struct AppleMusicLottieView: View {
                 CustomLottieView(.applemusicExporting)
                     .frame(width: 200, height: 200)
                 Text("수집한 플레이크를\nApple Music으로 내보내는 중...")
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.pretendard(weight: .semiBold600, size: 24))
                     .foregroundStyle(Color(.pPrimary))
                     .multilineTextAlignment(.center)
             }

@@ -81,7 +81,7 @@ struct SearchStartView: View {
                     Text("다음")
                         .font(.pretendard(weight: .medium500, size: 17))
                 }
-                //.disabled(viewModel.diggingList.isEmpty || !viewModel.isLoaded)
+                .disabled(viewModel.diggingList.isEmpty || !viewModel.isLoaded)
             }
         }
         .alert(isPresented: $viewModel.showBackButtonAlert) {

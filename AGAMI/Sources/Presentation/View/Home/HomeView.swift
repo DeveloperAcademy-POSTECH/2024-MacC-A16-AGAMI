@@ -11,7 +11,6 @@ import FirebaseAuth
 struct HomeView: View {
     @State private var viewModel: HomeViewModel = .init()
     @State private var plakeCoordinator: PlakeCoordinator = .init()
-    @State private var searchCoordinator: SearchCoordinator = .init()
     @State private var mapCoordinator: MapCoordinator = .init()
     
     var body: some View {

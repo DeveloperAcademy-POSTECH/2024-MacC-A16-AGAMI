@@ -152,5 +152,5 @@ struct CameraView: View {
 
 #Preview {
     CameraView(searchWritingViewModel: SearchWritingViewModel())
-        .environment(SearchCoordinator())
+        .environment(PlakeCoordinator())
 }

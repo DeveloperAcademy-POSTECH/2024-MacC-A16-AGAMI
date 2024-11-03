@@ -41,7 +41,7 @@ struct SearchStartView: View {
             
             ZStack(alignment: .bottom) {
                 Button {
-                    coordinator.push(view: .searchShazamingView)
+                    coordinator.push(route: .searchShazamingView)
                 } label: {
                     PlakeCTAButton(type: .addSong)
                         .padding(.bottom, 26)
@@ -76,7 +76,7 @@ struct SearchStartView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    coordinator.push(view: .searchWritingView)
+                    coordinator.push(route: .searchWritingView)
                 } label: {
                     Text("다음")
                         .font(.pretendard(weight: .medium500, size: 17))

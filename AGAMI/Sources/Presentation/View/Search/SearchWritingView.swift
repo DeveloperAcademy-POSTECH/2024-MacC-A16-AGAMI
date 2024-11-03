@@ -68,7 +68,8 @@ struct SearchWritingView: View {
             Button("취소", role: .cancel) {}
         }
         .photosPicker(isPresented: $viewModel.showPhotoPicker,
-                      selection: $viewModel.selectedItem)
+                      selection: $viewModel.selectedItem,
+                      matching: .images)
         .onChange(of: viewModel.selectedItem) {
             Task {
                 await viewModel.loadImageFromGallery()
@@ -183,10 +184,10 @@ private struct PlaylistTitleTextField: View {
                 .padding(EdgeInsets(top: 0, leading: 16, bottom: 14, trailing: 0))
             
             TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
-                .font(.pretendard(weight: .semiBold600, size: 24))
-                .foregroundStyle(.black)
+                .font(.pretendard(weight: .medium500, size: 20))
+                .foregroundStyle(Color(.pGray1))
                 .focused($isFocused)
-                .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 8))
+                .padding(16)
                 .background(Color(.pWhite))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay {

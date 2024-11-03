@@ -14,7 +14,6 @@ import PhotosUI
 final class SearchWritingViewModel {
     private let persistenceService = PersistenceService.shared
     private let firebaseService = FirebaseService()
-    private let locationService = LocationService.shared
     
     // 플레이리스트 정보
     var playlist = SwiftDataPlaylistModel()
@@ -36,18 +35,35 @@ final class SearchWritingViewModel {
     var showPhotoPicker: Bool = false
     
     // 유저 위치
-    var currentlatitude: Double?
-    var currentlongitude: Double?
+    var currentLatitude: Double?
+    var currentLongitude: Double?
     var currentStreetAddress: String?
     var placeHolderAddress: String = ""
-    var isLoaded: Bool = false
     
+    // 저장 상태 관리
     var isSaving: Bool = false
     
-    init() {
-        loadSavedSongs()
+    init(currentLatitude: Double? = nil,
+         currentLongitude: Double? = nil,
+         currentStreetAddress: String? = nil,
+         placeHolderAddress: String = "",
+         userTitle: String = "",
+         currentLocality: String = "",
+         currentRegion: String = "") {
+        self.currentLatitude = currentLatitude
+        self.currentLongitude = currentLongitude
+        self.currentStreetAddress = currentStreetAddress
+        self.placeHolderAddress = placeHolderAddress
+        if userTitle == "" {
+            self.userTitle = placeHolderAddress
+        } else {
+            self.userTitle = userTitle
+        }
+
+        self.currentLocality = currentLocality
+        self.currentRegion = currentRegion
         
-        locationService.delegate = self
+        loadSavedSongs()
         setCurrentDate()
     }
     
@@ -59,36 +75,13 @@ final class SearchWritingViewModel {
         }
     }
     
-    func requestCurrentLocation() {
-        dump("viewmodel requestCurrentLocation")
-        locationService.requestCurrentLocation()
-    }
-    
-    func getCurrentLocation() {
-        guard let currentLocation = locationService.getCurrentLocation() else { return }
-        
-        currentlatitude = currentLocation.coordinate.latitude
-        currentlongitude = currentLocation.coordinate.longitude
-        
-        locationService.coordinateToStreetAddress { [weak self] address in
-            guard let self = self else { return }
-            
-            self.currentStreetAddress = address
-            self.setAddress()
-            
-            if currentlatitude != nil && currentlongitude != nil && currentStreetAddress != nil {
-                isLoaded = true
-            }
-        }
-    }
-    
     func savedPlaylist() async -> Bool {
         isSaving = true
         defer { isSaving = false }
         
         do {
-            guard let currentlatitude = self.currentlatitude,
-                  let currentlongitude = self.currentlongitude,
+            guard let currentLatitude = self.currentLatitude,
+                  let currentLongitude = self.currentLongitude,
                   let currentStreetAddress = self.currentStreetAddress else { return false }
             
             userTitle = userTitle == "" ? placeHolderAddress : userTitle
@@ -96,15 +89,15 @@ final class SearchWritingViewModel {
             try persistenceService.createPlaylist(playlistName: userTitle,
                                                   playlistDescription: userDescription,
                                                   photoURL: photoURL,
-                                                  latitude: currentlatitude,
-                                                  longitude: currentlongitude,
+                                                  latitude: currentLatitude,
+                                                  longitude: currentLongitude,
                                                   streetAddress: currentStreetAddress)
             playlist.playlistName = userTitle
             playlist.playlistDescription = userDescription
             playlist.songs = try persistenceService.fetchDiggingList()
             playlist.photoURL = photoURL
-            playlist.latitude = currentlatitude
-            playlist.longitude = currentlongitude
+            playlist.latitude = currentLatitude
+            playlist.longitude = currentLongitude
             playlist.streetAddress = currentStreetAddress
             
             await playlist.photoURL = savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") ?? ""
@@ -148,40 +141,12 @@ final class SearchWritingViewModel {
         
         self.currentDate = dateFormatter.string(from: today)
     }
-    
-    func setAddress() {
-        if let address = locationService.placeHolderAddress {
-            if let range = address.range(of: "로") ?? address.range(of: "길") {
-                placeHolderAddress = String(address[..<range.upperBound])
-                placeHolderAddress += "에서 만난 플레이크"
-            } else {
-                placeHolderAddress = address
-                placeHolderAddress += "에서 만난 플레이크"
-            }
-            currentRegion = address
-        }
-        if let locality = locationService.locality {
-            currentLocality = locality
-        }
-    }
-    
+
     // 앨범에서 불러오기
     func loadImageFromGallery() async {
         if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
             selectedImageData = data
             photoUIImage = UIImage(data: data)?.cropSquare()
         }
-    }
-}
-
-extension SearchWritingViewModel: LocationServiceDelegate {
-    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
-        dump("delegate didUpdate method called")
-        getCurrentLocation()
-    }
-    
-    func locationService(_ service: LocationService, didGetReverseGeocode location: String) {
-        dump("delegate Geocode method called")
-        self.currentStreetAddress = location
     }
 }

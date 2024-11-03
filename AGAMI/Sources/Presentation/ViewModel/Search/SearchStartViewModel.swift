@@ -17,8 +17,8 @@ final class SearchStartViewModel {
     var currentLatitude: Double?
     var currentLongitude: Double?
     var currentStreetAddress: String?
-    var currentLocality: String?
-    var currentRegion: String?
+    var currentLocality: String = ""
+    var currentRegion: String = ""
     
     // 플레이크 타이틀
     var placeHolderAddress: String = ""

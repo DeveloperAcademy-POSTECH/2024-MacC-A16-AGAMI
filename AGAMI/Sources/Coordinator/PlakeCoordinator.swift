@@ -9,6 +9,22 @@ import Foundation
 import SwiftUI
 
 enum PlakeRoute: Hashable {
+    var id: String {
+        switch self {
+        case .listView:
+            return "listView"
+        case .playlistView:
+            return "playlistView"
+        case .newPlakeView:
+            return "newPlakeView"
+        case .searchShazamingView:
+            return "searchShazamingView"
+        case .searchWritingView:
+            return "searchWritingView"
+        case .cameraView:
+            return "cameraView"
+        }
+    }
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
     
@@ -17,36 +33,12 @@ enum PlakeRoute: Hashable {
     case searchWritingView(viewModel: SearchStartViewModel)
     case cameraView(viewModel: SearchWritingViewModel)
     
-    // Hashable 직접 구현
     func hash(into hasher: inout Hasher) {
-        switch self {
-        case .listView:
-            hasher.combine("listView")
-        case .playlistView:
-            hasher.combine("playlistView")
-        case .newPlakeView:
-            hasher.combine("newPlakeView")
-        case .searchShazamingView:
-            hasher.combine("searchShazamingView")
-        case .searchWritingView:
-            hasher.combine("searchWritingView")
-        case .cameraView:
-            hasher.combine("cameraView")
-        }
+        hasher.combine(id)
     }
     
     static func == (lhs: PlakeRoute, rhs: PlakeRoute) -> Bool {
-        switch (lhs, rhs) {
-        case (.listView, .listView),
-            (.playlistView, .playlistView),
-            (.newPlakeView, .newPlakeView),
-            (.searchShazamingView, .searchShazamingView),
-            (.searchWritingView, .searchWritingView),
-            (.cameraView, .cameraView):
-            return true
-        default:
-            return false
-        }
+        lhs.id == rhs.id
     }
 }
 

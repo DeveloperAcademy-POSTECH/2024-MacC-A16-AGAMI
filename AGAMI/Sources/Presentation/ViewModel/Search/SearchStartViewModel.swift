@@ -35,6 +35,18 @@ final class SearchStartViewModel {
         locationService.delegate = self
     }
     
+    func createSearchWritingViewModel() -> SearchWritingViewModel {
+        return SearchWritingViewModel(
+            currentLatitude: currentLatitude,
+            currentLongitude: currentLongitude,
+            currentStreetAddress: currentStreetAddress,
+            placeHolderAddress: placeHolderAddress,
+            userTitle: userTitle,
+            currentLocality: currentLocality,
+            currentRegion: currentRegion
+            )
+    }
+    
     func loadSavedSongs() {
         do {
             self.diggingList = try persistenceService.loadDiggingListWithOrder()

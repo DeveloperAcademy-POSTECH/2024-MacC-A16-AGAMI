@@ -16,15 +16,7 @@ struct SearchWritingView: View {
     
     init(searchStartViewModel: SearchStartViewModel) {
         self.searchStartViewModel = searchStartViewModel
-        _viewModel = State(initialValue: SearchWritingViewModel(
-            currentLatitude: searchStartViewModel.currentLatitude,
-            currentLongitude: searchStartViewModel.currentLongitude,
-            currentStreetAddress: searchStartViewModel.currentStreetAddress,
-            placeHolderAddress: searchStartViewModel.placeHolderAddress,
-            userTitle: searchStartViewModel.userTitle,
-            currentLocality: searchStartViewModel.currentLocality,
-            currentRegion: searchStartViewModel.currentRegion
-        ))
+        self._viewModel = State(initialValue: searchStartViewModel.createSearchWritingViewModel())
     }
     
     var body: some View {

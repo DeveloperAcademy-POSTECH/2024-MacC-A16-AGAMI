@@ -30,7 +30,7 @@ struct PlakePlaylistView: View {
             case .none:
                 EmptyView()
             }
-            if viewModel.presentationState.isUploadingPhoto {
+            if viewModel.presentationState.isLoading {
                 ProgressView()
             }
         }
@@ -57,10 +57,10 @@ struct PlakePlaylistView: View {
         } message: {
             Text("삭제한 플레이크는 되돌릴 수 없습니다.")
         }
-        .alert("커버 사진 삭제", isPresented: $viewModel.presentationState.isShowingDeletePhotoAlert) {
+        .alert("기본 이미지로 변경", isPresented: $viewModel.presentationState.isShowingDeletePhotoAlert) {
             DeletePhotoAlertActions(viewModel: viewModel)
         } message: {
-            Text("삭제한 사진은 되돌릴 수 없습니다.")
+            Text("이전 사진은 되돌릴 수 없습니다.")
         }
         .photosPicker(
             isPresented: $viewModel.presentationState.isShowingPicker,
@@ -368,7 +368,9 @@ private struct AddPhotoButton: View {
             .foregroundStyle(Color(.pPrimary))
             .highPriorityGesture(
                 TapGesture().onEnded {
-                    coordinator.push(route: .cameraView(viewModelContainer: .plakePlaylist(viewModel: viewModel)))
+                    coordinator.push(route: .cameraView(
+                        viewModelContainer: .plakePlaylist(viewModel: viewModel)
+                    ))
                 }
             )
             Spacer()
@@ -470,7 +472,9 @@ private struct MenuContents: View {
         }
 
         Button {
-
+            Task {
+                await viewModel.downloadPhotoAndSaveToAlbum()
+            }
         } label: {
             Label("사진 저장", systemImage: "square.and.arrow.down.fill")
         }

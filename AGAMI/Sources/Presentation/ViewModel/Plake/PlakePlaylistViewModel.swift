@@ -18,7 +18,7 @@ final class PlakePlaylistViewModel: Hashable {
         var isShowingDeletePlakeAlert: Bool = false
         var isShowingPicker: Bool = false
         var isUpdating: Bool = false
-        var isUploadingPhoto: Bool = false
+        var isLoading: Bool = false
     }
 
     let id: UUID = .init()
@@ -159,7 +159,7 @@ final class PlakePlaylistViewModel: Hashable {
     }
 
     func handleAndUploadPhotoFromAlbum() async {
-        presentationState.isUploadingPhoto = true
+        presentationState.isLoading = true
         // TODO: photourl 존재 시 갈아끼우기
         do {
             guard let item = selectedItem,
@@ -172,11 +172,11 @@ final class PlakePlaylistViewModel: Hashable {
         } catch {
             dump("handleAndUploadPhotoFromAlbum Error: \(error.localizedDescription)")
         }
-        presentationState.isUploadingPhoto = false
+        presentationState.isLoading = false
     }
 
     func uploadPhotoFromCamera() async {
-        presentationState.isUploadingPhoto = true
+        presentationState.isLoading = true
         guard let userID = FirebaseAuthService.currentUID,
               let image = photoFromCamera else { return }
         do {
@@ -185,7 +185,36 @@ final class PlakePlaylistViewModel: Hashable {
         } catch {
             dump("handleAndUploadPhotoFromAlbum Error: \(error.localizedDescription)")
         }
-        presentationState.isUploadingPhoto = false
+        presentationState.isLoading = false
+    }
+
+    func downloadPhotoAndSaveToAlbum() async {
+        presentationState.isLoading = true
+        guard let url = URL(string: playlist.photoURL) else { return }
+
+        do {
+            let (data, _) = try await URLSession.shared.data(from: url)
+
+            guard let image = UIImage(data: data) else {
+                dump("이미지 데이터 -> UIImage 캐스팅 실패")
+                return
+            }
+
+            let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+            guard status == .authorized || status == .limited else {
+                dump("사진 앨범 접근 권한이 없습니다.")
+                return
+            }
+
+            await MainActor.run {
+                PHPhotoLibrary.shared().performChanges {
+                    PHAssetChangeRequest.creationRequestForAsset(from: image)
+                }
+            }
+        } catch {
+            dump("downloadPhotoAndSaveToAlbum Error: \(error.localizedDescription)")
+        }
+        presentationState.isLoading = false
     }
 }
 

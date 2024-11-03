@@ -56,7 +56,7 @@ final class FirebaseService {
     }
     
     func uploadImageToFirebase(userID: String, image: UIImage) async throws -> String {
-        guard let imageData = image.jpegData(compressionQuality: 1.0) else {
+        guard let imageData = image.jpegData(compressionQuality: 0.7) else {
             throw NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])
         }
 

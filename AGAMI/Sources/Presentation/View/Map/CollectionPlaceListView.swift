@@ -6,30 +6,31 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct CollectionPlaceListView: View {
     let viewModel: CollectionPlaceViewModel
     
     private let columnWidth: CGFloat = 176
     private let columnSpacing: CGFloat = 9
-    private var columns: [GridItem] {
-        [
-            GridItem(.flexible(minimum: columnWidth), spacing: columnSpacing),
-            GridItem(.flexible(minimum: columnWidth))
-        ]
-    }
+    private var columns: [GridItem] {[
+        GridItem(.flexible(minimum: columnWidth), spacing: columnSpacing),
+        GridItem(.flexible(minimum: columnWidth))
+    ]}
     
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 9) {
                 ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                     ZStack {
-                        AsyncImage(url: URL(string: playlist.photoURL)) { image in
-                            image
-                                .image?.resizable()
-                                .aspectRatio(1.0, contentMode: .fit)
-                                .clipShape(RoundedRectangle(cornerRadius: 13))
-                        }
+                        KFImage(URL(string: playlist.photoURL))
+                            .resizable()
+                            .placeholder {
+                                Image(.editPhotoPlaceholder)
+                                    .resizable()
+                            }
+                            .aspectRatio(1.0, contentMode: .fit)
+                            .clipShape(RoundedRectangle(cornerRadius: 13))
                         
                         VStack(alignment: .center, spacing: 0) {
                             Spacer()

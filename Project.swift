@@ -41,10 +41,10 @@ let project = Project(
                             ],
                             "NSAppleMusicUsageDescription": "플레이리스트 추가를 위해 Apple Music 라이브러리에 접근합니다.",
                             "NSMicrophoneUsageDescription": "Shazam 음악 인식을 위해 마이크에 접근합니다.",
-                            "NSPhotoLibraryUsageDescription": "플레이리스트 사진 추가를 위해 사진 라이브러리에 접근합니다.",
+                            "NSPhotoLibraryUsageDescription": "플레이리스트 사진 추가 및 사진 저장을 위해 사진 라이브러리에 접근합니다.",
                             "NSCameraUsageDescription": "플레이리스트 사진 추가를 위해 카메라에 접근합니다.",
-                            "NSLocationUsageDescription": "근처 장소 탐색을 위해 사용자의 위치 정보에 접근합니다.",
-                            "NSLocationWhenInUseUsageDescription": "근처 장소 탐색을 위해 사용자의 위치 정보에 접근합니다.",
+                            "NSLocationUsageDescription": "플레이리스트 위치 저장을 위해 사용자의 위치 정보에 접근합니다.",
+                            "NSLocationWhenInUseUsageDescription": "플레이리스트 위치 저장을 위해 사용자의 위치 정보에 접근합니다.",
                             "UISupportedInterfaceOrientations": [
                                 "UIInterfaceOrientationPortrait",
                                 "UIInterfaceOrientationPortraitUpsideDown"

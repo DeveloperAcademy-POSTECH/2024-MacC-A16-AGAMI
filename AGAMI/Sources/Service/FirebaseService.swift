@@ -152,4 +152,58 @@ final class FirebaseService {
             try await deleteFilesRecursively(in: prefix)
         }
     }
+    
+    func saveUserNickname(userID: String, nickname: String) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            firestore
+                .collection("UserInformation")
+                .document(userID)
+                .setData(["UserNickname": nickname]) { error in
+                if let error = error {
+                    dump("Failed to save UserNickname: \(error.localizedDescription)")
+                    continuation.resume(throwing: error)
+                } else {
+                    dump("UserNickname successfully saved to Firestore!")
+                    continuation.resume(returning: ())
+                }
+            }
+        }
+    }
+
+    func uploadUserImageToFirebase(userID: String, image: UIImage) async throws {
+        guard let imageData = image.jpegData(compressionQuality: 0.7) else {
+            throw NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])
+        }
+
+        let storageRef = firestorage.reference()
+            .child("\(userID)/UserImage/image.jpg")
+
+        _ = try await storageRef.putDataAsync(imageData, metadata: nil)
+        
+        let downloadURL = try await storageRef.downloadURL()
+        let downloadURLString = downloadURL.absoluteString
+
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            firestore
+                .collection("UserInformation")
+                .document(userID)
+                .setData(["UserImageURL": downloadURLString], merge: true) { error in
+                if let error = error {
+                    continuation.resume(throwing: error)
+                } else {
+                    dump("UserImageURL successfully saved to Firestore!")
+                    continuation.resume(returning: ())
+                }
+            }
+        }
+    }
+    
+    func deleteUserImageInFirebase(userID: String) async throws {
+        let imageIDFolder = firestorage
+                                .reference()
+                                .child("\(userID)/UserImage")
+        
+        try await deleteFilesRecursively(in: imageIDFolder)
+        dump("Image files in storage successfully deleted")
+    }
 }

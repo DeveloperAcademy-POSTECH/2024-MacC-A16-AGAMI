@@ -11,7 +11,9 @@ import SwiftUI
 enum PlakeRoute: Hashable {
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
-    
+    case addPlakingView(viewModel: AddPlakingViewModel)
+    case addPlakingShazamView(viewModel: AddPlakingViewModel)
+
     case newPlakeView
     case searchShazamingView
     case searchWritingView(viewModel: SearchWritingViewModel)
@@ -22,7 +24,7 @@ enum PlakeRoute: Hashable {
     
     case accountView
     case deleteAccountView
-    
+
     var id: String {
         switch self {
         case .listView: return "listView"
@@ -38,9 +40,11 @@ enum PlakeRoute: Hashable {
             
         case .accountView: return "accountView"
         case .deleteAccountView: return "deleteAccountView"
+        case .addPlakingView: return "addPlakingView"
+        case .addPlakingShazamView: return "addPlakingShazamView"
         }
     }
-    
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -86,6 +90,10 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             EmptyView()
         case .deleteAccountView:
             EmptyView()
+        case let .addPlakingView(viewModel):
+            AddPlakingView(viewModel: viewModel)
+        case let .addPlakingShazamView(viewModel):
+            AddPlakingShazamView(viewModel: viewModel)
         }
     }
     

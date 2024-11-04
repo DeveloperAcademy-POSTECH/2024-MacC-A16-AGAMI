@@ -33,4 +33,18 @@ struct FirestoreSongModel: SongModel, Codable, Identifiable {
         self.artist = songModel.artist
         self.albumCoverURL = songModel.albumCoverURL
     }
+
+    init?(dictionary: [String: Any]) {
+        guard let songID = dictionary["songID"] as? String,
+              let title = dictionary["title"] as? String,
+              let artist = dictionary["artist"] as? String,
+              let albumCoverURL = dictionary["albumCoverURL"] as? String else {
+            return nil
+        }
+        
+        self.songID = songID
+        self.title = title
+        self.artist = artist
+        self.albumCoverURL = albumCoverURL
+    }
 }

@@ -30,9 +30,6 @@ struct PlakeListView: View {
                 EmptyView()
             }
         }
-        .onAppear {
-            viewModel.fetchPlaylists()
-        }
         .toolbarBackground(.visible, for: .tabBar)
         .onTapGesture {
             hideKeyboard()
@@ -40,6 +37,12 @@ struct PlakeListView: View {
         .onOpenURL { url in
             viewModel.handleURL(url)
         }
+//        .onChange(of: viewModel.showArchiveListUpLoadingCell) {
+//            dump("showArchiveListUpLoadingCell: \(viewModel.showArchiveListUpLoadingCell)")
+//            if viewModel.showArchiveListUpLoadingCell {
+//                viewModel.observePlaylistCnanges()
+//            }
+//        }
     }
 }
 
@@ -99,7 +102,9 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 Group {
-                    if viewModel.playlists.isEmpty {
+                    if viewModel.showArchiveListUpLoadingCell {
+                        ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
+                    } else if viewModel.playlists.isEmpty {
                         MakeNewPlakeCell(size: size)
                     }
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in
@@ -174,8 +179,8 @@ private struct PlakeListCell: View {
 
                     Spacer()
 
-                    HStack(spacing: 0) {
 
+                    HStack(alignment: .center, spacing: 0) {
                         Spacer()
                         Text(viewModel.formatDateToString(playlist.generationTime))
                             .font(.pretendard(weight: .regular400, size: 14))
@@ -195,11 +200,70 @@ private struct PlakeListCell: View {
         }
     }
 }
+    private struct ArchiveListUpLoadingCell: View {
+        let viewModel: PlakeListViewModel
+        let size: CGSize
+        var verticalSize: CGFloat { size.width * 176 / 377 }
+
+        var body: some View {
+            Button {
+    //            coord.push(view: .playlistView(viewModel: .init(playlist: playlist)))
+            } label: {
+                ZStack {
+                    Image(.archiveCellPlaceholder)
+                        .resizable()
+                        .frame(width: size.width, height: verticalSize)
+                        .shadow(radius: 10, x: 2, y: 4)
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        Group {
+                            Text(ListCellPlaceholderModel.shared.name ?? "")
+                                .font(.pretendard(weight: .bold700, size: 24))
+                                .kerning(-0.5)
+                                .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
+                            
+                            Text(ListCellPlaceholderModel.shared.streetAddress ?? "")
+                                .font(.pretendard(weight: .medium500, size: 16))
+                                .kerning(-0.5)
+                                .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
+                        }
+                        .foregroundStyle(Color(.pWhite))
+                        .shadow(radius: 10)
+
+                        Spacer()
+
+                        HStack(alignment: .center, spacing: 0) {
+                            CircleAnimationView()
+                                .padding(EdgeInsets( top: 0, leading: 18, bottom: 10, trailing: 0))
+                            
+                            Text("업로드 중")
+                                .font(.pretendard(weight: .medium500, size: 16))
+                                .foregroundStyle(Color(.pPrimary))
+                                .padding(EdgeInsets(top: 0, leading: 14, bottom: 10, trailing: 0))
+                            
+                            Spacer()
+                            
+                            Text(viewModel.formatDateToString(ListCellPlaceholderModel.shared.generationTime ?? Date()))
+                                .font(.pretendard(weight: .regular400, size: 14))
+                                .foregroundStyle(Color(.pWhite))
+                                .kerning(-0.5)
+                                .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+                                .background(Color(.pGray1))
+                                .clipShape(RoundedRectangle(cornerRadius: 20))
+                                .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 12))
+                        }
+                    }
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
+    }
 
 private struct MakeNewPlakeCell: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let size: CGSize
     private var verticalSize: CGFloat { size.width * 176 / 377 }
+    
     var body: some View {
         Button {
             coordinator.push(route: .newPlakeView)

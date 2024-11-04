@@ -12,12 +12,10 @@ struct HomeView: View {
     @State private var viewModel: HomeViewModel = .init()
     @State private var plakeCoordinator: PlakeCoordinator = .init()
     
-    @State private var selectedTab: Tab = .plake
-    
     var body: some View {
         ZStack(alignment: .bottom) {
             VStack {
-                if selectedTab == .plake {
+                if viewModel.selectedTab == .plake {
                     NavigationStack(path: $plakeCoordinator.path) {
                         plakeCoordinator.build(route: .listView)
                             .navigationDestination(for: PlakeRoute.self) { view in
@@ -68,7 +66,7 @@ struct HomeView: View {
                                     .foregroundStyle(Color(.pGray1))
                                     .onTapGesture {
                                         withAnimation {
-                                            selectedTab = .plake
+                                            viewModel.selectedTab = .plake
                                         }
                                     }
                                 Spacer()
@@ -79,18 +77,18 @@ struct HomeView: View {
                                     .foregroundStyle(Color(.pGray1))
                                     .onTapGesture {
                                         withAnimation {
-                                            selectedTab = .map
+                                            viewModel.selectedTab = .map
                                         }
                                     }
                             }
                             .padding(EdgeInsets(top: 0, leading: 29.25, bottom: 0, trailing: 32.25))
-                            .overlay(alignment: selectedTab == .plake ? .leading : .trailing) {
+                            .overlay(alignment: viewModel.selectedTab == .plake ? .leading : .trailing) {
                                 Capsule()
                                     .foregroundStyle(Color(.pWhite))
                                     .frame(width: 88, height: 35)
                                     .shadow(color: Color(.pBlack).opacity(0.12), radius: 8, x: 0, y: 3)
                                     .overlay {
-                                        Text(selectedTab == .plake ? "Plake" : "Map")
+                                        Text(viewModel.selectedTab.title)
                                             .font(.pretendard(weight: .semiBold600, size: 13))
                                             .kerning(-0.08)
                                             .foregroundStyle(Color(.pPrimary))
@@ -118,9 +116,4 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
-}
-
-enum Tab {
-    case plake
-    case map
 }

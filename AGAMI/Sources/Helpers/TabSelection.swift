@@ -8,5 +8,11 @@
 enum TabSelection: Hashable {
     case plake
     case map
-    case account
+    
+    var title: String {
+        switch self {
+        case .plake: return "Plake"
+        case .map: return "Map"
+        }
+    }
 }

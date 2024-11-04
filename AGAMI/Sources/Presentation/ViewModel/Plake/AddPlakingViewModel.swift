@@ -75,8 +75,9 @@ extension AddPlakingViewModel: ShazamServiceDelegate {
         stopRecognition()
         currentItem = mediaItem
         shazamStatus = .found
-
-        if let item = currentItem {
+        guard let item = currentItem else { return }
+        let isDuplicate = diggingList.contains { $0.songID == item.appleMusicID }
+        if !isDuplicate {
             diggingList.append(ModelAdapter.fromSHtoFirestoreSong(item))
         }
     }

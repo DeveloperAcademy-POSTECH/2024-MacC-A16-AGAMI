@@ -5,9 +5,8 @@
 //  Created by yegang on 11/3/24.
 //
 
-import Foundation
-import SwiftUICore
-import _PhotosUI_SwiftUI
+import SwiftUI
+import PhotosUI
 
 @Observable
 final class AccountViewModel {

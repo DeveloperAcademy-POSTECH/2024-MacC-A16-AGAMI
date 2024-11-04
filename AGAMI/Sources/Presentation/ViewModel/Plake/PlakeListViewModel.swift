@@ -121,6 +121,7 @@ final class PlakeListViewModel {
 
     func exportPlaylistToAppleMusic(playlist: PlaylistModel) async -> URL? {
         exportingState = .isAppleMusicExporting
+        defer { exportingState = .none }
         do {
             musicService.clearSongs()
             for song in playlist.songs {
@@ -131,7 +132,6 @@ final class PlakeListViewModel {
         } catch {
             dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
         }
-        exportingState = .none
         guard let urlString = musicService.getCurrentPlaylistUrl() else {
             return nil
         }
@@ -159,7 +159,6 @@ final class PlakeListViewModel {
             self?.exportingState = .none
             completion(.success(playlistURL))
         }
-        exportingState = .none
     }
 
     func formatDateToString(_ date: Date) -> String {

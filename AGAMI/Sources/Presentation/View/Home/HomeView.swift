@@ -13,10 +13,12 @@ struct HomeView: View {
     @State private var plakeCoordinator: PlakeCoordinator = .init()
     @State private var mapCoordinator: MapCoordinator = .init()
     
+    @State private var selectedTab: Tab = .plake
+    
     var body: some View {
-        if #available(iOS 18.0, *) {
-            TabView(selection: $viewModel.selectedTab) {
-                Tab("Plake", systemImage: "rectangle.stack.fill", value: .plake) {
+        ZStack(alignment: .bottom) {
+            VStack {
+                if selectedTab == .plake {
                     NavigationStack(path: $plakeCoordinator.path) {
                         plakeCoordinator.build(route: .listView)
                             .navigationDestination(for: PlakeRoute.self) { view in
@@ -30,9 +32,7 @@ struct HomeView: View {
                             }
                     }
                     .environment(plakeCoordinator)
-                }
-                
-                Tab("Map", systemImage: "bubble.middle.bottom.fill", value: .map) {
+                } else {
                     NavigationStack(path: $mapCoordinator.path) {
                         mapCoordinator.build(route: .mapView)
                             .navigationDestination(for: MapRoute.self) { view in
@@ -48,67 +48,74 @@ struct HomeView: View {
                     .environment(mapCoordinator)
                 }
                 
-                Tab("Account", systemImage: "person.fill", value: .account) {
-                    EmptyView()
+                HStack(spacing: 0) {
+                    Spacer()
+                    
+                    Image(systemName: "person.circle.fill")
+                        .font(.system(size: 39, weight: .regular))
+                        .foregroundStyle(Color(.pGray3))
+                    
+                    Capsule()
+                        .foregroundStyle(Color(.pGray2))
+                        .frame(width: 179, height: 39)
+                        .overlay {
+                            HStack(spacing: 0) {
+                                Text("Plake")
+                                    .font(.pretendard(weight: .semiBold600, size: 13))
+                                    .kerning(-0.08)
+                                    .foregroundStyle(Color(.pGray1))
+                                    .onTapGesture {
+                                        withAnimation {
+                                            selectedTab = .plake
+                                        }
+                                    }
+                                Spacer()
+                                
+                                Text("Map")
+                                    .font(.pretendard(weight: .semiBold600, size: 13))
+                                    .kerning(-0.08)
+                                    .foregroundStyle(Color(.pGray1))
+                                    .onTapGesture {
+                                        withAnimation {
+                                            selectedTab = .map
+                                        }
+                                    }
+                            }
+                            .padding(EdgeInsets(top: 0, leading: 29.25, bottom: 0, trailing: 32.25))
+                            .overlay(alignment: selectedTab == .plake ? .leading : .trailing) {
+                                Capsule()
+                                    .foregroundStyle(Color(.pWhite))
+                                    .frame(width: 88, height: 35)
+                                    .shadow(color: Color(.pBlack).opacity(0.12), radius: 8, x: 0, y: 3)
+                                    .overlay {
+                                        Text(selectedTab == .plake ? "Plake" : "Map")
+                                            .font(.pretendard(weight: .semiBold600, size: 13))
+                                            .kerning(-0.08)
+                                            .foregroundStyle(Color(.pPrimary))
+                                    }
+                                    .padding(.horizontal, 2)
+                            }
+                        }
+                        .padding(.horizontal, 29)
+                    
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 39, weight: .regular))
+                        .foregroundStyle(Color(.pPrimary))
+                    
+                    Spacer()
                 }
-            }
-        } else {
-            TabView {
-                NavigationStack(path: $plakeCoordinator.path) {
-                    plakeCoordinator.build(route: .listView)
-                        .navigationDestination(for: PlakeRoute.self) { view in
-                            plakeCoordinator.build(route: view)
-                        }
-                        .sheet(item: $plakeCoordinator.sheet) { sheet in
-                            plakeCoordinator.buildSheet(sheet: sheet)
-                        }
-                        .fullScreenCover(item: $plakeCoordinator.fullScreenCover) { cover in
-                            plakeCoordinator.buildFullScreenCover(cover: cover)
-                        }
-                }
-                .environment(plakeCoordinator)
-                .tabItem {
-                    VStack {
-                        Text("Plakive")
-                        Image(systemName: "rectangle.stack.fill")
-                    }
-                }
-                .tag(TabSelection.plake)
-                
-                NavigationStack(path: $mapCoordinator.path) {
-                    mapCoordinator.build(route: .mapView)
-                        .navigationDestination(for: MapRoute.self) { view in
-                            mapCoordinator.build(route: view)
-                        }
-                        .sheet(item: $mapCoordinator.sheet) { sheet in
-                            mapCoordinator.buildSheet(sheet: sheet)
-                        }
-                        .fullScreenCover(item: $mapCoordinator.fullScreenCover) { cover in
-                            mapCoordinator.buildFullScreenCover(cover: cover)
-                        }
-                }
-                .environment(mapCoordinator)
-                .tabItem {
-                    VStack {
-                        Text("Map")
-                        Image(systemName: "bubble.middle.bottom.fill")
-                    }
-                }
-                .tag(TabSelection.map)
-                
-                EmptyView()
-                    .tabItem {
-                        VStack {
-                            Text("Account")
-                            Image(systemName: "person.fill")
-                        }
-                    }
-                    .tag(TabSelection.account)
+                .padding(.bottom, 50)
             }
         }
+        .ignoresSafeArea(edges: .bottom)
     }
 }
 
 #Preview {
     HomeView()
+}
+
+enum Tab {
+    case plake
+    case map
 }

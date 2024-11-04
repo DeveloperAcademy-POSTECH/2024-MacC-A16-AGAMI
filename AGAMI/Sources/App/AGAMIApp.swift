@@ -28,8 +28,8 @@ struct AGAMIApp: App {
                         .fullScreenCover(item: $plakeCoordinator.fullScreenCover) { cover in
                             plakeCoordinator.buildFullScreenCover(cover: cover)
                         }
-                        .environment(listCellPlaceholder)
                 }
+                .environment(listCellPlaceholder)
                 .environment(plakeCoordinator)
             } else {
                 SignInView()

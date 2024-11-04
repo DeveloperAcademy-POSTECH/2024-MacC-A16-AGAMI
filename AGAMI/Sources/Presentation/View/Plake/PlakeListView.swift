@@ -37,12 +37,6 @@ struct PlakeListView: View {
         .onOpenURL { url in
             viewModel.handleURL(url)
         }
-//        .onChange(of: viewModel.showArchiveListUpLoadingCell) {
-//            dump("showArchiveListUpLoadingCell: \(viewModel.showArchiveListUpLoadingCell)")
-//            if viewModel.showArchiveListUpLoadingCell {
-//                viewModel.observePlaylistCnanges()
-//            }
-//        }
     }
 }
 

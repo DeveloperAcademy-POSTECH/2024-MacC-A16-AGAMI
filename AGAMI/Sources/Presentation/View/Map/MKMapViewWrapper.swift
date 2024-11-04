@@ -90,14 +90,14 @@ struct MKMapViewWrapper: UIViewRepresentable {
 
                 Task { @MainActor in
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: playlists)
-                    self.parent.coordinator.push(route: .map(.placeListView(viewModel: collectionPlaceViewModel)))
+                    self.parent.coordinator.push(route: .placeListView(viewModel: collectionPlaceViewModel))
                 }
             } else if let playlistAnnotation = view.annotation as? PlaylistAnnotation {
                 let playlist = playlistAnnotation.playlist
 
                 Task { @MainActor in
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: [playlist])
-                    self.parent.coordinator.push(route: .map(.placeListView(viewModel: collectionPlaceViewModel)))
+                    self.parent.coordinator.push(route: .placeListView(viewModel: collectionPlaceViewModel))
                 }
             }
         }

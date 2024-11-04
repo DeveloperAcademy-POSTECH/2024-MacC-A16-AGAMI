@@ -12,12 +12,10 @@ struct MapView: View {
     @State private var viewModel: MapViewModel = MapViewModel()
 
     var body: some View {
-        NavigationStack {
-            MKMapViewWrapper(viewModel: viewModel)
-                .ignoresSafeArea()
-                .onAppear {
-                    viewModel.fecthPlaylists()
-                }
-        }
+        MKMapViewWrapper(viewModel: viewModel)
+            .ignoresSafeArea()
+            .onAppear {
+                viewModel.fecthPlaylists()
+            }
     }
 }

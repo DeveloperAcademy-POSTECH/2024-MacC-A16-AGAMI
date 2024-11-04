@@ -81,6 +81,31 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
         self.firestoreSongs = try container.decodeIfPresent([FirestoreSongModel].self, forKey: .firestoreSongs) ?? []
     }
 
+    init?(dictionary: [String: Any]) {
+        guard
+            let playlistID = dictionary["playlistID"] as? String,
+            let playlistName = dictionary["playlistName"] as? String,
+            let playlistDescription = dictionary["playlistDescription"] as? String,
+            let photoURL = dictionary["photoURL"] as? String,
+            let latitude = dictionary["latitude"] as? Double,
+            let longitude = dictionary["longitude"] as? Double,
+            let streetAddress = dictionary["streetAddress"] as? String,
+            let generationTime = dictionary["generationTime"] as? Timestamp,
+            let firestoreSongsData = dictionary["firestoreSongs"] as? [[String: Any]]
+        else { return nil }
+
+        self.playlistID = playlistID
+        self.playlistName = playlistName
+        self.playlistDescription = playlistDescription
+        self.photoURL = photoURL
+        self.latitude = latitude
+        self.longitude = longitude
+        self.streetAddress = streetAddress
+        self.generationTime = generationTime.dateValue()
+        self.firestoreSongs = firestoreSongsData.compactMap { FirestoreSongModel(dictionary: $0)
+        }
+    }
+    
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(playlistID, forKey: .playlistID)

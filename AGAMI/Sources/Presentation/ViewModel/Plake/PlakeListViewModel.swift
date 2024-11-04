@@ -7,12 +7,14 @@
 
 import Foundation
 import AuthenticationServices
+import FirebaseFirestore
 
 @Observable
 final class PlakeListViewModel {
     private let firebaseService = FirebaseService()
     private let authService = FirebaseAuthService()
     private let musicService = MusicService()
+    private let listenerService = FirebaseListenerService()
 
     var playlists: [PlaylistModel] = []
     private var unfilteredPlaylists: [PlaylistModel] = []
@@ -25,6 +27,16 @@ final class PlakeListViewModel {
 
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
+    
+    var showArchiveListUpLoadingCell: Bool {
+        return ListCellPlaceholderModel.shared.name != nil
+            && ListCellPlaceholderModel.shared.streetAddress != nil
+            && ListCellPlaceholderModel.shared.generationTime != nil
+    }
+    
+    init() {
+        fetchPlaylists()
+    }
 
     func fetchPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
@@ -161,5 +173,56 @@ final class PlakeListViewModel {
            url.absoluteString.contains(decodedRedirectURL) {
             exportingState = .none
         }
+    }
+
+    func observePlaylistCnanges() {
+        guard let userID = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        
+        dump("observing playlist changes")
+        
+        listenerService.startListeningPlaylist(userID: userID) { [weak self] changes in
+            changes.forEach { diff in
+                switch diff.type {
+                case .added:
+                    dump("added")
+                    self?.stopObservingPlaylistChanges()
+                    self?.resetListCellPlaceholderModel()
+                    if let playlist = self?.createPlaylist(from: diff.document) {
+                        self?.playlists.insert(playlist, at: 0)
+                    }
+                case .modified:
+                    dump("modified")
+                    if let updatedPlaylist = self?.createPlaylist(from: diff.document),
+                       let index = self?.playlists.firstIndex(where: { $0.playlistID == updatedPlaylist.id }) {
+                        self?.playlists[index] = updatedPlaylist
+                    }
+                case .removed:
+                    dump("removed")
+                    let removedID = diff.document.documentID
+                    if let index = self?.playlists.firstIndex(where: { $0.playlistID == removedID }) {
+                        self?.playlists.remove(at: index)
+                    }
+                }
+            }
+            self?.stopObservingPlaylistChanges()
+        }
+    }
+    
+    func stopObservingPlaylistChanges() {
+        listenerService.stopListeningPlaylist()
+    }
+    
+    private func createPlaylist(from document: DocumentSnapshot) -> FirestorePlaylistModel? {
+        guard let data = document.data() else { return nil }
+        return FirestorePlaylistModel(dictionary: data)
+    }
+    
+    func resetListCellPlaceholderModel() {
+        ListCellPlaceholderModel.shared.name = nil
+        ListCellPlaceholderModel.shared.streetAddress = nil
+        ListCellPlaceholderModel.shared.generationTime = nil
     }
 }

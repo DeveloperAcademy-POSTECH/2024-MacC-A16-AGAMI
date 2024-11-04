@@ -88,9 +88,10 @@ struct SearchWritingView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     Task {
+                        coordinator.popToRoot()
+                        viewModel.setListCellPlaceholderModel()
                         if await viewModel.savedPlaylist() {
                             viewModel.clearDiggingList()
-                            coordinator.popToRoot()
                         } else {
                             print("Failed to save playlist. Please try again.")
                         }

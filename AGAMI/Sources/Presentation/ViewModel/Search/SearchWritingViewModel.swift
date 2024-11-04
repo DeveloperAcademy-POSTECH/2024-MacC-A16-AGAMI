@@ -148,10 +148,4 @@ final class SearchWritingViewModel {
             photoUIImage = UIImage(data: data)?.cropSquare()
         }
     }
-    
-    func setListCellPlaceholderModel() {
-        ListCellPlaceholderModel.shared.name = userTitle == "" ? placeHolderAddress : userTitle
-        ListCellPlaceholderModel.shared.streetAddress = currentStreetAddress
-        ListCellPlaceholderModel.shared.generationTime = Date()
-    }
 }

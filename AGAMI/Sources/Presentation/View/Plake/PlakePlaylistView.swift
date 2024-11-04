@@ -294,6 +294,7 @@ private struct PlaylistDescription: View {
                 .lineSpacing(3)
                 .foregroundStyle(Color(.pBlack))
                 .multilineTextAlignment(.leading)
+                .padding(.bottom, 133)
         }
     }
 }

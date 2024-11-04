@@ -319,7 +319,7 @@ private struct ContextMenuItems: View {
             Label("Spotify에서 열기", systemImage: "square.and.arrow.up")
         }
         Button(role: .destructive) {
-            viewModel.deletePlaylist(playlistID: playlist.playlistID)
+            viewModel.deletePlaylist(playlistID: playlist.playlistID, photoURL: playlist.photoURL)
         } label: {
             Label("삭제", systemImage: "trash")
         }

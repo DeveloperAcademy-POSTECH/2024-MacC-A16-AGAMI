@@ -6,7 +6,7 @@ struct AGAMIApp: App {
     @AppStorage("isSignedIn") private var isSignedIn: Bool = false
     @State private var plakeCoordinator: PlakeCoordinator = .init()
     @State private var listCellPlaceholder: ListCellPlaceholderModel = ListCellPlaceholderModel()
-    
+
     init() {
         FirebaseApp.configure()
     }

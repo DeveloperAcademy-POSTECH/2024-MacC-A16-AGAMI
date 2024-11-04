@@ -22,4 +22,10 @@ final class ListCellPlaceholderModel {
         self.streetAddress = nil
         self.generationTime = nil
     }
+    
+    func setListCellPlaceholderModel(userTitle: String, streetAddress: String, generationTime: Date) {
+        self.name = userTitle
+        self.streetAddress = streetAddress
+        self.generationTime = generationTime
+    }
 }

@@ -14,7 +14,7 @@ struct MapView: View {
     var body: some View {
         NavigationStack {
             MKMapViewWrapper(viewModel: viewModel)
-                .ignoresSafeArea(edges: .top)
+                .ignoresSafeArea()
                 .onAppear {
                     viewModel.fecthPlaylists()
                 }

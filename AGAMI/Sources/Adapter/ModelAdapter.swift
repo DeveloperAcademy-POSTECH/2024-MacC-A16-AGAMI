@@ -39,4 +39,16 @@ struct ModelAdapter {
             albumCoverURL: artworkURL
         )
     }
+
+    static func fromSHtoFirestoreSong(_ item: SHMediaItem) -> FirestoreSongModel {
+        var artworkURL: String = ""
+        if let url = item.artworkURL {
+            artworkURL = url.absoluteString
+        }
+
+        return FirestoreSongModel(songID: item.appleMusicID ?? "",
+                                  title: item.title ?? "",
+                                  artist: item.artist ?? "",
+                                  albumCoverURL: artworkURL)
+    }
 }

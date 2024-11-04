@@ -120,7 +120,7 @@ private struct SearchPlakeTitleTextField: View {
             
             TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
                 .font(.pretendard(weight: .medium500, size: 20))
-                .foregroundStyle(.black)
+                .foregroundStyle(Color(.pBlack))
                 .focused($isFocused)
                 .padding(16)
                 .background(Color(.pWhite))

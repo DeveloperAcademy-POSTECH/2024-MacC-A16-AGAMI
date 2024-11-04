@@ -148,12 +148,12 @@ final class PlakePlaylistViewModel: Hashable {
 
     func applyChangesToFirestore() async {
         presentationState.isUpdating = true
+        defer { presentationState.isUpdating = false }
         guard let userID = FirebaseAuthService.currentUID else {
             return
         }
         let firestoreModel = ModelAdapter.toFirestorePlaylist(from: playlist)
         try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
-        presentationState.isUpdating = false
     }
 
     func handleURL(_ url: URL) {
@@ -230,6 +230,21 @@ final class PlakePlaylistViewModel: Hashable {
             }
         } catch {
             dump("downloadPhotoAndSaveToAlbum Error: \(error.localizedDescription)")
+        }
+    }
+
+    func refreshPlaylist() {
+        Task {
+            guard let userID = FirebaseAuthService.currentUID,
+                  let newPlaylist = await firebaseService.fetchPlaylist(
+                      userID: userID,
+                      playlistID: playlist.playlistID
+                  ) else { return }
+
+            await MainActor.run { [weak self] in
+                guard let self = self else { return }
+                self.playlist = newPlaylist
+            }
         }
     }
 }

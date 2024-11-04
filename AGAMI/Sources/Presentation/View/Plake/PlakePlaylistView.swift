@@ -34,10 +34,9 @@ struct PlakePlaylistView: View {
                 ProgressView()
             }
         }
+        .onTapGesture { hideKeyboard() }
+        .refreshable { viewModel.refreshPlaylist() }
         .background(Color(.pLightGray))
-        .onTapGesture {
-            hideKeyboard()
-        }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 TopBarTrailingItems(viewModel: viewModel)
@@ -303,21 +302,22 @@ private struct ExportButton: View {
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
-        Button {
-            viewModel.presentationState.isExportDialogPresented = true
-        } label: {
-            HStack(spacing: 6) {
-                Spacer()
-                Image(.exportPlakeIcon)
-                Text("플레이크 내보내기")
-                    .font(.pretendard(weight: .medium500, size: 20))
-                    .foregroundStyle(Color(.pPrimary))
-                    .padding(.vertical, 14)
-                Spacer()
-            }
-            .background(Color(.pGray2))
-            .clipShape(RoundedRectangle(cornerRadius: 13))
+        HStack(spacing: 6) {
+            Spacer()
+            Image(.exportPlakeIcon)
+            Text("플레이크 내보내기")
+                .font(.pretendard(weight: .medium500, size: 20))
+                .foregroundStyle(Color(.pPrimary))
+                .padding(.vertical, 14)
+            Spacer()
         }
+        .background(Color(.pGray2))
+        .clipShape(RoundedRectangle(cornerRadius: 13))
+        .highPriorityGesture(
+            TapGesture().onEnded {
+                viewModel.presentationState.isExportDialogPresented = true
+            }
+        )
     }
 }
 
@@ -326,21 +326,24 @@ private struct AddSongsButton: View {
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
-        Button {
-            // TODO: - 플레이킹 더하기 연결
-        } label: {
-            HStack(spacing: 6) {
-                Spacer()
-                Image(.addPlakingIcon)
-                Text("플레이킹 더하기")
-                    .font(.pretendard(weight: .medium500, size: 20))
-                    .foregroundStyle(Color(.pPrimary))
-                    .padding(.vertical, 14)
-                Spacer()
-            }
-            .background(Color(.pGray2))
-            .clipShape(RoundedRectangle(cornerRadius: 13))
+        HStack(spacing: 6) {
+            Spacer()
+            Image(.addPlakingIcon)
+            Text("플레이킹 더하기")
+                .font(.pretendard(weight: .medium500, size: 20))
+                .foregroundStyle(Color(.pPrimary))
+                .padding(.vertical, 14)
+            Spacer()
         }
+        .background(Color(.pGray2))
+        .clipShape(RoundedRectangle(cornerRadius: 13))
+        .highPriorityGesture(
+            TapGesture().onEnded {
+                coordinator.push(route: .addPlakingView(
+                    viewModel: AddPlakingViewModel(playlist: viewModel.playlist)
+                ))
+            }
+        )
     }
 }
 
@@ -448,11 +451,14 @@ private struct TopBarTrailingItems: View {
 }
 
 private struct MenuContents: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
         Button {
-
+            coordinator.push(route: .addPlakingView(
+                viewModel: AddPlakingViewModel(playlist: viewModel.playlist)
+            ))
         } label: {
             Label("플레이킹 더하기", image: .menuBlackPlakeLogo)
         }

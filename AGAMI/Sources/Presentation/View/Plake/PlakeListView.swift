@@ -14,7 +14,7 @@ struct PlakeListView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                ListHeader(viewModel: viewModel)
+                ListHeader()
                 SearchBar(viewModel: viewModel)
                 GeometryReader { proxy in
                     ListView(viewModel: viewModel, size: proxy.size)
@@ -44,24 +44,10 @@ struct PlakeListView: View {
 }
 
 private struct ListHeader: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakeListViewModel
-
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
             Image(.plakeTabLogo)
             Spacer()
-            Button {
-                coordinator.push(route: .newPlakeView)
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "plus.circle.fill")
-                        .renderingMode(.template)
-                        .font(.system(size: 18))
-                    Text("새로운 플레이크")
-                        .font(.pretendard(weight: .medium500, size: 18))
-                }
-            }
         }
         .padding(EdgeInsets(top: 24, leading: 16, bottom: 12, trailing: 16))
     }

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CollectionPlaceView: View {
     @State var viewModel: CollectionPlaceViewModel
-    @Environment(MapCoordinator.self) private var coordinator
+    @Environment(PlakeCoordinator.self) private var coordinator
 
     init(viewModel: CollectionPlaceViewModel) {
         _viewModel = State(wrappedValue: viewModel)

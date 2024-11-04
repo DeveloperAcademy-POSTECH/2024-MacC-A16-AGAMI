@@ -10,39 +10,64 @@ import PhotosUI
 
 struct AccountView: View {
     @State var viewModel: AccountViewModel = .init()
+    @Environment(PlakeCoordinator.self) private var coordinator
     
     var body: some View {
         ZStack {
             Color(.pLightGray)
-                .ignoresSafeArea(.all)
+                .ignoresSafeArea()
             
-            VStack(spacing: 36) {
-                // HeaderView()
-                ProfileView(viewModel: viewModel)
-                InformationView(viewModel: viewModel)
-                Spacer()
-                LogoutButton(viewModel: viewModel)
+            ScrollView {
+                VStack(spacing: 36) {
+                    ProfileView(viewModel: viewModel)
+                        .padding(.top, 28)
+                    InformationView(viewModel: viewModel)
+                    Spacer()
+                    Spacer()
+                    Spacer()
+                    LogoutButton(viewModel: viewModel)
+                }
+                
+                if viewModel.isScucessDeleteAccount {
+                    SignOutView()
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                viewModel.isScucessDeleteAccount = false
+                                UserDefaults.standard.removeObject(forKey: "isSignedIn")
+                            }
+                        }
+                }
             }
             .padding(.horizontal, 8)
-            
-            if viewModel.isScucessDeleteAccount {
-                SignOutView()
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                            viewModel.isScucessDeleteAccount = false
-                            UserDefaults.standard.removeObject(forKey: "isSignedIn")
-                        }
-                    }
-            }
         }
         .navigationTitle("계정")
+        .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    coordinator.pop()
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.pretendard(weight: .semiBold600, size: 17))
+                }
+            }
+        }
         .onTapGesture {
             hideKeyboard()
         }
         .confirmationDialog("", isPresented: $viewModel.isPresented) {
             ProfileImageDialogActions(viewModel: viewModel)
         }
+        .photosPicker(isPresented: $viewModel.showPhotoPicker,
+                      selection: $viewModel.selectedItem,
+                      matching: .images)
+        .onChange(of: viewModel.selectedItem) { _, newValue in
+            Task {
+                await viewModel.convertImage(item: newValue)
+            }
+        }
+        
         .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
             SignOutAlertActions(viewModel: viewModel)
         } message: {
@@ -55,19 +80,6 @@ struct AccountView: View {
         }
     }
 }
-
-//private struct HeaderView: View {
-//    var body: some View {
-//        HStack {
-//            Text("계정")
-//                .font(.pretendard(weight: .bold700, size: 32))
-//                .foregroundStyle(Color(.pBlack))
-//
-//            Spacer()
-//        }
-//        .padding(EdgeInsets(top: 27, leading: 8, bottom: 0, trailing: 0))
-//    }
-//}
 
 private struct ProfileView: View {
     @Bindable var viewModel: AccountViewModel
@@ -100,24 +112,33 @@ private struct ProfileView: View {
                             viewModel.isPresented = true
                         }
                     } label: {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .frame(width: 94, height: 94)
-                            .foregroundStyle(Color(.pGray2))
-                            .overlay(alignment: .bottomTrailing) {
-                                if viewModel.isEditMode {
-                                    Circle()
-                                        .frame(width: 33, height: 33, alignment: .center)
-                                        .foregroundStyle(Color(.pLightGray))
-                                        .overlay {
-                                            Image(systemName: "camera.circle.fill")
-                                                .resizable()
-                                                .frame(width: 27, height: 27, alignment: .center)
-                                                .foregroundStyle(Color(.pPrimary))
-                                        }
-                                        .offset(x: 3, y: 3)
-                                }
+                        Group {
+                            if let postImage = viewModel.postImage {
+                                postImage
+                                    .resizable()
+                                    .scaledToFill()
+                                    .clipShape(Circle())
+                            } else {
+                                Image(systemName: "person.crop.circle.fill")
+                                    .resizable()
                             }
+                        }
+                        .frame(width: 94, height: 94)
+                        .foregroundStyle(Color(.pGray2))
+                        .overlay(alignment: .bottomTrailing) {
+                            if viewModel.isEditMode {
+                                Circle()
+                                    .frame(width: 33, height: 33, alignment: .center)
+                                    .foregroundStyle(Color(.pLightGray))
+                                    .overlay {
+                                        Image(systemName: "camera.circle.fill")
+                                            .resizable()
+                                            .frame(width: 27, height: 27, alignment: .center)
+                                            .foregroundStyle(Color(.pPrimary))
+                                    }
+                                    .offset(x: 3, y: 3)
+                            }
+                        }
                     }
                     
                     TextField(viewModel.userName, text: $viewModel.userName)
@@ -144,7 +165,7 @@ private struct ProfileView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 30)
+            .padding(EdgeInsets(top: 26, leading: 0, bottom: 20, trailing: 0))
             .background(
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(.pWhite))
@@ -226,13 +247,12 @@ private struct LogoutButton: View {
                 .font(.pretendard(weight: .medium500, size: 20))
                 .foregroundStyle(Color(.pWhite))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
+                .padding(.vertical, 14)
                 .background(
-                    RoundedRectangle(cornerRadius: 10)
+                    RoundedRectangle(cornerRadius: 13)
                         .foregroundStyle(Color(.pPrimary))
                 )
         }
-        .padding(.bottom, 27)
     }
 }
 
@@ -241,7 +261,7 @@ private struct ProfileImageDialogActions: View {
     
     var body: some View {
         Button {
-            
+            viewModel.showPhotoPicker.toggle()
         } label: {
             Text("앨범에서 가져오기")
                 .font(.pretendard(weight: .regular400, size: 18))
@@ -249,7 +269,7 @@ private struct ProfileImageDialogActions: View {
         }
         
         Button {
-            
+            viewModel.postImage = nil
         } label: {
             Text("기본 이미지로 변경")
                 .font(.pretendard(weight: .regular400, size: 18))

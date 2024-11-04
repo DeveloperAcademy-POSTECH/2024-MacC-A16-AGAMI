@@ -28,12 +28,6 @@ final class PlakeListViewModel {
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
     
-    var showArchiveListUpLoadingCell: Bool {
-        return ListCellPlaceholderModel.shared.name != nil
-            && ListCellPlaceholderModel.shared.streetAddress != nil
-            && ListCellPlaceholderModel.shared.generationTime != nil
-    }
-    
     init() {
         fetchPlaylists()
     }
@@ -189,7 +183,6 @@ final class PlakeListViewModel {
                 case .added:
                     dump("added")
                     self?.stopObservingPlaylistChanges()
-                    self?.resetListCellPlaceholderModel()
                     if let playlist = self?.createPlaylist(from: diff.document) {
                         self?.playlists.insert(playlist, at: 0)
                     }
@@ -218,11 +211,5 @@ final class PlakeListViewModel {
     private func createPlaylist(from document: DocumentSnapshot) -> FirestorePlaylistModel? {
         guard let data = document.data() else { return nil }
         return FirestorePlaylistModel(dictionary: data)
-    }
-    
-    func resetListCellPlaceholderModel() {
-        ListCellPlaceholderModel.shared.name = nil
-        ListCellPlaceholderModel.shared.streetAddress = nil
-        ListCellPlaceholderModel.shared.generationTime = nil
     }
 }

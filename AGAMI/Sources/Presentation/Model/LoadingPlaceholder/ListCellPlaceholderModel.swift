@@ -7,10 +7,19 @@
 
 import Foundation
 
+@Observable
 final class ListCellPlaceholderModel {
-    private init() {}
-    static let shared = ListCellPlaceholderModel()
     var name: String?
     var streetAddress: String?
     var generationTime: Date?
+
+    var showArchiveListUpLoadingCell: Bool {
+        return name != nil && streetAddress != nil && generationTime != nil
+    }
+
+    func resetListCellPlaceholderModel() {
+        self.name = nil
+        self.streetAddress = nil
+        self.generationTime = nil
+    }
 }

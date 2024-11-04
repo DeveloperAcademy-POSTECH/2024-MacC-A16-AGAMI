@@ -185,7 +185,7 @@ private struct ImageAndTitleWithHeaderView: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Image(.editPhotoPlaceholder)
+                        Image(.coverImageThumbnail)
                             .resizable()
                     }
                     .aspectRatio(1, contentMode: .fit)

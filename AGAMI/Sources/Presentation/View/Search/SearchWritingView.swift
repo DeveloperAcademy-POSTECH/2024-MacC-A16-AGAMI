@@ -55,7 +55,7 @@ struct SearchWritingView: View {
         }
         .confirmationDialog("", isPresented: $viewModel.showSheet) {
             Button("카메라") {
-                coordinator.push(route: .cameraView(viewModel: viewModel))
+                coordinator.push(route: .cameraView(viewModelContainer: .searchWriting(viewModel: viewModel)))
             }
             Button("앨범에서 가져오기") {
                 viewModel.showPhotoPicker.toggle()

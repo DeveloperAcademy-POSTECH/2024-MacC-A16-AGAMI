@@ -134,7 +134,7 @@ private struct PlakeListCell: View {
 
     var body: some View {
         Button {
-            coord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
+            coord.push(route: .list(.playlistView(viewModel: .init(playlist: playlist))))
         } label: {
             ZStack {
                 KFImage(URL(string: playlist.photoURL))
@@ -202,7 +202,7 @@ private struct MakeNewPlakeCell: View {
     private var verticalSize: CGFloat { size.width * 176 / 377 }
     var body: some View {
         Button {
-            coordinator.push(route: .newPlakeView)
+            coordinator.push(route: .creation(.newPlakeView))
         } label: {
             ZStack {
                 Image(.makeNewPlakeCell)

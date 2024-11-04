@@ -359,8 +359,8 @@ private struct AddPhotoButton: View {
             .foregroundStyle(Color(.pPrimary))
             .highPriorityGesture(
                 TapGesture().onEnded {
-                    coordinator.push(route: .cameraView(
-                        viewModelContainer: .plakePlaylist(viewModel: viewModel)
+                    coordinator.push(route: .creation(.cameraView(
+                        viewModelContainer: .plakePlaylist(viewModel: viewModel))
                     ))
                 }
             )

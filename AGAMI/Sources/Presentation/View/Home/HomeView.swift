@@ -17,7 +17,7 @@ struct HomeView: View {
             VStack {
                 if viewModel.selectedTab == .plake {
                     NavigationStack(path: $plakeCoordinator.path) {
-                        plakeCoordinator.build(route: .listView)
+                        plakeCoordinator.buildListRoute(route: .listView)
                             .navigationDestination(for: PlakeRoute.self) { view in
                                 plakeCoordinator.build(route: view)
                             }
@@ -31,7 +31,7 @@ struct HomeView: View {
                     .environment(plakeCoordinator)
                 } else {
                     NavigationStack(path: $plakeCoordinator.path) {
-                        plakeCoordinator.build(route: .mapView)
+                        plakeCoordinator.buildMapRoute(route: .mapView)
                             .navigationDestination(for: PlakeRoute.self) { view in
                                 plakeCoordinator.build(route: view)
                             }
@@ -54,7 +54,7 @@ struct HomeView: View {
                         .font(.system(size: 39, weight: .regular))
                         .foregroundStyle(Color(.pGray3))
                         .onTapGesture {
-                            plakeCoordinator.push(route: .accountView)
+                            plakeCoordinator.push(route: .account(.accountView))
                         }
                     
                     Capsule()
@@ -100,7 +100,7 @@ struct HomeView: View {
                         .font(.system(size: 39, weight: .regular))
                         .foregroundStyle(Color(.pPrimary))
                         .onTapGesture {
-                            plakeCoordinator.push(route: .newPlakeView)
+                            plakeCoordinator.push(route: .creation(.newPlakeView))
                         }
                     
                     Spacer()

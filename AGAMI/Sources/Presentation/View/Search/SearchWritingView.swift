@@ -11,12 +11,10 @@ import PhotosUI
 
 struct SearchWritingView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
-    @State var viewModel: SearchWritingViewModel = SearchWritingViewModel()
-    let searchStartViewModel: SearchStartViewModel
+    @State var viewModel: SearchWritingViewModel
     
-    init(searchStartViewModel: SearchStartViewModel) {
-        self.searchStartViewModel = searchStartViewModel
-        self._viewModel = State(initialValue: searchStartViewModel.createSearchWritingViewModel())
+    init(viewModel: SearchWritingViewModel) {
+        self._viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {

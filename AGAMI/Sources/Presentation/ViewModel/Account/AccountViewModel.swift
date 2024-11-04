@@ -20,6 +20,7 @@ final class AccountViewModel {
     
     var userName: String = "가자미"
     
+    var showPhotoPicker: Bool = false
     var selectedItem: PhotosPickerItem?
     var postImage: Image?
     

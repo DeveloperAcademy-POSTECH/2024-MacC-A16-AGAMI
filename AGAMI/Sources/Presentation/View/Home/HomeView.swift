@@ -52,7 +52,8 @@ struct HomeView: View {
                     
                     Image(systemName: "person.circle.fill")
                         .font(.system(size: 39, weight: .regular))
-                        .foregroundStyle(Color(.pGray3))
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(Color(.pWhite), Color(.pGray3))
                         .onTapGesture {
                             plakeCoordinator.push(route: .account(.accountView))
                         }
@@ -98,7 +99,8 @@ struct HomeView: View {
                     
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 39, weight: .regular))
-                        .foregroundStyle(Color(.pPrimary))
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(Color(.pWhite), Color(.pPrimary))
                         .onTapGesture {
                             plakeCoordinator.push(route: .creation(.newPlakeView))
                         }

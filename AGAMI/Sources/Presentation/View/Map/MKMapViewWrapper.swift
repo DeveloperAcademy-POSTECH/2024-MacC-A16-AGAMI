@@ -11,7 +11,7 @@ import Kingfisher
 
 // MARK: - MKMapView 래퍼
 struct MKMapViewWrapper: UIViewRepresentable {
-    @Environment(MapCoordinator.self) var coordinator
+    @Environment(PlakeCoordinator.self) var coordinator
     var viewModel: MapViewModel
 
     func makeUIView(context: Context) -> MKMapView {

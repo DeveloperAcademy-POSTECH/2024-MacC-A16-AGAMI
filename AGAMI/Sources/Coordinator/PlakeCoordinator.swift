@@ -11,27 +11,39 @@ import SwiftUI
 enum PlakeRoute: Hashable {
     var id: String {
         switch self {
-        case .listView:
-            return "listView"
-        case .playlistView:
-            return "playlistView"
-        case .newPlakeView:
-            return "newPlakeView"
-        case .searchShazamingView:
-            return "searchShazamingView"
-        case .searchWritingView:
-            return "searchWritingView"
-        case .cameraView:
-            return "cameraView"
+        case .listView: return "listView"
+        case .playlistView: return "playlistView"
+            
+        case .newPlakeView: return "newPlakeView"
+        case .searchShazamingView: return "searchShazamingView"
+        case .searchWritingView: return "searchWritingView"
+        case .cameraView: return "cameraView"
+            
+        case .mapView: return "mapView"
+        case .placeListView: return "placeListView"
+            
+        case .accountView: return "accountView"
+        case .deleteAccountView: return "deleteAccountView"
         }
     }
+    
+    // 플레이크 리스트
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
     
+    // 플레이크 생성
     case newPlakeView
     case searchShazamingView
     case searchWritingView(viewModel: SearchWritingViewModel)
     case cameraView(viewModelContainer: CoordinatorViewModelContainer)
+    
+    // 맵
+    case mapView
+    case placeListView(viewModel: CollectionPlaceViewModel)
+    
+    // 계정
+    case accountView
+    case deleteAccountView
 
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
@@ -62,6 +74,7 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             PlakeListView()
         case let .playlistView(viewModel):
             PlakePlaylistView(viewModel: viewModel)
+            
         case .newPlakeView:
             SearchStartView()
         case .searchShazamingView:
@@ -70,6 +83,17 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             SearchWritingView(viewModel: viewModel)
         case let .cameraView(viewModelContainer):
             CameraView(viewModelContainer: viewModelContainer)
+            
+        case .mapView:
+            MapView()
+        case let .placeListView(viewModel):
+            CollectionPlaceView(viewModel: viewModel)
+            
+            //TODO: 계정뷰 연결
+        case .accountView:
+            EmptyView()
+        case .deleteAccountView:
+            EmptyView()
         }
     }
 

@@ -11,7 +11,6 @@ import FirebaseAuth
 struct HomeView: View {
     @State private var viewModel: HomeViewModel = .init()
     @State private var plakeCoordinator: PlakeCoordinator = .init()
-    @State private var mapCoordinator: MapCoordinator = .init()
     
     @State private var selectedTab: Tab = .plake
     
@@ -33,19 +32,19 @@ struct HomeView: View {
                     }
                     .environment(plakeCoordinator)
                 } else {
-                    NavigationStack(path: $mapCoordinator.path) {
-                        mapCoordinator.build(route: .mapView)
-                            .navigationDestination(for: MapRoute.self) { view in
-                                mapCoordinator.build(route: view)
+                    NavigationStack(path: $plakeCoordinator.path) {
+                        plakeCoordinator.build(route: .mapView)
+                            .navigationDestination(for: PlakeRoute.self) { view in
+                                plakeCoordinator.build(route: view)
                             }
-                            .sheet(item: $mapCoordinator.sheet) { sheet in
-                                mapCoordinator.buildSheet(sheet: sheet)
+                            .sheet(item: $plakeCoordinator.sheet) { sheet in
+                                plakeCoordinator.buildSheet(sheet: sheet)
                             }
-                            .fullScreenCover(item: $mapCoordinator.fullScreenCover) { cover in
-                                mapCoordinator.buildFullScreenCover(cover: cover)
+                            .fullScreenCover(item: $plakeCoordinator.fullScreenCover) { cover in
+                                plakeCoordinator.buildFullScreenCover(cover: cover)
                             }
                     }
-                    .environment(mapCoordinator)
+                    .environment(plakeCoordinator)
                 }
                 
                 HStack(spacing: 0) {
@@ -54,6 +53,9 @@ struct HomeView: View {
                     Image(systemName: "person.circle.fill")
                         .font(.system(size: 39, weight: .regular))
                         .foregroundStyle(Color(.pGray3))
+                        .onTapGesture {
+                            plakeCoordinator.push(route: .accountView)
+                        }
                     
                     Capsule()
                         .foregroundStyle(Color(.pGray2))
@@ -101,6 +103,9 @@ struct HomeView: View {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 39, weight: .regular))
                         .foregroundStyle(Color(.pPrimary))
+                        .onTapGesture {
+                            plakeCoordinator.push(route: .newPlakeView)
+                        }
                     
                     Spacer()
                 }

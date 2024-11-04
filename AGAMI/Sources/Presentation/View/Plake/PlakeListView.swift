@@ -92,6 +92,7 @@ private struct SearchBar: View {
 }
 
 private struct ListView: View {
+    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     @Bindable var viewModel: PlakeListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat {
@@ -102,7 +103,7 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 Group {
-                    if viewModel.showArchiveListUpLoadingCell {
+                    if listCellPlaceholder.showArchiveListUpLoadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
                     } else if viewModel.playlists.isEmpty {
                         MakeNewPlakeCell(size: size)
@@ -179,7 +180,6 @@ private struct PlakeListCell: View {
 
                     Spacer()
 
-
                     HStack(alignment: .center, spacing: 0) {
                         Spacer()
                         Text(viewModel.formatDateToString(playlist.generationTime))
@@ -201,6 +201,7 @@ private struct PlakeListCell: View {
     }
 }
     private struct ArchiveListUpLoadingCell: View {
+        @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
         let viewModel: PlakeListViewModel
         let size: CGSize
         var verticalSize: CGFloat { size.width * 176 / 377 }
@@ -217,12 +218,12 @@ private struct PlakeListCell: View {
 
                     VStack(alignment: .leading, spacing: 0) {
                         Group {
-                            Text(ListCellPlaceholderModel.shared.name ?? "")
+                            Text(listCellPlaceholder.name ?? "")
                                 .font(.pretendard(weight: .bold700, size: 24))
                                 .kerning(-0.5)
                                 .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
                             
-                            Text(ListCellPlaceholderModel.shared.streetAddress ?? "")
+                            Text(listCellPlaceholder.streetAddress ?? "")
                                 .font(.pretendard(weight: .medium500, size: 16))
                                 .kerning(-0.5)
                                 .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
@@ -243,7 +244,7 @@ private struct PlakeListCell: View {
                             
                             Spacer()
                             
-                            Text(viewModel.formatDateToString(ListCellPlaceholderModel.shared.generationTime ?? Date()))
+                            Text(viewModel.formatDateToString(listCellPlaceholder.generationTime ?? Date()))
                                 .font(.pretendard(weight: .regular400, size: 14))
                                 .foregroundStyle(Color(.pWhite))
                                 .kerning(-0.5)

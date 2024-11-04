@@ -11,6 +11,7 @@ import PhotosUI
 
 struct SearchWritingView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     @State var viewModel: SearchWritingViewModel
     
     init(viewModel: SearchWritingViewModel) {
@@ -89,7 +90,12 @@ struct SearchWritingView: View {
                 Button {
                     Task {
                         coordinator.popToRoot()
-                        viewModel.setListCellPlaceholderModel()
+                        listCellPlaceholder
+                            .setListCellPlaceholderModel(
+                                userTitle: viewModel.userTitle,
+                                streetAddress: viewModel.currentStreetAddress ?? "",
+                                generationTime: Date()
+                            )
                         if await viewModel.savedPlaylist() {
                             viewModel.clearDiggingList()
                         } else {

@@ -105,11 +105,21 @@ final class PlakePlaylistViewModel: Hashable {
         }
     }
 
+    func deletePhoto(userID: String) async {
+        if !playlist.photoURL.isEmpty {
+            let pastURL = playlist.photoURL
+            try? await firebaseService.deleteImageInFirebase(userID: userID, photoURL: pastURL)
+            deletePhotoURL()
+        }
+    }
+
     func deletePlaylist() async {
         guard let userID = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
             return
         }
+
+        await deletePhoto(userID: userID)
+
         try? await firebaseService.deletePlaylist(userID: userID, playlistID: playlist.playlistID)
     }
 
@@ -133,7 +143,7 @@ final class PlakePlaylistViewModel: Hashable {
     }
 
     func deletePhotoURL() {
-        playlist.photoURL = ""
+        playlist.photoURL.removeAll()
     }
 
     func applyChangesToFirestore() async {
@@ -161,13 +171,16 @@ final class PlakePlaylistViewModel: Hashable {
     func handleAndUploadPhotoFromAlbum() async {
         presentationState.isLoading = true
         defer { presentationState.isLoading = false }
-        // TODO: photourl 존재 시 갈아끼우기
+
         do {
             guard let item = selectedItem,
                   let data = try await item.loadTransferable(type: Data.self),
                   let rawImage = UIImage(data: data),
                   let image = rawImage.cropSquare(),
                   let userID = FirebaseAuthService.currentUID else { return }
+
+            await deletePhoto(userID: userID)
+
             let url = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             await MainActor.run { playlist.photoURL = url }
         } catch {

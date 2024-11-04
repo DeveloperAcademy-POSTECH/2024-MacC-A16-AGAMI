@@ -101,12 +101,19 @@ final class PlakeListViewModel {
         }
     }
 
-    func deletePlaylist(playlistID: String) {
+    func deletePhoto(userID: String, photoURL: String) async {
+        if !photoURL.isEmpty {
+            try? await firebaseService.deleteImageInFirebase(userID: userID, photoURL: photoURL)
+        }
+    }
+
+    func deletePlaylist(playlistID: String, photoURL: String) {
         guard let userID = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
             return
         }
         Task {
+            await deletePhoto(userID: userID, photoURL: photoURL)
             try? await firebaseService.deletePlaylist(userID: userID, playlistID: playlistID)
             fetchPlaylists()
         }

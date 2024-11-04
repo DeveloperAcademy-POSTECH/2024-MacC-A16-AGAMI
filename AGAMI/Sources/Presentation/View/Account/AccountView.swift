@@ -209,7 +209,6 @@ private struct LogoutButton: View {
                         .foregroundStyle(Color(.pPrimary))
                 )
         }
-        .border(.red)
         .padding(.bottom, 27)
     }
 }

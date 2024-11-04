@@ -11,6 +11,7 @@ import FirebaseAuth
 struct HomeView: View {
     @State private var viewModel: HomeViewModel = .init()
     @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     
     var body: some View {
         ZStack(alignment: .bottom) {

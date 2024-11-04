@@ -26,7 +26,7 @@ struct CollectionPlaceListView: View {
                         KFImage(URL(string: playlist.photoURL))
                             .resizable()
                             .placeholder {
-                                Image(.editPhotoPlaceholder)
+                                Image(.coverImageThumbnail)
                                     .resizable()
                             }
                             .aspectRatio(1.0, contentMode: .fit)

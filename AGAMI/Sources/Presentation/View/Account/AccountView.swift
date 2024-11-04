@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct AccountView: View {
     @State var viewModel: AccountViewModel = .init()
@@ -16,16 +17,42 @@ struct AccountView: View {
                 .ignoresSafeArea(.all)
             
             VStack(spacing: 36) {
-                //                    HeaderView()
+                // HeaderView()
                 ProfileView(viewModel: viewModel)
                 InformationView(viewModel: viewModel)
                 Spacer()
                 LogoutButton(viewModel: viewModel)
             }
             .padding(.horizontal, 8)
+            
+            if viewModel.isScucessDeleteAccount {
+                SignOutView()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                            viewModel.isScucessDeleteAccount = false
+                            UserDefaults.standard.removeObject(forKey: "isSignedIn")
+                        }
+                    }
+            }
         }
         .navigationTitle("계정")
         .navigationBarBackButtonHidden()
+        .onTapGesture {
+            hideKeyboard()
+        }
+        .confirmationDialog("", isPresented: $viewModel.isPresented) {
+            ProfileImageDialogActions(viewModel: viewModel)
+        }
+        .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
+            SignOutAlertActions(viewModel: viewModel)
+        } message: {
+            Text("현재 기기에서 로그아웃 합니다.")
+        }
+        .alert("회원 탈퇴", isPresented: $viewModel.isDeletingAccount) {
+            DeleteAccountAlertActions(viewModel: viewModel)
+        } message: {
+            Text("탈퇴한 계정은 복구할 수 없습니다.")
+        }
     }
 }
 
@@ -92,9 +119,6 @@ private struct ProfileView: View {
                                 }
                             }
                     }
-                    .confirmationDialog("", isPresented: $viewModel.isPresented) {
-                        ProfileImageDialogActions(viewModel: viewModel)
-                    }
                     
                     TextField(viewModel.userName, text: $viewModel.userName)
                         .font(.pretendard(weight: .semiBold600, size: 28))
@@ -109,8 +133,8 @@ private struct ProfileView: View {
                             : nil
                         )
                         .onChange(of: viewModel.userName) { _, newValue in
-                            if newValue.count > 10 {
-                                viewModel.userName = String(newValue.prefix(9))
+                            if newValue.count > 8 {
+                                viewModel.userName = String(newValue.prefix(8))
                             }
                             
                         }
@@ -170,7 +194,7 @@ private struct InformationView: View {
                 }
                 
                 Button {
-                    //TODO: - 회원 탈퇴 기능 붙이기
+                    viewModel.isDeletingAccount = true
                 } label: {
                     HStack(spacing: 0) {
                         Text("회원 탈퇴")
@@ -196,7 +220,7 @@ private struct LogoutButton: View {
     
     var body: some View {
         Button {
-            //TODO: - 로그아웃 기능 붙이기
+            viewModel.isShowingSignOutAlert = true
         } label: {
             Text("로그아웃")
                 .font(.pretendard(weight: .medium500, size: 20))
@@ -213,7 +237,7 @@ private struct LogoutButton: View {
 }
 
 private struct ProfileImageDialogActions: View {
-    let viewModel: AccountViewModel
+    @Bindable var viewModel: AccountViewModel
     
     var body: some View {
         Button {
@@ -234,28 +258,33 @@ private struct ProfileImageDialogActions: View {
     }
 }
 
-private struct LogoutAlertActions: View {
+private struct SignOutAlertActions: View {
     let viewModel: AccountViewModel
     
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.isShowingLogoutAlert = false
+            viewModel.isShowingSignOutAlert = false
         }
         
         Button("확인", role: .destructive) {
-            
+            viewModel.signOut()
+            viewModel.isShowingSignOutAlert = false
         }
     }
 }
 
-private struct SignOutAlertActions: View {
+private struct DeleteAccountAlertActions: View {
+    let viewModel: AccountViewModel
+    
     var body: some View {
         Button("취소", role: .cancel) {
-            
+            viewModel.isDeletingAccount = false
         }
         
         Button("탈퇴", role: .destructive) {
-            
+            Task {
+                await viewModel.deleteAccount()
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ struct AccountView: View {
             
             VStack(spacing: 36) {
                 //                    HeaderView()
-                ProfileView(viewModel: $viewModel)
+                ProfileView(viewModel: viewModel)
                 InformationView(viewModel: viewModel)
                 Spacer()
                 LogoutButton(viewModel: viewModel)
@@ -43,8 +43,7 @@ struct AccountView: View {
 //}
 
 private struct ProfileView: View {
-    @Binding var viewModel: AccountViewModel
-    @State var isPresented = false
+    @Bindable var viewModel: AccountViewModel
     
     var body: some View {
         VStack(spacing: 11) {
@@ -71,7 +70,7 @@ private struct ProfileView: View {
                 VStack(alignment: .center, spacing: 10) {
                     Button {
                         if viewModel.isEditMode {
-                            isPresented = true
+                            viewModel.isPresented = true
                         }
                     } label: {
                         Image(systemName: "person.crop.circle.fill")
@@ -93,7 +92,7 @@ private struct ProfileView: View {
                                 }
                             }
                     }
-                    .confirmationDialog("", isPresented: $isPresented) {
+                    .confirmationDialog("", isPresented: $viewModel.isPresented) {
                         ProfileImageDialogActions(viewModel: viewModel)
                     }
                     
@@ -257,7 +256,8 @@ private struct SignOutAlertActions: View {
         
         Button("탈퇴", role: .destructive) {
             
-        }    }
+        }
+    }
 }
 
 #Preview {

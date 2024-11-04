@@ -12,7 +12,9 @@ import _PhotosUI_SwiftUI
 @Observable
 final class AccountViewModel {
     var isEditMode: Bool = false
+    var isPresented: Bool = false
     var isShowingLogoutAlert: Bool = false
+    
     var userName: String = "가자미가자미가자미"
     
     var selectedItem: PhotosPickerItem?

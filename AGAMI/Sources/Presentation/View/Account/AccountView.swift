@@ -52,6 +52,7 @@ struct AccountView: View {
                 } label: {
                     Image(systemName: "chevron.backward")
                         .font(.pretendard(weight: .semiBold600, size: 17))
+                        .foregroundStyle(Color(.pPrimary))
                 }
             }
         }
@@ -162,6 +163,7 @@ private struct ProfileView: View {
                     TextField(viewModel.userName, text: $viewModel.userName)
                         .font(.pretendard(weight: .semiBold600, size: 28))
                         .foregroundStyle(Color(.pBlack))
+                        .tint(Color(.pPrimary))
                         .frame(width: 221)
                         .multilineTextAlignment(.center)
                         .padding(.vertical, 10)

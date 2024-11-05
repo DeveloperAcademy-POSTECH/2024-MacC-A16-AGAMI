@@ -15,7 +15,7 @@ struct AGAMIApp: App {
         WindowGroup {
             if isSignedIn {
                 NavigationStack(path: $plakeCoordinator.path) {
-                    HomeView()
+                    plakeCoordinator.build(route: .homeView)
                         .onOpenURL { url in
                             handleURL(url)
                         }

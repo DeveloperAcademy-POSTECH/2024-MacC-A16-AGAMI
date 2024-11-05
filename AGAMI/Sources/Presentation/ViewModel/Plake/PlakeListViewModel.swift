@@ -14,11 +14,10 @@ final class PlakeListViewModel {
     private let firebaseService = FirebaseService()
     private let authService = FirebaseAuthService()
     private let musicService = MusicService()
-    private let listenerService = FirebaseListenerService()
 
     var playlists: [PlaylistModel] = []
     private var unfilteredPlaylists: [PlaylistModel] = []
-
+    var isUploading: Bool = false
     var searchText: String = "" {
         didSet {
             filterPlaylists()
@@ -28,10 +27,6 @@ final class PlakeListViewModel {
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
     
-    init() {
-        fetchPlaylists()
-    }
-
     func fetchPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
@@ -175,47 +170,79 @@ final class PlakeListViewModel {
         }
     }
 
-    func observePlaylistCnanges() {
-        guard let userID = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
-            return
-        }
-        
-        dump("observing playlist changes")
-        
-        listenerService.startListeningPlaylist(userID: userID) { [weak self] changes in
-            changes.forEach { diff in
-                switch diff.type {
-                case .added:
-                    dump("added")
-                    self?.stopObservingPlaylistChanges()
-                    if let playlist = self?.createPlaylist(from: diff.document) {
-                        self?.playlists.insert(playlist, at: 0)
-                    }
-                case .modified:
-                    dump("modified")
-                    if let updatedPlaylist = self?.createPlaylist(from: diff.document),
-                       let index = self?.playlists.firstIndex(where: { $0.playlistID == updatedPlaylist.id }) {
-                        self?.playlists[index] = updatedPlaylist
-                    }
-                case .removed:
-                    dump("removed")
-                    let removedID = diff.document.documentID
-                    if let index = self?.playlists.firstIndex(where: { $0.playlistID == removedID }) {
-                        self?.playlists.remove(at: index)
-                    }
-                }
-            }
-            self?.stopObservingPlaylistChanges()
-        }
-    }
     
-    func stopObservingPlaylistChanges() {
-        listenerService.stopListeningPlaylist()
-    }
+// MARK: - FirebaseListner 코드
+//    private let listenerService = FirebaseListenerService()
+
+//    private var isInitialFetchCompleted = false
     
-    private func createPlaylist(from document: DocumentSnapshot) -> FirestorePlaylistModel? {
-        guard let data = document.data() else { return nil }
-        return FirestorePlaylistModel(dictionary: data)
-    }
+//    func observePlaylistChanges() {
+//        guard let userID = FirebaseAuthService.currentUID else {
+//            dump("UID를 가져오는 데 실패했습니다.")
+//            return
+//        }
+//
+//        dump("observing playlist changes")
+//
+//        listenerService.startListeningPlaylist(userID: userID) { [weak self] changes in
+//            changes.forEach { diff in
+//                switch diff.type {
+//                case .added:
+////                    if !(self?.isInitialFetchCompleted ?? false) {
+//                        dump("added")
+//                        if let playlist = self?.createPlaylist(from: diff.document) {
+//                            self?.playlists.insert(playlist, at: 0)
+//                        }
+////                    }
+//                case .modified:
+//                    dump("modified")
+//                    if let updatedPlaylist = self?.createPlaylist(from: diff.document),
+//                       let index = self?.playlists.firstIndex(where: { $0.playlistID == updatedPlaylist.id }) {
+//                        self?.playlists[index] = updatedPlaylist
+//                    }
+//                case .removed:
+//                    dump("removed")
+//                    let removedID = diff.document.documentID
+//                    if let index = self?.playlists.firstIndex(where: { $0.playlistID == removedID }) {
+//                        self?.playlists.remove(at: index)
+//                    }
+//                }
+//            }
+////            self?.isInitialFetchCompleted = true
+//            self?.stopObservingPlaylistChanges()
+//            self?.isUploading = false
+//        }
+//    }
+//
+//    func fetchAndSetInitialPlaylists() async throws {
+//        guard !isInitialFetchCompleted else {
+//            dump("Initial fetch already completed, skipping fetch.")
+//            return
+//        }
+//        
+//        guard let userID = FirebaseAuthService.currentUID else {
+//            dump("User ID is not available")
+//            throw NSError(domain: "UserIDError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User ID is not available"])
+//        }
+//        
+//        let initialSnapshots = try await listenerService.fetchInitialPlaylistSnapshot(userID: userID)
+//        
+//        for document in initialSnapshots {
+//            if let playlist = createPlaylist(from: document) {
+//                playlists.append(playlist)
+//            }
+//        }
+//        
+//        dump("Initial fetch completed with \(initialSnapshots.count) playlists")
+//        isInitialFetchCompleted = true
+//    }
+//
+//    func stopObservingPlaylistChanges() {
+//        listenerService.stopListeningPlaylist()
+//    }
+//    
+//    private func createPlaylist(from document: DocumentSnapshot) -> FirestorePlaylistModel? {
+//        guard let data = document.data() else { return nil }
+//        return FirestorePlaylistModel(dictionary: data)
+//    }
 }

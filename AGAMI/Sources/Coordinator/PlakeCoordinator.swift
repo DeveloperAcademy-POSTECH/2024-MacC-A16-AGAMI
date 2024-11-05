@@ -9,6 +9,8 @@ import Foundation
 import SwiftUI
 
 enum PlakeRoute: Hashable {
+    case homeView
+    
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
     case addPlakingView(viewModel: AddPlakingViewModel)
@@ -27,6 +29,7 @@ enum PlakeRoute: Hashable {
 
     var id: String {
         switch self {
+        case .homeView: return "homeView"
         case .listView: return "listView"
         case .playlistView: return "playlistView"
             
@@ -70,6 +73,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
     @ViewBuilder
     func build(route: PlakeRoute) -> some View {
         switch route {
+        case .homeView:
+            HomeView()
         case .listView:
             PlakeListView()
         case let .playlistView(viewModel):

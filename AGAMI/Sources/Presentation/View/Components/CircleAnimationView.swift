@@ -23,7 +23,7 @@ struct CircleAnimationView: View {
     
     private func createAnimatedCircle(delay: Double) -> some View {
         Circle()
-            .fill(Color.accentColor)
+            .fill(Color(.pPrimary))
             .frame(width: 6.14, height: 6.14)
             .offset(y: moveUp ? -5 : 5)
             .animation(

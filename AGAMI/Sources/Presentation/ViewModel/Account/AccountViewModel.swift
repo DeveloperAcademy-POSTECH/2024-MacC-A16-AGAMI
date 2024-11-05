@@ -20,7 +20,7 @@ final class AccountViewModel {
     
     var isShowingSignOutAlert: Bool = false
     var isDeletingAccount: Bool = false
-    g
+
     var userName: String = "Plake"
     var isUserNameSaved: Bool = false
     

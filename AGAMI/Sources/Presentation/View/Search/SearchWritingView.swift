@@ -90,13 +90,13 @@ struct SearchWritingView: View {
                 Button {
                     Task {
                         coordinator.popToRoot()
-                        listCellPlaceholder
-                            .setListCellPlaceholderModel(
+                        listCellPlaceholder.setListCellPlaceholderModel(
                                 userTitle: viewModel.userTitle,
                                 streetAddress: viewModel.currentStreetAddress ?? "",
                                 generationTime: Date()
                             )
                         if await viewModel.savedPlaylist() {
+                            listCellPlaceholder.resetListCellPlaceholderModel()
                             viewModel.clearDiggingList()
                         } else {
                             print("Failed to save playlist. Please try again.")

@@ -45,7 +45,6 @@ final class SearchShazamingViewModel: NSObject {
 
 extension SearchShazamingViewModel: ShazamServiceDelegate {
     func shazamService(_ service: ShazamService, didFind match: SHMatch) {
-        dump(#function)
         guard let mediaItem = match.mediaItems.first else { return }
         stopRecognition()
         currentItem = mediaItem
@@ -61,13 +60,11 @@ extension SearchShazamingViewModel: ShazamServiceDelegate {
     }
     
     func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
-        dump(#function)
         shazamStatus = .failed
         stopRecognition()
     }
     
     func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
-        dump(#function)
         shazamStatus = .failed
         stopRecognition()
     }

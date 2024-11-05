@@ -10,7 +10,8 @@ import Kingfisher
 
 struct PlakeListView: View {
     @State var viewModel: PlakeListViewModel = PlakeListViewModel()
-
+    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -36,6 +37,14 @@ struct PlakeListView: View {
         }
         .onOpenURL { url in
             viewModel.handleURL(url)
+        }
+        .onAppear {
+            viewModel.fetchPlaylists()
+        }
+        .onChange(of: listCellPlaceholder.showArchiveListUpLoadingCell) { oldValue, newValue in
+            if oldValue == true, newValue == false {
+                viewModel.fetchPlaylists()
+            }
         }
     }
 }
@@ -87,12 +96,12 @@ private struct SearchBar: View {
 
 private struct ListView: View {
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-    @Bindable var viewModel: PlakeListViewModel
+    let viewModel: PlakeListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat {
         size.width / 377 * 12
     }
-
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
@@ -194,65 +203,63 @@ private struct PlakeListCell: View {
         }
     }
 }
-    private struct ArchiveListUpLoadingCell: View {
-        @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-        let viewModel: PlakeListViewModel
-        let size: CGSize
-        var verticalSize: CGFloat { size.width * 176 / 377 }
 
-        var body: some View {
-            Button {
-    //            coord.push(view: .playlistView(viewModel: .init(playlist: playlist)))
-            } label: {
-                ZStack {
-                    Image(.archiveCellPlaceholder)
-                        .resizable()
-                        .frame(width: size.width, height: verticalSize)
-                        .shadow(radius: 10, x: 2, y: 4)
-
-                    VStack(alignment: .leading, spacing: 0) {
-                        Group {
-                            Text(listCellPlaceholder.name ?? "")
-                                .font(.pretendard(weight: .bold700, size: 24))
-                                .kerning(-0.5)
-                                .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
-                            
-                            Text(listCellPlaceholder.streetAddress ?? "")
-                                .font(.pretendard(weight: .medium500, size: 16))
-                                .kerning(-0.5)
-                                .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
-                        }
+private struct ArchiveListUpLoadingCell: View {
+    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
+    let viewModel: PlakeListViewModel
+    let size: CGSize
+    var verticalSize: CGFloat { size.width * 176 / 377 }
+    
+    var body: some View {
+        
+        ZStack {
+            Image(.archiveCellPlaceholder)
+                .resizable()
+                .frame(width: size.width, height: verticalSize)
+                .shadow(radius: 10, x: 2, y: 4)
+            
+            VStack(alignment: .leading, spacing: 0) {
+                Group {
+                    Text(listCellPlaceholder.name ?? "")
+                        .font(.pretendard(weight: .bold700, size: 24))
+                        .kerning(-0.5)
+                        .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
+                    
+                    Text(listCellPlaceholder.streetAddress ?? "")
+                        .font(.pretendard(weight: .medium500, size: 16))
+                        .kerning(-0.5)
+                        .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
+                }
+                .foregroundStyle(Color(.pWhite))
+                .shadow(radius: 10)
+                
+                Spacer()
+                
+                HStack(alignment: .center, spacing: 0) {
+                    CircleAnimationView()
+                        .padding(EdgeInsets( top: 0, leading: 18, bottom: 10, trailing: 0))
+                    
+                    Text("업로드 중")
+                        .font(.pretendard(weight: .medium500, size: 16))
+                        .foregroundStyle(Color(.pPrimary))
+                        .padding(EdgeInsets(top: 0, leading: 14, bottom: 10, trailing: 0))
+                    
+                    Spacer()
+                    
+                    Text(viewModel.formatDateToString(listCellPlaceholder.generationTime ?? Date()))
+                        .font(.pretendard(weight: .regular400, size: 14))
                         .foregroundStyle(Color(.pWhite))
-                        .shadow(radius: 10)
-
-                        Spacer()
-
-                        HStack(alignment: .center, spacing: 0) {
-                            CircleAnimationView()
-                                .padding(EdgeInsets( top: 0, leading: 18, bottom: 10, trailing: 0))
-                            
-                            Text("업로드 중")
-                                .font(.pretendard(weight: .medium500, size: 16))
-                                .foregroundStyle(Color(.pPrimary))
-                                .padding(EdgeInsets(top: 0, leading: 14, bottom: 10, trailing: 0))
-                            
-                            Spacer()
-                            
-                            Text(viewModel.formatDateToString(listCellPlaceholder.generationTime ?? Date()))
-                                .font(.pretendard(weight: .regular400, size: 14))
-                                .foregroundStyle(Color(.pWhite))
-                                .kerning(-0.5)
-                                .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-                                .background(Color(.pGray1))
-                                .clipShape(RoundedRectangle(cornerRadius: 20))
-                                .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 12))
-                        }
-                    }
+                        .kerning(-0.5)
+                        .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+                        .background(Color(.pGray1))
+                        .clipShape(RoundedRectangle(cornerRadius: 20))
+                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 12))
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
+}
 
 private struct MakeNewPlakeCell: View {
     @Environment(PlakeCoordinator.self) private var coordinator

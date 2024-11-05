@@ -15,12 +15,10 @@ struct HomeView: View {
     
     var body: some View {
         ZStack(alignment: .bottom) {
-            VStack {
-                if viewModel.selectedTab == .plake {
-                    coordinator.build(route: .listView)
-                } else {
-                    coordinator.build(route: .mapView)
-                }
+            if viewModel.selectedTab == .plake {
+                coordinator.build(route: .listView)
+            } else {
+                coordinator.build(route: .mapView)
             }
             
             HStack(spacing: 0) {

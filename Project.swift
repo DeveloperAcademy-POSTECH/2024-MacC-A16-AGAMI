@@ -61,7 +61,9 @@ let project = Project(
                             "CLIENT_ID": .string("$(CLIENT_ID)"),
                             "CLIENT_SECRET": .string("$(CLIENT_SECRET)"),
                             "REDIRECT_URL": .string("$(REDIRECT_URL)"),
-                            "CFBundleDisplayName": "Plake"
+                            "CFBundleDisplayName": "Plake",
+                            "CFBundleShortVersionString": "1.0.0",
+                            "CFBundleVersion": "1"
                         ]
                     ),
             sources: ["AGAMI/Sources/**"],

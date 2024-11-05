@@ -98,9 +98,7 @@ private struct ProfileView: View {
                 Button {
                     if viewModel.isEditMode {
                         Task {
-                            if let userName = viewModel.userName {
-                                await viewModel.saveUserName(nickname: userName)
-                            }
+                            await viewModel.saveUserName(nickname: viewModel.userName)
                             
                             if let image = viewModel.postImage {
                                 await viewModel.saveUserProfileImage(image: image)

@@ -21,7 +21,7 @@ final class AccountViewModel {
     var isShowingSignOutAlert: Bool = false
     var isDeletingAccount: Bool = false
     
-    var userName: String?
+    var userName: String = ""
     var isUserNameSaved: Bool = false
     
     var showPhotoPicker: Bool = false

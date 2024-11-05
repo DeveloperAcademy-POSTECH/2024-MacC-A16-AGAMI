@@ -40,6 +40,7 @@ struct PlakePlaylistView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 TopBarTrailingItems(viewModel: viewModel)
+                    .foregroundStyle(Color(.pPrimary))
             }
         }
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)
@@ -225,6 +226,7 @@ private struct ImageAndTitleWithHeaderView: View {
                 TextField("", text: $viewModel.playlist.playlistName)
                     .font(.pretendard(weight: .medium500, size: 20))
                     .foregroundStyle(Color(.pGray1))
+                    .tint(Color(.pPrimary))
                     .padding(EdgeInsets(top: 13, leading: 16, bottom: 13, trailing: 16))
                     .background(Color(.pWhite))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -278,6 +280,7 @@ private struct PlaylistDescription: View {
         if viewModel.presentationState.isEditing {
             TextField("플레이크에 대한 설명 추가하기", text: $viewModel.playlist.playlistDescription, axis: .vertical)
                 .font(.pretendard(weight: .regular400, size: 16))
+                .tint(Color(.pPrimary))
                 .foregroundStyle(Color(.pBlack))
                 .kerning(-0.3)
                 .lineSpacing(3)
@@ -432,18 +435,24 @@ private struct TopBarTrailingItems: View {
                     } else {
                         Text("저장")
                             .font(.pretendard(weight: .semiBold600, size: 17))
+                            .foregroundStyle(Color(.pPrimary))
                     }
                 }
                 .disabled(viewModel.presentationState.isUpdating)
             } else {
-                Button("편집") {
+                Button {
                     viewModel.presentationState.isEditing = true
+                } label: {
+                    Text("편집")
+                        .font(.pretendard(weight: .regular400, size: 17))
+                        .foregroundStyle(Color(.pPrimary))
                 }
                 Menu {
                     MenuContents(viewModel: viewModel)
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .font(.system(size: 17, weight: .regular))
+                        .foregroundStyle(Color(.pPrimary))
                 }
             }
         }

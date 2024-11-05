@@ -162,6 +162,7 @@ private struct AddPlakingButton: View {
         } label: {
             Text("완료")
                 .font(.pretendard(weight: .medium500, size: 17))
+                .foregroundStyle(Color(.pPrimary))
         }
     }
 }
@@ -175,7 +176,7 @@ private struct ShazamButton: View {
             Button {
                 coordinator.push(route: .addPlakingShazamView(viewModel: viewModel))
             } label: {
-                PlakeCTAButton(type: .addSong)
+                PlakeCTAButton(type: .plaking)
                     .padding(.bottom, 26)
             }
         }

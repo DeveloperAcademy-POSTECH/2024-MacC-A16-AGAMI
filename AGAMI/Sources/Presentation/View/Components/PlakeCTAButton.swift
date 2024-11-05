@@ -33,13 +33,12 @@ struct PlakeCTAButton: View {
 
 enum PlakeCTAButtonType {
     case plaking
-    case addSong
     case cancel
     case logout
     
     var backgroundColor: Color {
         switch self {
-        case .plaking, .addSong, .logout: return Color(.pPrimary)
+        case .plaking, .logout: return Color(.pPrimary)
         case .cancel: return Color(.pWhite)
         }
     }
@@ -47,8 +46,7 @@ enum PlakeCTAButtonType {
     var buttonTitle: String {
         switch self {
         case .plaking: return "플레이킹"
-        case .addSong: return "노래 추가하기"
-        case .cancel: return "취소하기"
+        case .cancel: return "그만두기"
         case .logout: return "로그아웃"
         }
     }
@@ -56,14 +54,13 @@ enum PlakeCTAButtonType {
     var buttonImage: Image? {
         switch self {
         case .plaking: return Image(.plakingButtonLogo)
-        case .addSong: return Image(systemName: "plus")
         case .cancel, .logout: return nil
         }
     }
     
     var buttonTItleColor: Color {
         switch self {
-        case .plaking, .addSong, .logout: return Color(.pWhite)
+        case .plaking, .logout: return Color(.pWhite)
         case .cancel: return Color(.pPrimary)
         }
     }

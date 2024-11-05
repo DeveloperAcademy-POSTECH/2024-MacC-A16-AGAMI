@@ -69,10 +69,11 @@ private struct SearchBar: View {
                 .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
                 .focused($isFocused)
                 .background(Color(.pGray2))
+                .tint(Color(.pPrimary))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(
                     RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.accentColor, lineWidth: isFocused ? 1 : 0)
+                        .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
                 )
                 .padding(.horizontal, 8)
                 .padding(.vertical, 8)

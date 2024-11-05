@@ -477,11 +477,11 @@ private struct MenuContents: View {
             Label("플레이킹 더하기", image: .menuBlackPlakeLogo)
         }
 
-        Button {
-
-        } label: {
-            Label("공유하기", systemImage: "square.and.arrow.up")
-        }
+//        Button {
+//
+//        } label: {
+//            Label("공유하기", systemImage: "square.and.arrow.up")
+//        }
 
         Button {
             Task {

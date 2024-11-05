@@ -169,7 +169,7 @@ final class FirebaseService {
             }
         }
     }
-
+    
     func uploadUserImageToFirebase(userID: String, image: UIImage) async throws {
         guard let imageData = image.jpegData(compressionQuality: 0.7) else {
             throw NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])
@@ -205,5 +205,26 @@ final class FirebaseService {
         
         try await deleteFilesRecursively(in: imageIDFolder)
         dump("Image files in storage successfully deleted")
+    }
+    
+    func fetchUserInformation(userID: String) async throws -> [String: Any] {
+        let documentSnapshot = try await firestore
+                                            .collection("UserInformation")
+                                            .document(userID)
+                                            .getDocument()
+        
+        guard let data = documentSnapshot.data() else {
+            throw NSError(domain: "FirestoreError", code: -1, userInfo: [NSLocalizedDescriptionKey: "사용자 데이터를 찾을 수 없습니다."])
+        }
+        
+        var result: [String: Any] = [:]
+        if let userNickname = data["UserNickname"] {
+            result["UserNickname"] = userNickname
+        }
+        if let userImageURL = data["UserImageURL"] {
+            result["UserImageURL"] = userImageURL
+        }
+        
+        return result
     }
 }

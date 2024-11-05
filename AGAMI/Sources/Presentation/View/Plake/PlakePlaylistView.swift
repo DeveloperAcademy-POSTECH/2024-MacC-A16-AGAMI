@@ -14,7 +14,8 @@ import PhotosUI
 struct PlakePlaylistView: View {
     @State var viewModel: PlakePlaylistViewModel
     @Environment(\.openURL) private var openURL
-
+    @Environment(PlakeCoordinator.self) private var coordinator
+    
     init(viewModel: PlakePlaylistViewModel) {
         _viewModel = State(wrappedValue: viewModel)
     }
@@ -38,14 +39,22 @@ struct PlakePlaylistView: View {
         .refreshable { viewModel.refreshPlaylist() }
         .background(Color(.pLightGray))
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    coordinator.pop()
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color(.pPrimary))
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 TopBarTrailingItems(viewModel: viewModel)
                     .foregroundStyle(Color(.pPrimary))
             }
         }
-        .toolbarVisibilityForVersion(.hidden, for: .tabBar)
-        .toolbarRole(.editor)
         .navigationTitle(viewModel.presentationState.isEditing ? "편집하기" : "")
+        .navigationBarBackButtonHidden()
         .confirmationDialog("", isPresented: $viewModel.presentationState.isExportDialogPresented) {
             ExportConfirmationDialogActions(viewModel: viewModel)
         }
@@ -81,10 +90,6 @@ private struct ListView: View {
             Group {
                 if viewModel.presentationState.isEditing {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("편집하기")
-                            .font(.pretendard(weight: .bold700, size: 32))
-                            .foregroundStyle(Color(.pBlack))
-                            .listRowInsets(EdgeInsets())
                         Text("플레이크를 편집해보세요.")
                             .font(.pretendard(weight: .regular400, size: 16))
                             .foregroundStyle(Color(.pGray1))

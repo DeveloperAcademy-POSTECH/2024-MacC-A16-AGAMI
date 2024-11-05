@@ -80,12 +80,23 @@ struct SearchWritingView: View {
             hideKeyboard()
         }
         .listStyle(PlainListStyle())
+        .tint(Color(.pPrimary))
         .scrollDisabled(viewModel.isSaving)
         .allowsHitTesting(!viewModel.isSaving)
         .navigationTitle("커버 사진")
         .navigationBarTitleDisplayMode(.large)
+        .navigationBarBackButtonHidden()
         .scrollIndicators(.hidden)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    coordinator.pop()
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color(.pPrimary))
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     Task {
@@ -110,8 +121,6 @@ struct SearchWritingView: View {
                 .disabled(viewModel.isSaving)
             }
         }
-        .toolbarRole(.editor)
-        .toolbarVisibilityForVersion(.hidden, for: .tabBar)
     }
 }
 

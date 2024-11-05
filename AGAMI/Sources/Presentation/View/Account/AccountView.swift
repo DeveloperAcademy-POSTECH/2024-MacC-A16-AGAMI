@@ -7,6 +7,7 @@
 
 import SwiftUI
 import PhotosUI
+import Kingfisher
 
 struct AccountView: View {
     @State var viewModel: AccountViewModel = .init()
@@ -17,16 +18,17 @@ struct AccountView: View {
             Color(.pLightGray)
                 .ignoresSafeArea()
             
-            ScrollView {
-                VStack(spacing: 36) {
+            VStack(spacing: 0) {
+                ScrollView {
                     ProfileView(viewModel: viewModel)
                         .padding(.top, 28)
                     InformationView(viewModel: viewModel)
-                    Spacer()
-                    Spacer()
-                    Spacer()
-                    LogoutButton(viewModel: viewModel)
+                        .padding(.top, 33)
                 }
+                Spacer()
+                
+                LogoutButton(viewModel: viewModel)
+                    .padding(.bottom, 20)
                 
                 if viewModel.isScucessDeleteAccount {
                     SignOutView()
@@ -94,6 +96,18 @@ private struct ProfileView: View {
                 Spacer()
                 
                 Button {
+                    if viewModel.isEditMode {
+                        Task {
+                            if let userName = viewModel.userName {
+                                await viewModel.saveUserName(nickname: userName)
+                            }
+                            
+                            if let image = viewModel.postImage {
+                                await viewModel.saveUserProfileImage(image: image)
+                            }
+                        }
+                    }
+                    
                     viewModel.isEditMode.toggle()
                 } label: {
                     Text(viewModel.isEditMode ? "완료" : "편집")
@@ -114,13 +128,20 @@ private struct ProfileView: View {
                     } label: {
                         Group {
                             if let postImage = viewModel.postImage {
-                                postImage
+                                Image(uiImage: postImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .clipShape(Circle())
+                            } else if let imageURL = viewModel.imageURL {
+                                KFImage(URL(string: imageURL))
                                     .resizable()
                                     .scaledToFill()
                                     .clipShape(Circle())
                             } else {
                                 Image(systemName: "person.crop.circle.fill")
                                     .resizable()
+                                    .scaledToFill()
+                                    .clipShape(Circle())
                             }
                         }
                         .frame(width: 94, height: 94)
@@ -170,6 +191,11 @@ private struct ProfileView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(.pWhite))
             )
+            .onAppear {
+                Task {
+                    await viewModel.fetchUserInformation()
+                }
+            }
         }
     }
 }
@@ -247,7 +273,7 @@ private struct LogoutButton: View {
                 .font(.pretendard(weight: .medium500, size: 20))
                 .foregroundStyle(Color(.pWhite))
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
+                .padding(.vertical, 13)
                 .background(
                     RoundedRectangle(cornerRadius: 13)
                         .foregroundStyle(Color(.pPrimary))
@@ -270,6 +296,7 @@ private struct ProfileImageDialogActions: View {
         
         Button {
             viewModel.postImage = nil
+            viewModel.imageURL = nil
         } label: {
             Text("기본 이미지로 변경")
                 .font(.pretendard(weight: .regular400, size: 18))

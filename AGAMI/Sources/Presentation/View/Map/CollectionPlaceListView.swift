@@ -55,5 +55,6 @@ struct CollectionPlaceListView: View {
                 }
             }
         }
+        .scrollIndicators(.hidden)
     }
 }

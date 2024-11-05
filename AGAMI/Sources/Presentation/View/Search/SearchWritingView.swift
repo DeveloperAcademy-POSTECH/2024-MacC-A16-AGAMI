@@ -105,6 +105,7 @@ struct SearchWritingView: View {
                 } label: {
                     Text("저장")
                         .font(.pretendard(weight: .semiBold600, size: 17))
+                        .foregroundStyle(Color(.pPrimary))
                 }
                 .disabled(viewModel.isSaving)
             }

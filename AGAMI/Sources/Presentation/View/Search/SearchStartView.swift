@@ -43,7 +43,7 @@ struct SearchStartView: View {
                 Button {
                     coordinator.push(route: .searchShazamingView)
                 } label: {
-                    PlakeCTAButton(type: .addSong)
+                    PlakeCTAButton(type: .plaking)
                         .padding(.bottom, 26)
                 }
             }
@@ -76,14 +76,16 @@ struct SearchStartView: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
+                let nextButtonDisabled = viewModel.diggingList.isEmpty || !viewModel.isLoaded
                 Button {
                     let searchWritingViewModel = viewModel.createSearchWritingViewModel()
                     coordinator.push(route: .searchWritingView(viewModel: searchWritingViewModel))
                 } label: {
                     Text("다음")
                         .font(.pretendard(weight: .medium500, size: 17))
+                        .foregroundStyle(nextButtonDisabled ? Color(.pGray1) : Color(.pPrimary))
                 }
-                .disabled(viewModel.diggingList.isEmpty || !viewModel.isLoaded)
+                .disabled(nextButtonDisabled)
             }
         }
         .alert(isPresented: $viewModel.showBackButtonAlert) {
@@ -97,7 +99,7 @@ struct SearchStartView: View {
                 primaryButton: .default(Text("취소")) {
                     viewModel.showBackButtonAlert = false
                 },
-                secondaryButton: .default(Text("확인")) {
+                secondaryButton: .destructive(Text("확인")) {
                     viewModel.clearDiggingList()
                     coordinator.pop()
                 }
@@ -121,6 +123,7 @@ private struct SearchPlakeTitleTextField: View {
             TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
                 .font(.pretendard(weight: .medium500, size: 20))
                 .foregroundStyle(Color(.pBlack))
+                .tint(Color(.pPrimary))
                 .focused($isFocused)
                 .padding(16)
                 .background(Color(.pWhite))

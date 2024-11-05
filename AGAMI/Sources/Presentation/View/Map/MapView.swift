@@ -16,6 +16,7 @@ struct MapView: View {
             .ignoresSafeArea()
             .onAppear {
                 viewModel.fecthPlaylists()
+                viewModel.getCurrentLocation()
             }
     }
 }

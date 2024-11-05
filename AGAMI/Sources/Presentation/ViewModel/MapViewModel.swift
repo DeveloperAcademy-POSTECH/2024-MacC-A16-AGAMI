@@ -14,6 +14,7 @@ final class MapViewModel {
     private let authService = FirebaseAuthService()
     private let locationService = LocationService.shared
     
+    var currentLocationCoordinate2D: CLLocationCoordinate2D?
     var currentlatitude: Double?
     var currentlongitude: Double?
     var currentStreetAddress: String?
@@ -50,6 +51,7 @@ final class MapViewModel {
             return
         }
         
+        currentLocationCoordinate2D = currentLocation.coordinate
         currentlatitude = currentLocation.coordinate.latitude
         currentlongitude = currentLocation.coordinate.longitude
         requestCurrentStreetAddress()

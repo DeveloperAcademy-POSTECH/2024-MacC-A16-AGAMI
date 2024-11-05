@@ -18,7 +18,7 @@ struct MKMapViewWrapper: UIViewRepresentable {
         let mapView = MKMapView()
 
         mapView.delegate = context.coordinator
-
+        mapView.showsUserLocation = true
         mapView.register(BubbleAnnotationView.self, forAnnotationViewWithReuseIdentifier: NSStringFromClass(BubbleAnnotationView.self))
         mapView.register(ClusterBubbleAnnotationView.self, forAnnotationViewWithReuseIdentifier: NSStringFromClass(ClusterBubbleAnnotationView.self))
 
@@ -31,6 +31,11 @@ struct MKMapViewWrapper: UIViewRepresentable {
         let annotations = viewModel.playlists.map { playlist -> PlaylistAnnotation in
             let annotation = PlaylistAnnotation(playlist: playlist)
             return annotation
+        }
+        
+        if let currentLocation = viewModel.currentLocationCoordinate2D {
+            let region = MKCoordinateRegion(center: currentLocation, latitudinalMeters: 500, longitudinalMeters: 500)
+            uiView.setRegion(region, animated: false)
         }
 
         uiView.addAnnotations(annotations)

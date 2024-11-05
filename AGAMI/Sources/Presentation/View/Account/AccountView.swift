@@ -29,30 +29,32 @@ struct AccountView: View {
                 
                 LogoutButton(viewModel: viewModel)
                     .padding(.bottom, 20)
-                
-                if viewModel.isScucessDeleteAccount {
-                    SignOutView()
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                                viewModel.isScucessDeleteAccount = false
-                                UserDefaults.standard.removeObject(forKey: "isSignedIn")
-                            }
-                        }
-                }
             }
             .padding(.horizontal, 8)
+            
+            if viewModel.isScucessDeleteAccount {
+                SignOutView()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                            viewModel.isScucessDeleteAccount = false
+                            UserDefaults.standard.removeObject(forKey: "isSignedIn")
+                        }
+                    }
+            }
         }
         .navigationTitle("계정")
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden()
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    coordinator.pop()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.pretendard(weight: .semiBold600, size: 17))
-                        .foregroundStyle(Color(.pPrimary))
+            if !viewModel.isScucessDeleteAccount {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        coordinator.pop()
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                            .font(.pretendard(weight: .semiBold600, size: 17))
+                            .foregroundStyle(Color(.pPrimary))
+                    }
                 }
             }
         }

@@ -27,7 +27,7 @@ final class AccountViewModel {
     var showPhotoPicker: Bool = false
     var selectedItem: PhotosPickerItem?
     var postImage: UIImage?
-    var imageURL: String?
+    var imageURL: String = ""
     
     func convertImage(item: PhotosPickerItem?) async {
         guard let item = item else { return }

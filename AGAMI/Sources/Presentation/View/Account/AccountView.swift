@@ -69,7 +69,6 @@ struct AccountView: View {
                 await viewModel.convertImage(item: newValue)
             }
         }
-        
         .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
             SignOutAlertActions(viewModel: viewModel)
         } message: {
@@ -130,8 +129,8 @@ private struct ProfileView: View {
                                     .resizable()
                                     .scaledToFill()
                                     .clipShape(Circle())
-                            } else if let imageURL = viewModel.imageURL {
-                                KFImage(URL(string: imageURL))
+                            } else if !viewModel.imageURL.isEmpty {
+                                KFImage(URL(string: viewModel.imageURL))
                                     .resizable()
                                     .scaledToFill()
                                     .clipShape(Circle())
@@ -294,7 +293,7 @@ private struct ProfileImageDialogActions: View {
         
         Button {
             viewModel.postImage = nil
-            viewModel.imageURL = nil
+            viewModel.imageURL.removeAll()
         } label: {
             Text("기본 이미지로 변경")
                 .font(.pretendard(weight: .regular400, size: 18))

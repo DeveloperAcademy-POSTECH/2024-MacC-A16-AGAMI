@@ -59,7 +59,6 @@ struct SearchStartView: View {
         }
         .navigationTitle("새로운 플레이크")
         .navigationBarTitleDisplayMode(.large)
-        .toolbarVisibilityForVersion(.hidden, for: .tabBar)
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -73,6 +72,7 @@ struct SearchStartView: View {
                 } label: {
                     Image(systemName: "chevron.backward")
                         .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(Color(.pPrimary))
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {

@@ -53,7 +53,6 @@ final class AccountViewModel {
         
         if success {
             isScucessDeleteAccount = true
-            UserDefaults.standard.removeObject(forKey: "isSignedIn")
             dump("계정 삭제 성공")
         } else {
             dump("계정 삭제 실패")

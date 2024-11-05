@@ -154,6 +154,9 @@ final class BubbleAnnotationView: MKAnnotationView {
 
             self.hostingController = hostingController
         }
+
+        self.bounds = CGRect(x: 0, y: 0, width: 65, height: 75)
+        self.centerOffset = CGPoint(x: 0, y: -37.5)
     }
 }
 
@@ -194,6 +197,9 @@ final class ClusterBubbleAnnotationView: MKAnnotationView {
 
             self.hostingController = hostingController
         }
+
+        self.bounds = CGRect(x: 0, y: 0, width: 65, height: 75)
+        self.centerOffset = CGPoint(x: 0, y: -37.5)
     }
 }
 

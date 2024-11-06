@@ -89,10 +89,7 @@ private struct PlakeTitleText: View {
             Text(viewModel.playlist.playlistName)
                 .font(.pretendard(weight: .bold700, size: 26))
                 .foregroundStyle(Color(.pBlack))
-                .padding(EdgeInsets(top: 10, leading: 8, bottom: 10, trailing: 8))
-                .background(Color(.pWhite))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 16)
                 .padding(.bottom, 37)
         }
     }

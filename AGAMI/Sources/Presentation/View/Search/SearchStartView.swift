@@ -125,7 +125,7 @@ private struct SearchPlakeTitleTextField: View {
                 .foregroundStyle(Color(.pBlack))
                 .tint(Color(.pPrimary))
                 .focused($isFocused)
-                .padding(16)
+                .padding(EdgeInsets(top: 13, leading: 16, bottom: 13, trailing: 16))
                 .background(Color(.pWhite))
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay {

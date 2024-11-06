@@ -59,7 +59,20 @@ struct CameraView: View {
                 .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
             }
         }
-        .toolbar(.hidden, for: .tabBar)
+        .navigationTitle("사진 촬영")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    coordinator.pop()
+                } label: {
+                    Image(systemName: "chevron.backward")
+                        .font(.pretendard(weight: .semiBold600, size: 17))
+                        .foregroundStyle(Color(.pPrimary))
+                }
+            }
+        }
     }
     
     private var captureButton: some View {

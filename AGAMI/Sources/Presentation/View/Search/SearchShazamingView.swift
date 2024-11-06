@@ -33,14 +33,21 @@ struct SearchShazamingView: View {
                                                          endRadius: 234.3))
                 }
                 
-                Image(.shazamButton)
-                    .onTapGesture {
-                        viewModel.searchButtonTapped()
-                    }
-                    .shadow(color: Color(.pBlack).opacity(0.25),
-                            radius: 10,
-                            x: 0,
-                            y: 5)
+                if viewModel.shazamStatus == .failed {
+                    Image(.shazamButton)
+                        .onTapGesture {
+                            viewModel.searchButtonTapped()
+                        }
+                        .shadow(color: Color(.pBlack).opacity(0.25),
+                                radius: 10,
+                                x: 0,
+                                y: 5)
+                } else {
+                    Image(.shazamButton)
+                        .onTapGesture {
+                            viewModel.searchButtonTapped()
+                        }
+                }
             }
             .padding(.bottom, 160)
             

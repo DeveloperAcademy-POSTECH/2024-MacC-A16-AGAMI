@@ -182,7 +182,8 @@ private struct ArchivePlaylistRow: View {
 
 private struct ImageAndTitleWithHeaderView: View {
     @Bindable var viewModel: PlakePlaylistViewModel
-
+    @FocusState private var isFocused: Bool
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             ZStack(alignment: .bottom) {
@@ -230,11 +231,16 @@ private struct ImageAndTitleWithHeaderView: View {
 
                 TextField("", text: $viewModel.playlist.playlistName)
                     .font(.pretendard(weight: .medium500, size: 20))
-                    .foregroundStyle(Color(.pGray1))
+                    .foregroundStyle(Color(.pBlack))
                     .tint(Color(.pPrimary))
+                    .focused($isFocused)
                     .padding(EdgeInsets(top: 13, leading: 16, bottom: 13, trailing: 16))
                     .background(Color(.pWhite))
                     .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
+                    }
                     .padding(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
             } else {
                 Text(viewModel.playlist.playlistName)

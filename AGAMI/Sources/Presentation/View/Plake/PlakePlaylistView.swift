@@ -95,7 +95,7 @@ private struct ListView: View {
                             .foregroundStyle(Color(.pGray1))
                             .listRowInsets(EdgeInsets())
                     }
-                    .listRowInsets(EdgeInsets(top: 13, leading: 16, bottom: 10, trailing: 16))
+                    .listRowInsets(EdgeInsets(top: 3, leading: 16, bottom: 10, trailing: 16))
                     .listRowSeparator(.hidden)
                 }
 
@@ -210,9 +210,9 @@ private struct ImageAndTitleWithHeaderView: View {
                     if !viewModel.playlist.photoURL.isEmpty {
                         Group {
                             Text(viewModel.playlist.streetAddress)
-                                .padding(.bottom, viewModel.presentationState.isEditing ? 9 : 12)
+                                .padding(.bottom, 2)
                             Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
-                                .padding(.bottom, viewModel.presentationState.isEditing ? 16 : 22)
+                                .padding(.bottom, viewModel.presentationState.isEditing ? 10 : 16)
                         }
                         .font(.pretendard(weight: .medium500, size: viewModel.presentationState.isEditing ? 15 : 20))
                         .foregroundStyle(Color(.pWhite))

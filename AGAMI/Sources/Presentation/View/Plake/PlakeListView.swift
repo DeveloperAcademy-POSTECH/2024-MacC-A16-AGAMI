@@ -172,12 +172,12 @@ private struct PlakeListCell: View {
                     Group {
                         Text(playlist.playlistName)
                             .font(.pretendard(weight: .bold700, size: 22))
-                            .kerning(-0.5)
-                            .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
+                            .kerning(-0.3)
+                            .padding(EdgeInsets(top: 16, leading: 16, bottom: 0, trailing: 0))
                         Text(playlist.streetAddress)
                             .font(.pretendard(weight: .medium500, size: 16))
-                            .kerning(-0.5)
-                            .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
+                            .kerning(-0.3)
+                            .padding(EdgeInsets(top: 2, leading: 18, bottom: 0, trailing: 0))
                     }
                     .foregroundStyle(Color(.pWhite))
                     .shadow(radius: 10)

@@ -23,8 +23,15 @@ final class SearchShazamingViewModel: NSObject {
     }
     
     func startRecognition() {
-        shazamStatus = .searching
-        shazamService.startRecognition()
+        checkMicrophonePermission { [weak self] granted in
+            guard let self = self else { return }
+            if granted {
+                self.shazamStatus = .searching
+                self.shazamService.startRecognition()
+            } else {
+                self.shazamStatus = .idle
+            }
+        }
     }
     
     func stopRecognition() {
@@ -33,12 +40,29 @@ final class SearchShazamingViewModel: NSObject {
     
     func searchButtonTapped() {
         currentItem = nil
-
+        
         if shazamStatus == .searching {
             stopRecognition()
             shazamStatus = .idle
         } else {
             startRecognition()
+        }
+    }
+    
+    private func checkMicrophonePermission(completion: @escaping (Bool) -> Void) {
+        switch AVAudioApplication.shared.recordPermission {
+        case .denied:
+            completion(false)
+        case .granted:
+            completion(true)
+        case .undetermined:
+            AVAudioApplication.requestRecordPermission { granted in
+                DispatchQueue.main.async {
+                    completion(granted)
+                }
+            }
+        @unknown default:
+            completion(false)
         }
     }
 }

@@ -450,7 +450,7 @@ private struct TopBarTrailingItems: View {
                     }
                 }
                 .disabled(viewModel.presentationState.isUpdating)
-            } else {
+            } else if viewModel.exportingState == .none {
                 Button {
                     viewModel.presentationState.isEditing = true
                 } label: {

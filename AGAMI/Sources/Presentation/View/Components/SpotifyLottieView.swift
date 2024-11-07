@@ -20,7 +20,6 @@ struct SpotifyLottieView: View {
                     .foregroundStyle(Color(.pPrimary))
                     .multilineTextAlignment(.center)
             }
-
         }
         .ignoresSafeArea()
     }

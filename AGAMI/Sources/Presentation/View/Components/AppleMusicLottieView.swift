@@ -20,7 +20,6 @@ struct AppleMusicLottieView: View {
                     .foregroundStyle(Color(.pPrimary))
                     .multilineTextAlignment(.center)
             }
-
         }
         .ignoresSafeArea()
     }

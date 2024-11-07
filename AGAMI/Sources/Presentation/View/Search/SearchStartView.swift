@@ -50,6 +50,7 @@ struct SearchStartView: View {
             .frame(height: 47)
             .background(Color(.pLightGray))
         }
+        .ignoresSafeArea(.keyboard)
         .onAppear {
             viewModel.requestCurrentLocation()
             viewModel.loadSavedSongs()

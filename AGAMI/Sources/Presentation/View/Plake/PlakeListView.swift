@@ -152,6 +152,8 @@ private struct PlakeListCell: View {
                     .cancelOnDisappear(true)
                     .placeholder {
                         Image(.archiveCellPlaceholder)
+                            .resizable()
+                            .scaledToFit()
                     }
                     .scaledToFill()
                     .clipped()

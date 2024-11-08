@@ -22,6 +22,7 @@ final class PlakePlaylistViewModel: Hashable {
         var isLoading: Bool = false
         var isShowingExportingAppleMusicFailedAlert: Bool = false
         var isShowingExportingSpotifyFailedAlert: Bool = false
+        var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
     }
     let id: UUID = .init()
     
@@ -92,6 +93,7 @@ final class PlakePlaylistViewModel: Hashable {
     func exportPlaylistToSpotify(completion: @escaping (Result<URL, Error>) -> Void) {
         exportingState = .isSpotifyExporting
         let musicList = playlist.songs.map { ($0.title, $0.artist) }
+        presentationState.didOpenSpotifyURL = true
         SpotifyService.shared.addPlayList(name: playlist.playlistName,
                                           musicList: musicList,
                                           description: playlist.playlistDescription) { [weak self] playlistUri in

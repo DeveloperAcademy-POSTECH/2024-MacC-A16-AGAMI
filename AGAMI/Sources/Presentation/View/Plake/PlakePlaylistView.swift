@@ -15,6 +15,7 @@ struct PlakePlaylistView: View {
     @State var viewModel: PlakePlaylistViewModel
     @Environment(\.openURL) private var openURL
     @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(\.scenePhase) private var scenePhase
     
     init(viewModel: PlakePlaylistViewModel) {
         _viewModel = State(wrappedValue: viewModel)
@@ -83,6 +84,12 @@ struct PlakePlaylistView: View {
         )
         .onOpenURL { url in
             viewModel.handleURL(url)
+        }
+        .onChange(of: scenePhase) { _, newScene in
+            if newScene == .active && viewModel.presentationState.didOpenSpotifyURL {
+                viewModel.exportingState = .none
+                viewModel.presentationState.didOpenSpotifyURL = false
+            }
         }
     }
 }
@@ -542,12 +549,12 @@ private struct DeletePlakeAlertActions: View {
 private struct ExportingFailedAlertActions: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
-
+    
     var body: some View {
         Button("취소", role: .cancel) {
             viewModel.presentationState.isShowingDeletePlakeAlert = false
         }
-
+        
         Button("확인", role: .destructive) {
             viewModel.presentationState.isShowingDeletePlakeAlert = false
             viewModel.openAppleMusicInAppStore()

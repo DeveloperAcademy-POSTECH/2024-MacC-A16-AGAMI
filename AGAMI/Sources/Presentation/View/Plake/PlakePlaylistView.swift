@@ -66,6 +66,11 @@ struct PlakePlaylistView: View {
         } message: {
             Text("삭제한 플레이크는 되돌릴 수 없습니다.")
         }
+        .alert("게정 상태 문제", isPresented: $viewModel.presentationState.isShowingExportingAppleMusicFailedAlert) {
+            ExportingFailedAlertActions(viewModel: viewModel)
+        } message: {
+            Text("플레이크를 내보낼 수 없습니다.\n Apple Music의 계정 상태를 확인해주세요.")
+        }
         .alert("기본 이미지로 변경", isPresented: $viewModel.presentationState.isShowingDeletePhotoAlert) {
             DeletePhotoAlertActions(viewModel: viewModel)
         } message: {
@@ -530,6 +535,22 @@ private struct DeletePlakeAlertActions: View {
                 await viewModel.deletePlaylist()
                 coordinator.pop()
             }
+        }
+    }
+}
+
+private struct ExportingFailedAlertActions: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakePlaylistViewModel
+
+    var body: some View {
+        Button("취소", role: .cancel) {
+            viewModel.presentationState.isShowingDeletePlakeAlert = false
+        }
+
+        Button("확인", role: .destructive) {
+            viewModel.presentationState.isShowingDeletePlakeAlert = false
+            viewModel.openAppleMusicInAppStore()
         }
     }
 }

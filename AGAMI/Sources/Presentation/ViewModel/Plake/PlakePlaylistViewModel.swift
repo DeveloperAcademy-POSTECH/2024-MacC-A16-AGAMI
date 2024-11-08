@@ -20,6 +20,8 @@ final class PlakePlaylistViewModel: Hashable {
         var isShowingPicker: Bool = false
         var isUpdating: Bool = false
         var isLoading: Bool = false
+        var isShowingExportingAppleMusicFailedAlert: Bool = false
+        var isShowingExportingSpotifyFailedAlert: Bool = false
     }
     let id: UUID = .init()
     
@@ -64,7 +66,7 @@ final class PlakePlaylistViewModel: Hashable {
     
     func exportPlaylistToAppleMusic() async -> URL? {
         guard await musicService.checkAppleMusicSubscriptionStatus() else {
-            print("Apple Music 구독이 필요합니다. 사용자에게 구독 안내를 표시하세요.")
+            self.presentationState.isShowingExportingAppleMusicFailedAlert = true
             return nil
         }
         
@@ -107,6 +109,12 @@ final class PlakePlaylistViewModel: Hashable {
             }
             self?.exportingState = .none
             completion(.success(playlistURL))
+        }
+    }
+    
+    func openAppleMusicInAppStore() {
+        if let url = URL(string: "itms-apps://itunes.apple.com/app/apple-music/id1108187390") {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
     

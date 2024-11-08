@@ -22,14 +22,14 @@ final class PlakePlaylistViewModel: Hashable {
         var isLoading: Bool = false
     }
     let id: UUID = .init()
-
+    
     var playlist: PlaylistModel
     private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
-
+    
     var exportingState: ExportingState = .none
     var presentationState: PlaylistPresentationState = .init()
-
+    
     var selectedItem: PhotosPickerItem? {
         didSet {
             Task {
@@ -37,7 +37,7 @@ final class PlakePlaylistViewModel: Hashable {
             }
         }
     }
-
+    
     var photoFromCamera: UIImage? {
         didSet {
             Task {
@@ -45,24 +45,29 @@ final class PlakePlaylistViewModel: Hashable {
             }
         }
     }
-
+    
     var showDeleteButton: Bool {
         !playlist.photoURL.isEmpty && presentationState.isEditing
     }
-
+    
     init(playlist: PlaylistModel) {
         self.playlist = playlist
     }
-
+    
     static func == (lhs: PlakePlaylistViewModel, rhs: PlakePlaylistViewModel) -> Bool {
         return lhs.id == rhs.id
     }
-
+    
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-
+    
     func exportPlaylistToAppleMusic() async -> URL? {
+        guard await musicService.checkAppleMusicSubscriptionStatus() else {
+            print("Apple Music 구독이 필요합니다. 사용자에게 구독 안내를 표시하세요.")
+            return nil
+        }
+        
         exportingState = .isAppleMusicExporting
         do {
             musicService.clearSongs()
@@ -81,7 +86,7 @@ final class PlakePlaylistViewModel: Hashable {
         }
         return URL(string: urlString)
     }
-
+    
     func exportPlaylistToSpotify(completion: @escaping (Result<URL, Error>) -> Void) {
         exportingState = .isSpotifyExporting
         let musicList = playlist.songs.map { ($0.title, $0.artist) }
@@ -104,7 +109,7 @@ final class PlakePlaylistViewModel: Hashable {
             completion(.success(playlistURL))
         }
     }
-
+    
     func deletePhoto(userID: String) async {
         if !playlist.photoURL.isEmpty {
             let pastURL = playlist.photoURL
@@ -112,40 +117,40 @@ final class PlakePlaylistViewModel: Hashable {
             deletePhotoURL()
         }
     }
-
+    
     func deletePlaylist() async {
         guard let userID = FirebaseAuthService.currentUID else {
             return
         }
-
+        
         await deletePhoto(userID: userID)
-
+        
         try? await firebaseService.deletePlaylist(userID: userID, playlistID: playlist.playlistID)
     }
-
+    
     func getCurrentPlaylistURL() -> URL? {
         guard let url = musicService.getCurrentPlaylistUrl() else { return nil }
         return URL(string: url)
     }
-
+    
     func deleteMusic(indexSet: IndexSet) {
         playlist.songs.remove(atOffsets: indexSet)
     }
-
+    
     func moveMusic(from source: IndexSet, to destination: Int) {
         playlist.songs.move(fromOffsets: source, toOffset: destination)
     }
-
+    
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy. MM. dd"
         return dateFormatter.string(from: date)
     }
-
+    
     func deletePhotoURL() {
         playlist.photoURL.removeAll()
     }
-
+    
     func applyChangesToFirestore() async {
         presentationState.isUpdating = true
         defer { presentationState.isUpdating = false }
@@ -155,7 +160,7 @@ final class PlakePlaylistViewModel: Hashable {
         let firestoreModel = ModelAdapter.toFirestorePlaylist(from: playlist)
         try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
     }
-
+    
     func handleURL(_ url: URL) {
         if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
            let decodedRedirectURL = redirectURL.removingPercentEncoding,
@@ -163,35 +168,35 @@ final class PlakePlaylistViewModel: Hashable {
             exportingState = .none
         }
     }
-
+    
     func setPhotoFromCamera(photo: UIImage) {
         photoFromCamera = photo
     }
-
+    
     func handleAndUploadPhotoFromAlbum() async {
         presentationState.isLoading = true
         defer { presentationState.isLoading = false }
-
+        
         do {
             guard let item = selectedItem,
                   let data = try await item.loadTransferable(type: Data.self),
                   let rawImage = UIImage(data: data),
                   let image = rawImage.cropSquare(),
                   let userID = FirebaseAuthService.currentUID else { return }
-
+            
             await deletePhoto(userID: userID)
-
+            
             let url = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             await MainActor.run { playlist.photoURL = url }
         } catch {
             dump("handleAndUplgoadPhotoFromAlbum Error: \(error.localizedDescription)")
         }
     }
-
+    
     func uploadPhotoFromCamera() async {
         presentationState.isLoading = true
         defer { presentationState.isLoading = false }
-
+        
         guard let userID = FirebaseAuthService.currentUID,
               let image = photoFromCamera else { return }
         do {
@@ -202,27 +207,27 @@ final class PlakePlaylistViewModel: Hashable {
         }
         presentationState.isLoading = false
     }
-
+    
     func downloadPhotoAndSaveToAlbum() async {
         presentationState.isLoading = true
         defer { presentationState.isLoading = false }
-
+        
         guard let url = URL(string: playlist.photoURL) else { return }
-
+        
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
-
+            
             guard let image = UIImage(data: data) else {
                 dump("이미지 데이터 -> UIImage 캐스팅 실패")
                 return
             }
-
+            
             let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
             guard status == .authorized || status == .limited else {
                 dump("사진 앨범 접근 권한이 없습니다.")
                 return
             }
-
+            
             await MainActor.run {
                 PHPhotoLibrary.shared().performChanges {
                     PHAssetChangeRequest.creationRequestForAsset(from: image)
@@ -232,15 +237,15 @@ final class PlakePlaylistViewModel: Hashable {
             dump("downloadPhotoAndSaveToAlbum Error: \(error.localizedDescription)")
         }
     }
-
+    
     func refreshPlaylist() {
         Task {
             guard let userID = FirebaseAuthService.currentUID,
                   let newPlaylist = await firebaseService.fetchPlaylist(
-                      userID: userID,
-                      playlistID: playlist.playlistID
+                    userID: userID,
+                    playlistID: playlist.playlistID
                   ) else { return }
-
+            
             await MainActor.run { [weak self] in
                 guard let self = self else { return }
                 self.playlist = newPlaylist

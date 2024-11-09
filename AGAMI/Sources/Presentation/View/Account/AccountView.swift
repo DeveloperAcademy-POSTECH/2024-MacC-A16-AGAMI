@@ -11,6 +11,7 @@ import Kingfisher
 
 struct AccountView: View {
     @State var viewModel: AccountViewModel = .init()
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     
     var body: some View {
@@ -42,6 +43,7 @@ struct AccountView: View {
                     }
             }
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationTitle("계정")
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden()
@@ -315,7 +317,7 @@ private struct SignOutAlertActions: View {
         }
         
         Button("확인", role: .destructive) {
-            viewModel.signOut()
+            viewModel.signOutUserID()
             viewModel.isShowingSignOutAlert = false
         }
     }
@@ -331,7 +333,8 @@ private struct DeleteAccountAlertActions: View {
         
         Button("탈퇴", role: .destructive) {
             Task {
-                await viewModel.deleteAccount()
+                try await viewModel.deleteFirebaseData()
+                try await viewModel.deleteAccount()
             }
         }
     }

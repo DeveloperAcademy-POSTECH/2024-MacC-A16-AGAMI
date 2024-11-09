@@ -36,8 +36,8 @@ final class AccountViewModel {
         self.postImage = uiImage
     }
     
-    func signOut() {
-        firebaseAuthService.signOut { result in
+    func signOutUserID() {
+        FirebaseAuthService.signOut { result in
             switch result {
             case .success:
                 UserDefaults.standard.removeObject(forKey: "isSignedIn")
@@ -48,12 +48,28 @@ final class AccountViewModel {
         }
     }
     
-    func deleteAccount() async {
+    func deleteFirebaseData() async throws {
+        guard let uid = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        
+        try await firebaseService.deleteAllPlaylists(userID: uid)
+        try await firebaseService.deleteAllPhotoInStorage(userID: uid)
+    }
+    
+    func deleteAccount() async throws {
+        guard let uid = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        
         let success = await firebaseAuthService.deleteAccount()
         
         if success {
-            isScucessDeleteAccount = true
+            try await firebaseService.saveIsUserValued(userID: uid, isUserValued: false)
             dump("계정 삭제 성공")
+            isScucessDeleteAccount = true
         } else {
             dump("계정 삭제 실패")
         }

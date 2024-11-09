@@ -224,7 +224,23 @@ final class FirebaseService {
         if let userImageURL = data["UserImageURL"] {
             result["UserImageURL"] = userImageURL
         }
-        
         return result
+    }
+    
+    func saveIsUserValued(userID: String, isUserValued: Bool) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            firestore
+                .collection("UserInformation")
+                .document(userID)
+                .setData(["isUserValued": isUserValued]) { error in
+                if let error = error {
+                    dump("Failed to save isUserValued: \(error.localizedDescription)")
+                    continuation.resume(throwing: error)
+                } else {
+                    dump("isUserValued successfully saved to Firestore!")
+                    continuation.resume(returning: ())
+                }
+            }
+        }
     }
 }

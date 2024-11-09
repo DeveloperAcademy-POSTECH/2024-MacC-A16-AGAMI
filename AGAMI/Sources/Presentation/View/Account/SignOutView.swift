@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct SignOutView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    
     var body: some View {
         ZStack {
             Color(.pLightGray)
@@ -34,6 +36,7 @@ struct SignOutView: View {
                     .foregroundStyle(Color(.pBlack))
             }
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
     }
 }
 

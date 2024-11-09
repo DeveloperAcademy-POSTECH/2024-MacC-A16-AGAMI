@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SearchStartView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     @State private var viewModel: SearchStartViewModel = SearchStartViewModel()
     
@@ -51,6 +52,7 @@ struct SearchStartView: View {
             .background(Color(.pLightGray))
         }
         .ignoresSafeArea(.keyboard)
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .onAppear {
             viewModel.requestCurrentLocation()
             viewModel.loadSavedSongs()

@@ -9,6 +9,7 @@ import Foundation
 import CryptoKit
 import FirebaseAuth
 import AuthenticationServices
+import FirebaseFirestore
 
 final class FirebaseAuthService {
     
@@ -26,6 +27,35 @@ final class FirebaseAuthService {
     
     init() {
         registerAuthStateHandler()
+    }
+    
+    static func checkUserValued() async throws {
+        guard let uid = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            self.signOutUserID()
+            return
+        }
+        
+        let isUserValued = try await fetchIsUserValued(userID: uid)
+        
+        if isUserValued {
+            dump("정상적인 사용자입니다.")
+            return
+        }
+        
+        self.signOutUserID()
+    }
+    
+    static func signOutUserID() {
+        signOut { result in
+            switch result {
+            case .success:
+                UserDefaults.standard.removeObject(forKey: "isSignedIn")
+                dump("로그아웃 성공")
+            case .failure(let error):
+                dump("로그아웃 실패 \(error.localizedDescription)")
+            }
+        }
     }
     
     func generateNonce() {
@@ -97,7 +127,7 @@ final class FirebaseAuthService {
         }
     }
     
-    func signOut(completion: @escaping (Result<Void, Error>) -> Void) {
+    static func signOut(completion: @escaping (Result<Void, Error>) -> Void) {
         do {
             try Auth.auth().signOut()
             completion(.success(()))
@@ -150,11 +180,31 @@ final class FirebaseAuthService {
             return false
         }
     }
+    
+    static func fetchIsUserValued(userID: String) async throws -> Bool {
+           let documentRef = Firestore
+                                .firestore()
+                                .collection("UserInformation")
+                                .document(userID)
+           
+           do {
+               let documentSnapshot = try await documentRef.getDocument()
+               guard let isUserValued = documentSnapshot.get("isUserValued") as? Bool else {
+                   dump("isUserValued 필드를 찾을 수 없습니다.")
+                   return false
+               }
+               dump("isUserValued 받아옴: \(isUserValued)")
+               return isUserValued
+           } catch {
+               dump("Error fetching isUserValued: \(error.localizedDescription)")
+               return false
+           }
+       }
 }
 
 final class SignInWithApple: NSObject, ASAuthorizationControllerDelegate {
 
-  private var continuation : CheckedContinuation<ASAuthorizationAppleIDCredential, Error>?
+  private var continuation: CheckedContinuation<ASAuthorizationAppleIDCredential, Error>?
 
   func callAsFunction() async throws -> ASAuthorizationAppleIDCredential {
     return try await withCheckedThrowingContinuation { continuation in

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AddPlakingShazamView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AddPlakingViewModel
 
@@ -71,6 +72,7 @@ struct AddPlakingShazamView: View {
                     .padding(.bottom, 13)
             }
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationBarBackButtonHidden()
         .onAppear {
             viewModel.startRecognition()

@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct AddPlakingView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     @State var viewModel: AddPlakingViewModel
 
@@ -44,6 +45,7 @@ struct AddPlakingView: View {
 
             ShazamButton(viewModel: viewModel)
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationTitle("플레이킹 더하기")
         .navigationBarTitleDisplayMode(.large)
         .toolbarVisibilityForVersion(.hidden, for: .tabBar)

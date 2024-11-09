@@ -43,17 +43,6 @@ final class PlakeListViewModel {
         searchText = ""
     }
 
-    func logout() {
-        authService.signOut { result in
-            switch result {
-            case .success:
-                UserDefaults.standard.removeObject(forKey: "isSignedIn")
-            case .failure(let err):
-                dump(err.localizedDescription)
-            }
-        }
-    }
-
     func deleteAllDataInFirebase() async throws {
         guard let userID = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
@@ -70,7 +59,7 @@ final class PlakeListViewModel {
     
     func deleteAccountAndSignOut() async {
         if await authService.deleteAccount() {
-            logout()
+            FirebaseAuthService.signOutUserID()
         } else {
             dump("계정 삭제에 실패했습니다.")
         }
@@ -169,7 +158,6 @@ final class PlakeListViewModel {
             exportingState = .none
         }
     }
-
     
 // MARK: - FirebaseListner 코드
 //    private let listenerService = FirebaseListenerService()

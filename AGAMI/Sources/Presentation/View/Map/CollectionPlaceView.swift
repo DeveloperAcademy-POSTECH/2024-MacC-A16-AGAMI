@@ -9,6 +9,7 @@ import SwiftUI
 
 struct CollectionPlaceView: View {
     @State var viewModel: CollectionPlaceViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
 
     init(viewModel: CollectionPlaceViewModel) {
@@ -52,5 +53,6 @@ struct CollectionPlaceView: View {
             .padding(EdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 16))
             .navigationBarBackButtonHidden(true)
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
     }
 }

@@ -10,9 +10,11 @@ import MapKit
 
 struct MapView: View {
     @State private var viewModel: MapViewModel = MapViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         MKMapViewWrapper(viewModel: viewModel)
+            .onAppearAndActiveCheckUserValued(scenePhase)
             .ignoresSafeArea()
             .onAppear {
                 viewModel.fecthPlaylists()

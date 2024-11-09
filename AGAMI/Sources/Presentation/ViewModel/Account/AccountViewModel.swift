@@ -16,28 +16,65 @@ final class AccountViewModel {
     var isScucessDeleteAccount: Bool = false
     
     var isEditMode: Bool = false
-    var isPresented: Bool = false
     
+    var isProfileImageDialogPresented: Bool = false
     var isShowingSignOutAlert: Bool = false
     var isDeletingAccount: Bool = false
 
-    var userName: String = "Plake"
-    var isUserNameSaved: Bool = false
+    var userName: String = "닉네임"
+    var editingUserName = ""
     
+    var isDefaultImage: Bool = false
+    var isProfileImageChanged: Bool = false
+
     var showPhotoPicker: Bool = false
     var selectedItem: PhotosPickerItem?
     var postImage: UIImage?
     var imageURL: String = ""
     
-    func convertImage(item: PhotosPickerItem?) async {
-        guard let item = item else { return }
-        guard let data = try? await item.loadTransferable(type: Data.self) else { return }
-        guard let uiImage = UIImage(data: data) else { return }
-        self.postImage = uiImage
+    func convertImage(item: PhotosPickerItem?) {
+        Task {
+            guard let item = item else { return }
+            guard let data = try? await item.loadTransferable(type: Data.self) else { return }
+            guard let uiImage = UIImage(data: data) else { return }
+            self.postImage = uiImage
+            isProfileImageChanged = true
+        }
     }
     
-    func signOutUserID() {
-        FirebaseAuthService.signOut { result in
+    func fetchUserInformation() {
+        Task {
+            guard let uid = FirebaseAuthService.currentUID else {
+                dump("UID를 가져오는 데 실패했습니다.")
+                return
+            }
+            
+            do {
+                let userInformation = try await firebaseService.fetchUserInformation(userID: uid)
+                
+                if let userName = userInformation["UserNickname"] as? String {
+                    self.userName = userName
+                } else {
+                    dump("userName 값이 String 타입이 아니거나 nil입니다.")
+                }
+                
+                if let imageURL = userInformation["UserImageURL"] as? String {
+                    self.imageURL = imageURL
+                } else {
+                    dump("imageURL 값이 String 타입이 아니거나 nil입니다.")
+                }
+            } catch {
+                dump("유저 정보를 불러오는데 실패했습니다.")
+            }
+        }
+    }
+}
+
+/// 로그인 로그아웃
+extension AccountViewModel {
+    
+    func signOut() {
+        firebaseAuthService.signOut { result in
             switch result {
             case .success:
                 UserDefaults.standard.removeObject(forKey: "isSignedIn")
@@ -65,6 +102,25 @@ final class AccountViewModel {
         }
         
         let success = await firebaseAuthService.deleteAccount()
+    func deleteAccount() {
+        Task {
+            let success = await firebaseAuthService.deleteAccount()
+            
+            if success {
+                isScucessDeleteAccount = true
+                dump("계정 삭제 성공")
+            } else {
+                dump("계정 삭제 실패")
+            }
+        }
+    }
+}
+
+/// 프로필 편집
+extension AccountViewModel {
+    func changeDefaultImage() {
+        postImage = nil
+        imageURL = ""
         
         if success {
             try await firebaseService.saveIsUserValued(userID: uid, isUserValued: false)
@@ -72,7 +128,39 @@ final class AccountViewModel {
             isScucessDeleteAccount = true
         } else {
             dump("계정 삭제 실패")
+        isDefaultImage = true
+    }
+    
+    func startEditButtonTaped() {
+        editingUserName = userName
+        
+        isEditMode = true
+    }
+    
+    func endEditButtonTaped() {
+        Task {
+            if userName != editingUserName {
+                await saveUserName(nickname: userName)
+            }
+            
+            if isProfileImageChanged, let image = postImage {
+                await savePhotoImageToFirebase(image: image)
+                isProfileImageChanged = false
+                dump("해냈냐?")
+            }
+            
+            if isDefaultImage {
+                await deletePhotoImageToFirebase()
+                postImage = nil
+                imageURL = ""
+                isDefaultImage = false
+                dump("제거했냐")
+            }
+
+            fetchUserInformation()
         }
+        
+        isEditMode = false
     }
     
     func saveUserName(nickname: String) async {
@@ -88,32 +176,7 @@ final class AccountViewModel {
         }
     }
     
-    func fetchUserInformation() async {
-        guard let uid = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
-            return
-        }
-        
-        do {
-            let userInformation = try await firebaseService.fetchUserInformation(userID: uid)
-            
-            if let userName = userInformation["UserNickname"] as? String {
-                self.userName = userName
-            } else {
-                dump("userName 값이 String 타입이 아니거나 nil입니다.")
-            }
-            
-            if let imageURL = userInformation["UserImageURL"] as? String {
-                self.imageURL = imageURL
-            } else {
-                dump("imageURL 값이 String 타입이 아니거나 nil입니다.")
-            }
-        } catch {
-            dump("유저 정보를 불러오는데 실패했습니다.")
-        }
-    }
-    
-    func saveUserProfileImage(image: UIImage) async {
+    func savePhotoImageToFirebase(image: UIImage) async {
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
             return
@@ -124,6 +187,20 @@ final class AccountViewModel {
             dump("유저 이미지를 저장하는데 성공했습니다.")
         } catch {
             dump("유저 이미지를 저장하는데 실패했습니다.")
+        }
+    }
+    
+    func deletePhotoImageToFirebase() async {
+        guard let uid = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        
+        do {
+            try await firebaseService.deleteUserImageInFirebase(userID: uid)
+            dump("유저 이미지를 삭제하는데 성공했습니다.")
+        } catch {
+            dump("유저 이미지를 삭제하는데 실패했습니다.")
         }
     }
 }

@@ -87,8 +87,7 @@ struct PlakePlaylistView: View {
         }
         .onChange(of: scenePhase) { _, newScene in
             if newScene == .active && viewModel.presentationState.didOpenSpotifyURL {
-                viewModel.exportingState = .none
-                viewModel.presentationState.didOpenSpotifyURL = false
+                viewModel.resetSpotifyURLState()
             }
         }
     }
@@ -548,6 +547,7 @@ private struct DeletePlakeAlertActions: View {
 
 private struct ExportingFailedAlertActions: View {
     @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(\.openURL) private var openURL
     let viewModel: PlakePlaylistViewModel
     
     var body: some View {
@@ -557,7 +557,9 @@ private struct ExportingFailedAlertActions: View {
         
         Button("확인", role: .destructive) {
             viewModel.presentationState.isShowingDeletePlakeAlert = false
-            viewModel.openAppleMusicInAppStore()
+            if let url = URL(string: viewModel.exportAppleMusicURLString) {
+                openURL(url)
+            }
         }
     }
 }

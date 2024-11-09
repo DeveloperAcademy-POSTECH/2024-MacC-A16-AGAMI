@@ -122,12 +122,6 @@ extension AccountViewModel {
         postImage = nil
         imageURL = ""
         
-        if success {
-            try await firebaseService.saveIsUserValued(userID: uid, isUserValued: false)
-            dump("계정 삭제 성공")
-            isScucessDeleteAccount = true
-        } else {
-            dump("계정 삭제 실패")
         isDefaultImage = true
     }
     

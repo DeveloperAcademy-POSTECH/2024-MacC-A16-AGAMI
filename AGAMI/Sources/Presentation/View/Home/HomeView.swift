@@ -10,6 +10,7 @@ import FirebaseAuth
 
 struct HomeView: View {
     @State private var viewModel: HomeViewModel = .init()
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     
@@ -85,6 +86,7 @@ struct HomeView: View {
             .padding(.bottom, 50)
             
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .ignoresSafeArea(edges: .bottom)
     }
 }

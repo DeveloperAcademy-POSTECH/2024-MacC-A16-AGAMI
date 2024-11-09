@@ -13,6 +13,7 @@ import PhotosUI
 
 struct PlakePlaylistView: View {
     @State var viewModel: PlakePlaylistViewModel
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
     @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(\.scenePhase) private var scenePhase
@@ -36,6 +37,7 @@ struct PlakePlaylistView: View {
                 ProgressView()
             }
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture { hideKeyboard() }
         .refreshable { viewModel.refreshPlaylist() }
         .background(Color(.pLightGray))

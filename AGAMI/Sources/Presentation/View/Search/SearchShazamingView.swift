@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct SearchShazamingView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel: SearchShazamingViewModel = SearchShazamingViewModel()
@@ -76,6 +77,7 @@ struct SearchShazamingView: View {
                     .padding(.bottom, 13)
             }
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationBarBackButtonHidden()
         .onAppear {
             viewModel.startRecognition()

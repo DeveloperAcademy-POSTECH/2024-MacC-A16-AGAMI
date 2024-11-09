@@ -205,6 +205,11 @@ final class FirebaseService {
                                 .child("\(userID)/UserImage")
         
         try await deleteFilesRecursively(in: imageIDFolder)
+        
+        try await firestore
+                    .collection("UserInformation")
+                    .document(userID)
+                    .updateData(["UserImageURL": ""])
         dump("Image files in storage successfully deleted")
     }
     

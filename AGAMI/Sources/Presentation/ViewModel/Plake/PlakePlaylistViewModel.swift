@@ -33,6 +33,8 @@ final class PlakePlaylistViewModel: Hashable {
     var exportingState: ExportingState = .none
     var presentationState: PlaylistPresentationState = .init()
     
+    let exportAppleMusicURLString: String = "itms-apps://itunes.apple.com/app/apple-music/id1108187390"
+    
     var selectedItem: PhotosPickerItem? {
         didSet {
             Task {
@@ -111,12 +113,6 @@ final class PlakePlaylistViewModel: Hashable {
             }
             self?.exportingState = .none
             completion(.success(playlistURL))
-        }
-    }
-    
-    func openAppleMusicInAppStore() {
-        if let url = URL(string: "itms-apps://itunes.apple.com/app/apple-music/id1108187390") {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
     
@@ -261,6 +257,11 @@ final class PlakePlaylistViewModel: Hashable {
                 self.playlist = newPlaylist
             }
         }
+    }
+    
+    func resetSpotifyURLState() {
+        exportingState = .none
+        presentationState.didOpenSpotifyURL = false
     }
 }
 

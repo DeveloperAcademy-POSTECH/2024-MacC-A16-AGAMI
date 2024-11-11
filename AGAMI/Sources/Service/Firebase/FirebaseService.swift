@@ -158,7 +158,8 @@ final class FirebaseService {
             firestore
                 .collection("UserInformation")
                 .document(userID)
-                .setData(["UserNickname": nickname]) { error in
+                .setData(["UserNickname": nickname], merge: true) { error in
+                    
                 if let error = error {
                     dump("Failed to save UserNickname: \(error.localizedDescription)")
                     continuation.resume(throwing: error)
@@ -232,7 +233,7 @@ final class FirebaseService {
             firestore
                 .collection("UserInformation")
                 .document(userID)
-                .setData(["isUserValued": isUserValued]) { error in
+                .setData(["isUserValued": isUserValued], merge: true) { error in
                 if let error = error {
                     dump("Failed to save isUserValued: \(error.localizedDescription)")
                     continuation.resume(throwing: error)

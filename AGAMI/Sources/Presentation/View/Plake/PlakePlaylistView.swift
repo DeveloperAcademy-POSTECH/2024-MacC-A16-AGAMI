@@ -16,7 +16,6 @@ struct PlakePlaylistView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.openURL) private var openURL
     @Environment(PlakeCoordinator.self) private var coordinator
-    @Environment(\.scenePhase) private var scenePhase
     
     init(viewModel: PlakePlaylistViewModel) {
         _viewModel = State(wrappedValue: viewModel)

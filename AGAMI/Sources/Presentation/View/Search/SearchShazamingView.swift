@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SearchShazamingView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(\.scenePhase) private var scenePhase
     @State private var viewModel: SearchShazamingViewModel = SearchShazamingViewModel()
     
     var body: some View {
@@ -82,6 +83,12 @@ struct SearchShazamingView: View {
         .onChange(of: viewModel.shazamStatus) { _, newStatus in
             if newStatus == .found {
                 coordinator.pop()
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .background {
+                viewModel.shazamStatus = .failed
+                viewModel.stopRecognition()
             }
         }
     }

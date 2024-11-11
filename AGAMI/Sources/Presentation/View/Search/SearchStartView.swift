@@ -52,7 +52,6 @@ struct SearchStartView: View {
         }
         .ignoresSafeArea(.keyboard)
         .onAppear {
-            viewModel.requestCurrentLocation()
             viewModel.loadSavedSongs()
         }
         .onTapGesture {

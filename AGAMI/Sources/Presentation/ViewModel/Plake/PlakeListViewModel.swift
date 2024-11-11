@@ -18,6 +18,7 @@ final class PlakeListViewModel {
     var playlists: [PlaylistModel] = []
     private var unfilteredPlaylists: [PlaylistModel] = []
     var isUploading: Bool = false
+    var isSearchResultEmpty: Bool = false
     var searchText: String = "" {
         didSet {
             filterPlaylists()
@@ -41,6 +42,7 @@ final class PlakeListViewModel {
 
     func clearSearchText() {
         searchText = ""
+        isSearchResultEmpty = false
     }
 
     func logout() {
@@ -89,10 +91,12 @@ final class PlakeListViewModel {
     private func filterPlaylists() {
         if searchText.isEmpty {
             playlists = unfilteredPlaylists
+            isSearchResultEmpty = false
         } else {
             playlists = unfilteredPlaylists.filter { playlist in
                 playlist.playlistName.lowercased().contains(searchText.lowercased())
             }
+            isSearchResultEmpty = playlists.isEmpty
         }
     }
 

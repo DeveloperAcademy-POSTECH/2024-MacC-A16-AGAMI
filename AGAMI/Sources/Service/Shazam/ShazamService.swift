@@ -76,6 +76,7 @@ final class ShazamService: NSObject {
 
     private func startTimer() {
         dump(#function)
+        guard timer == nil else { return } // 타이머 중복 생성 방지
         timer = Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { [weak self] _ in
             dump("20초 경과 샤잠 종료")
             self?.stopRecognition()

@@ -40,15 +40,18 @@ struct PlakePlaylistView: View {
         .refreshable { viewModel.refreshPlaylist() }
         .background(Color(.pLightGray))
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    coordinator.pop()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(Color(.pPrimary))
+            if !viewModel.presentationState.isEditing {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        coordinator.pop()
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Color(.pPrimary))
+                    }
                 }
             }
+            
             ToolbarItem(placement: .topBarTrailing) {
                 TopBarTrailingItems(viewModel: viewModel)
                     .foregroundStyle(Color(.pPrimary))
@@ -146,6 +149,9 @@ private struct ListView: View {
         }
         .listStyle(.plain)
         .scrollIndicators(.hidden)
+        .onAppear {
+            viewModel.refreshPlaylist()
+        }
     }
 }
 
@@ -448,6 +454,15 @@ private struct TopBarTrailingItems: View {
     var body: some View {
         HStack {
             if viewModel.presentationState.isEditing {
+                Button {
+                    viewModel.resetPlaylist()
+                    viewModel.presentationState.isEditing = false
+                } label: {
+                    Text("취소")
+                        .font(.pretendard(weight: .semiBold600, size: 17))
+                        .foregroundStyle(Color(.pPrimary))
+                }
+                
                 Button(role: .cancel) {
                     Task {
                         await viewModel.applyChangesToFirestore()

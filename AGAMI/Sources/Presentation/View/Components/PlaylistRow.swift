@@ -25,7 +25,7 @@ struct PlaylistRow: View {
                     .frame(width: 60, height: 60)
                     .padding(.trailing, 20)
             } else {
-                Image(.musicEmpty)
+                Image(.songEmpty)
                     .padding(.trailing, 20)
             }
             

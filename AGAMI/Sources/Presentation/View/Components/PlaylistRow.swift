@@ -26,6 +26,9 @@ struct PlaylistRow: View {
                     .padding(.trailing, 20)
             } else {
                 Image(.songEmpty)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
                     .padding(.trailing, 20)
             }
             

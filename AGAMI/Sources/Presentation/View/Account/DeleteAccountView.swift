@@ -10,6 +10,8 @@ import SwiftUI
 struct SignOutView: View {
     @Environment(\.scenePhase) private var scenePhase
     
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: AccountViewModel
     var body: some View {
         ZStack {
             Color(.pLightGray)
@@ -31,15 +33,26 @@ struct SignOutView: View {
                         .foregroundStyle(Color(.pPrimary))
                 }
                 
-                Text("회원 탈퇴 완료!")
-                    .font(.pretendard(weight: .semiBold600, size: 24))
-                    .foregroundStyle(Color(.pBlack))
+                switch viewModel.deleteAccountProcess {
+                case .inProgress:
+                    Text("회원 탈퇴중입니다...")
+                        .font(.pretendard(weight: .semiBold600, size: 24))
+                        .foregroundStyle(Color(.pBlack))
+                default:
+                    Text("회원 탈퇴 완료!")
+                        .font(.pretendard(weight: .semiBold600, size: 24))
+                        .foregroundStyle(Color(.pBlack))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                UserDefaults.standard.removeObject(forKey: "isSignedIn")
+                                coordinator.popToRoot()
+                            }
+                        }
+                }
             }
         }
         .onAppearAndActiveCheckUserValued(scenePhase)
+        .navigationTitle("")
+        .isEnablePopGesture()
     }
-}
-
-#Preview {
-    DeleteAccountView()
 }

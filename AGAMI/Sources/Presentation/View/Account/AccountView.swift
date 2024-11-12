@@ -177,11 +177,11 @@ private struct ProfileView: View {
                     .fill(Color(.pWhite))
             )
         }
-
+        
     }
 }
 
-//MARK: - InformationView
+// MARK: - InformationView
 private struct InformationView: View {
     @Environment(\.openURL) private var openURL
     let viewModel: AccountViewModel
@@ -244,7 +244,7 @@ private struct InformationView: View {
     }
 }
 
-//MARK: - LogoutButton View
+// MARK: - LogoutButton View
 private struct LogoutButton: View {
     let viewModel: AccountViewModel
     
@@ -265,7 +265,7 @@ private struct LogoutButton: View {
     }
 }
 
-//MARK: - ProfileImageDialogActions
+// MARK: - ProfileImageDialogActions
 private struct ProfileImageDialogActions: View {
     @Bindable var viewModel: AccountViewModel
     
@@ -288,7 +288,7 @@ private struct ProfileImageDialogActions: View {
     }
 }
 
-//MARK: - SignOutAlertActions
+// MARK: - SignOutAlertActions
 private struct SignOutAlertActions: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
@@ -305,7 +305,7 @@ private struct SignOutAlertActions: View {
     }
 }
 
-//MARK: - DeleteAccountAlertActions
+// MARK: - DeleteAccountAlertActions
 private struct DeleteAccountAlertActions: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel

@@ -15,6 +15,7 @@ final class PlakeListViewModel {
     private let authService = FirebaseAuthService()
     private let musicService = MusicService()
 
+    var isFetching: Bool = false
     var playlists: [PlaylistModel] = []
     private var unfilteredPlaylists: [PlaylistModel] = []
     var isUploading: Bool = false
@@ -28,6 +29,9 @@ final class PlakeListViewModel {
     var exportingState: ExportingState = .none
     
     func fetchPlaylists() {
+        isFetching = true
+        defer { isFetching = false }
+        
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
             return

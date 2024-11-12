@@ -32,7 +32,6 @@ final class SearchStartViewModel {
     
     init() {
         loadSavedSongs()
-        locationService.delegate = self
     }
     
     func createSearchWritingViewModel() -> SearchWritingViewModel {
@@ -44,32 +43,32 @@ final class SearchStartViewModel {
             userTitle: userTitle,
             currentLocality: currentLocality,
             currentRegion: currentRegion
-            )
+        )
     }
     
     func loadSavedSongs() {
         do {
             self.diggingList = try persistenceService.loadDiggingListWithOrder()
         } catch {
-            dump("Failed to load saved songs: \(error)")
+            dump("저장된 노래를 불러오는 데 실패했습니다: \(error)")
+        }
+    }
+
+    func fetchCurrentLocation() async {
+        do {
+            let location = try await locationService.requestCurrentLocation()
+            currentLatitude = location.coordinate.latitude
+            currentLongitude = location.coordinate.longitude
+            await fetchCurrentStreetAddress()
+        } catch {
+            dump("현재 위치를 가져오는 데 실패했습니다: \(error)")
         }
     }
     
-    func requestCurrentLocation() {
-        locationService.requestCurrentLocation()
-    }
-    
-    func getCurrentLocation() {
-        guard let currentLocation = locationService.getCurrentLocation() else { return }
-        currentLatitude = currentLocation.coordinate.latitude
-        currentLongitude = currentLocation.coordinate.longitude
-        
-        locationService.coordinateToStreetAddress { [weak self] address in
-            guard let self = self else { return }
-            
-            self.currentStreetAddress = address
-            self.setPlaceHolderAddress()
-            
+    func fetchCurrentStreetAddress() async {
+        if let address = await locationService.coordinateToStreetAddress() {
+            currentStreetAddress = address
+            setPlaceHolderAddress()
             if currentLatitude != nil && currentLongitude != nil && currentStreetAddress != nil {
                 isLoaded = true
             }
@@ -103,10 +102,10 @@ final class SearchStartViewModel {
                     try persistenceService.deleteSong(item: song)
                     loadSavedSongs()
                 } catch {
-                    dump("Error deleting song: \(error)")
+                    dump("노래 삭제 중 오류 발생: \(error)")
                 }
             } else {
-                dump("Error: Song is not of type SwiftDataSongModel")
+                dump("오류: Song이 SwiftDataSongModel 타입이 아닙니다")
             }
         }
     }
@@ -121,17 +120,7 @@ final class SearchStartViewModel {
             diggingList.removeAll()
             try persistenceService.deleteAllSongs()
         } catch {
-            print("Failed to clear songs: \(error)")
+            print("노래를 모두 삭제하는 데 실패했습니다: \(error)")
         }
-    }
-}
-
-extension SearchStartViewModel: LocationServiceDelegate {
-    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
-        getCurrentLocation()
-    }
-    
-    func locationService(_ service: LocationService, didGetReverseGeocode location: String) {
-        self.currentStreetAddress = location
     }
 }

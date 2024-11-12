@@ -109,12 +109,10 @@ private struct ListView: View {
                 Group {
                     if !viewModel.searchText.isEmpty && viewModel.isSearchResultEmpty {
                         EntpyResult()
-                    } else {
-                        if listCellPlaceholder.showArchiveListUpLoadingCell {
-                            ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
-                        } else if viewModel.playlists.isEmpty {
-                            MakeNewPlakeCell(size: size)
-                        }
+                    } else if listCellPlaceholder.showArchiveListUpLoadingCell {
+                        ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
+                    } else if viewModel.playlists.isEmpty {
+                        MakeNewPlakeCell(size: size)
                     }
 
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in

@@ -27,6 +27,7 @@ final class PlakePlaylistViewModel: Hashable {
     let id: UUID = .init()
     
     var playlist: PlaylistModel
+    private var initialPlaylist: PlaylistModel
     private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
     
@@ -55,8 +56,9 @@ final class PlakePlaylistViewModel: Hashable {
         !playlist.photoURL.isEmpty && presentationState.isEditing
     }
     
-    init(playlist: PlaylistModel) {
+    init(playlist: PlaylistModel, initialPlaylist: PlaylistModel) {
         self.playlist = playlist
+        self.initialPlaylist = initialPlaylist
     }
     
     static func == (lhs: PlakePlaylistViewModel, rhs: PlakePlaylistViewModel) -> Bool {
@@ -160,11 +162,17 @@ final class PlakePlaylistViewModel: Hashable {
     func applyChangesToFirestore() async {
         presentationState.isUpdating = true
         defer { presentationState.isUpdating = false }
-        guard let userID = FirebaseAuthService.currentUID else {
-            return
-        }
+        
+        guard let userID = FirebaseAuthService.currentUID else { return }
+        
         let firestoreModel = ModelAdapter.toFirestorePlaylist(from: playlist)
-        try? await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
+        do {
+            try await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
+            refreshPlaylist()
+            initialPlaylist = firestoreModel
+        } catch {
+            print("Failed to save playlist to Firebase: \(error)")
+        }
     }
     
     func handleURL(_ url: URL) {
@@ -262,6 +270,10 @@ final class PlakePlaylistViewModel: Hashable {
     func resetSpotifyURLState() {
         exportingState = .none
         presentationState.didOpenSpotifyURL = false
+    }
+    
+    func resetPlaylist() {
+        playlist = initialPlaylist
     }
 }
 

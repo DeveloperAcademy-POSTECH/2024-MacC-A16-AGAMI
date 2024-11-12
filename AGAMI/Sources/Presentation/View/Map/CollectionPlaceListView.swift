@@ -25,7 +25,7 @@ struct CollectionPlaceListView: View {
                 ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                     Button {
                         coordinator.push(route: .playlistView(
-                            viewModel: PlakePlaylistViewModel(playlist: playlist)
+                            viewModel: PlakePlaylistViewModel(playlist: playlist, initialPlaylist: playlist)
                         ))
                     } label: {
                         ZStack {

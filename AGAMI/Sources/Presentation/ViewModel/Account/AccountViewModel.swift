@@ -12,9 +12,15 @@ import PhotosUI
 final class AccountViewModel {
     private let firebaseAuthService: FirebaseAuthService = FirebaseAuthService()
     private let firebaseService: FirebaseService = FirebaseService()
+
+    // 계정 삭제에 대한 상태
+    enum DeleteAccountProcess {
+        case none
+        case inProgress
+        case finished
+    }
     
-    // 회원탈퇴 여부
-    var isScucessDeleteAccount: Bool = false
+    var deleteAccountProcess: DeleteAccountProcess = .none
     
     // 편집 모드 여부
     var isEditMode: Bool = false
@@ -26,7 +32,7 @@ final class AccountViewModel {
     var isProfileImageChanged: Bool = false
     
     // 유저 프로필 이름
-    var userName: String = "닉네임"
+    var userName: String = "Plake"
     var editingUserName = ""
     
     // 유저 프로필 이미지
@@ -75,7 +81,6 @@ final class AccountViewModel {
 
 /// 로그인 로그아웃
 extension AccountViewModel {
-    
     func logoutButtonTapped() {
         isShowingSignOutAlert = true
     }
@@ -111,11 +116,12 @@ extension AccountViewModel {
         let success = await firebaseAuthService.deleteAccount()
     func deleteAccount() {
         Task {
-            let success = await firebaseAuthService.deleteAccount()
-            
+            let success = await firebaseAuthService.deleteAccount {
+                self.deleteAccountProcess = .inProgress
+            }
             if success {
-                isScucessDeleteAccount = true
                 dump("계정 삭제 성공")
+                deleteAccountProcess = .finished
             } else {
                 dump("계정 삭제 실패")
             }

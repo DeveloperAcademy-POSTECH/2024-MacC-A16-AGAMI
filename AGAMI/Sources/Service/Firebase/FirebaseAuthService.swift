@@ -136,7 +136,7 @@ final class FirebaseAuthService {
         }
     }
 
-    func deleteAccount() async -> Bool {
+    func deleteAccount(changeProgress: @escaping () -> Void) async -> Bool {
         guard let user = user else { return false }
         guard let lastSignInDate = user.metadata.lastSignInDate else { return false }
         let needsReAuth = !lastSignInDate.isWithinPast(minutes: 5)
@@ -147,6 +147,8 @@ final class FirebaseAuthService {
             if needsReAuth || needsTokenRevocation {
                 let signInWithApple = await SignInWithApple()
                 let appleIDCredential = try await signInWithApple()
+                
+                changeProgress()
                 
                 guard let appleIDToken = appleIDCredential.identityToken else {
                     dump("Unable to fetdch identify token.")

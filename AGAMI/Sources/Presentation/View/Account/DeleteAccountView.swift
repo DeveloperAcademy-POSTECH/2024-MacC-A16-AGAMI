@@ -1,5 +1,5 @@
 //
-//  SignOutView.swift
+//  DeleteAccountView.swift
 //  AGAMI
 //
 //  Created by yegang on 11/4/24.

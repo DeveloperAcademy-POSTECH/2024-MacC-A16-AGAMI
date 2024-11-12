@@ -13,21 +13,24 @@ final class AccountViewModel {
     private let firebaseAuthService: FirebaseAuthService = FirebaseAuthService()
     private let firebaseService: FirebaseService = FirebaseService()
     
+    // 회원탈퇴 여부
     var isScucessDeleteAccount: Bool = false
     
+    // 편집 모드 여부
     var isEditMode: Bool = false
     
     var isProfileImageDialogPresented: Bool = false
     var isShowingSignOutAlert: Bool = false
     var isDeletingAccount: Bool = false
-
+    var isDefaultImage: Bool = false
+    var isProfileImageChanged: Bool = false
+    
+    // 유저 프로필 이름
     var userName: String = "닉네임"
     var editingUserName = ""
     
-    var isDefaultImage: Bool = false
-    var isProfileImageChanged: Bool = false
-
-    var showPhotoPicker: Bool = false
+    // 유저 프로필 이미지
+    var isShowPhotoPicker: Bool = false
     var selectedItem: PhotosPickerItem?
     var postImage: UIImage?
     var imageURL: String = ""
@@ -72,6 +75,10 @@ final class AccountViewModel {
 
 /// 로그인 로그아웃
 extension AccountViewModel {
+    
+    func logoutButtonTapped() {
+        isShowingSignOutAlert = true
+    }
     
     func signOut() {
         firebaseAuthService.signOut { result in
@@ -125,13 +132,38 @@ extension AccountViewModel {
         isDefaultImage = true
     }
     
-    func startEditButtonTaped() {
+    func albumButtonTapped() {
+        isShowPhotoPicker.toggle()
+    }
+    
+    func startEditButtonTapped() {
         editingUserName = userName
         
         isEditMode = true
     }
     
-    func endEditButtonTaped() {
+    func cancelSignOutAlert() {
+        isShowingSignOutAlert = false
+    }
+    
+    func confirmSignOut() {
+        signOut()
+        isShowingSignOutAlert = false
+    }
+    
+    func cancelDeleteAccountAlert() {
+        isDeletingAccount = false
+    }
+    
+    func showProfileImageDialog() {
+        isProfileImageDialogPresented = true
+    }
+    
+    func deleteAccountButtonTapped() {
+        isDeletingAccount = true
+    }
+    
+    func endEditButtonTapped() {
         Task {
             if userName != editingUserName {
                 await saveUserName(nickname: userName)

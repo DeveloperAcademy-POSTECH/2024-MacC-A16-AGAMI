@@ -85,8 +85,8 @@ extension AccountViewModel {
         isShowingSignOutAlert = true
     }
     
-    func signOut() {
-        firebaseAuthService.signOut { result in
+    func signOutUserID() {
+        FirebaseAuthService.signOut { result in
             switch result {
             case .success:
                 UserDefaults.standard.removeObject(forKey: "isSignedIn")
@@ -108,12 +108,14 @@ extension AccountViewModel {
     }
     
     func deleteAccount() async throws {
-        guard let uid = FirebaseAuthService.currentUID else {
+        guard FirebaseAuthService.currentUID != nil else {
             dump("UID를 가져오는 데 실패했습니다.")
             return
         }
         
-        let success = await firebaseAuthService.deleteAccount()
+        let success = await firebaseAuthService.deleteAccount(changeProgress: { })
+    }
+        
     func deleteAccount() {
         Task {
             let success = await firebaseAuthService.deleteAccount {
@@ -153,7 +155,7 @@ extension AccountViewModel {
     }
     
     func confirmSignOut() {
-        signOut()
+        signOutUserID()
         isShowingSignOutAlert = false
     }
     

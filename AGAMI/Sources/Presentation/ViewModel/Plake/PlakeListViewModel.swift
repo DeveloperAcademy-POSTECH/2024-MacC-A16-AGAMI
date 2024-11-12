@@ -30,15 +30,22 @@ final class PlakeListViewModel {
     
     func fetchPlaylists() {
         isFetching = true
-        defer { isFetching = false }
         
         guard let uid = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
+            print("UID를 가져오는 데 실패했습니다.")
+            isFetching = false
             return
         }
+        
         Task {
+            defer {
+                isFetching = false
+            }
+            
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 await updatePlaylists(sortPlaylistsByDate(playlistModels))
+            } else {
+                print("플레이리스트 데이터를 가져오는 데 실패했습니다.")
             }
         }
     }

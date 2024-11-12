@@ -62,7 +62,7 @@ private struct ListHeader: View {
 private struct SearchBar: View {
     @Bindable var viewModel: PlakeListViewModel
     @FocusState var isFocused: Bool
-
+    
     var body: some View {
         ZStack {
             TextField("당신의 아카이브", text: $viewModel.searchText)
@@ -77,7 +77,7 @@ private struct SearchBar: View {
                 )
                 .padding(.horizontal, 8)
                 .padding(.vertical, 8)
-
+            
             HStack {
                 Spacer()
                 Button {
@@ -127,6 +127,14 @@ private struct ListView: View {
                 }
             }
             .scrollTargetLayout()
+            
+            if viewModel.isFetching {
+                ProgressView("")
+                    .scaleEffect(1.5)
+                    .padding()
+                    .background(Color(.systemBackground).opacity(0.8))
+                    .cornerRadius(10)
+            }
         }
         .scrollTargetBehavior(.viewAligned(limitBehavior: getAlwaysByOneIfAvailableElseAlways()))
         .safeAreaPadding(.vertical, size.height / 10)
@@ -136,12 +144,12 @@ private struct ListView: View {
 private struct PlakeListCell: View {
     @Environment(PlakeCoordinator.self) private var coord
     @State private var kfImageOpacity: Double = 0
-
+    
     let viewModel: PlakeListViewModel
     let playlist: PlaylistModel
     let size: CGSize
     private var verticalSize: CGFloat { size.width * 176 / 377 }
-
+    
     var body: some View {
         Button {
             coord.push(route: .playlistView(viewModel: .init(playlist: playlist, initialPlaylist: playlist)))
@@ -169,7 +177,7 @@ private struct PlakeListCell: View {
                     .onDisappear {
                         kfImageOpacity = 0
                     }
-
+                
                 VStack(alignment: .leading, spacing: 0) {
                     Group {
                         Text(playlist.playlistName)
@@ -183,9 +191,9 @@ private struct PlakeListCell: View {
                     }
                     .foregroundStyle(Color(.pWhite))
                     .shadow(radius: 10)
-
+                    
                     Spacer()
-
+                    
                     HStack(alignment: .center, spacing: 0) {
                         Spacer()
                         Text(viewModel.formatDateToString(playlist.generationTime))
@@ -299,7 +307,7 @@ private struct ContextMenuItems: View {
     @Environment(\.openURL) private var openURL
     let viewModel: PlakeListViewModel
     let playlist: PlaylistModel
-
+    
     var body: some View {
         Button {
             Task {

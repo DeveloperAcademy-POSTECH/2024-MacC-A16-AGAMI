@@ -8,10 +8,9 @@
 import SwiftUI
 
 struct SignOutView: View {
-    @Environment(\.scenePhase) private var scenePhase
-    
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
+    
     var body: some View {
         ZStack {
             Color(.pLightGray)
@@ -51,8 +50,7 @@ struct SignOutView: View {
                 }
             }
         }
-        .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationTitle("")
-        .isEnablePopGesture()
+        .disablePopGesture()
     }
 }

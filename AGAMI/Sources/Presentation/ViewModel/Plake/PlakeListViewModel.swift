@@ -54,28 +54,6 @@ final class PlakeListViewModel {
         searchText = ""
     }
 
-    func deleteAllDataInFirebase() async throws {
-        guard let userID = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
-            return
-        }
-        
-        do {
-            try await firebaseService.deleteAllPhotoInStorage(userID: userID)
-            try await firebaseService.deleteAllPlaylists(userID: userID)
-        } catch {
-            dump("\(error.localizedDescription) while deleting account")
-        }
-    }
-    
-    func deleteAccountAndSignOut() async {
-        if await authService.deleteAccount() {
-            FirebaseAuthService.signOutUserID()
-        } else {
-            dump("계정 삭제에 실패했습니다.")
-        }
-    }
-
     private func sortPlaylistsByDate(_ playlistModels: [PlaylistModel]) -> [PlaylistModel] {
         playlistModels.sorted { $0.generationTime > $1.generationTime }
     }

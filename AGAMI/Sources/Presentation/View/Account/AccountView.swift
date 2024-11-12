@@ -19,14 +19,16 @@ struct AccountView: View {
             Color(.pLightGray)
                 .ignoresSafeArea()
             
-            if !viewModel.isDeletingAccount {
+            if case .none = viewModel.deleteAccountProcess {
                 VStack(spacing: 0) {
                     ScrollView {
-                        profileView
+                        ProfileView(viewModel: viewModel)
                             .padding(.top, 28)
+                        
                         InformationView(viewModel: viewModel)
                             .padding(.top, 33)
                     }
+                    
                     Spacer()
                     
                     LogoutButton(viewModel: viewModel)
@@ -34,12 +36,7 @@ struct AccountView: View {
                 }
                 .padding(.horizontal, 8)
             } else {
-                DeleteAccountView()
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                            coordinator.popToRoot()
-                        }
-                    }
+                DeleteAccountView(viewModel: viewModel)
             }
         }
         .onAppearAndActiveCheckUserValued(scenePhase)
@@ -47,19 +44,19 @@ struct AccountView: View {
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden()
         .ignoresSafeArea(.keyboard)
-//        .toolbar {
-//            if !viewModel.isScucessDeleteAccount {
-//                ToolbarItem(placement: .topBarLeading) {
-//                    Button {
-//                        coordinator.pop()
-//                    } label: {
-//                        Image(systemName: "chevron.backward")
-//                            .font(.pretendard(weight: .semiBold600, size: 17))
-//                            .foregroundStyle(Color(.pPrimary))
-//                    }
-//                }
-//            }
-//        }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                if viewModel.deleteAccountProcess == .none {
+                    Button {
+                        coordinator.pop()
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                            .font(.pretendard(weight: .semiBold600, size: 17))
+                            .foregroundStyle(Color(.pPrimary))
+                    }
+                }
+            }
+        }
         .onTapGesture {
             hideKeyboard()
         }
@@ -86,9 +83,13 @@ struct AccountView: View {
             viewModel.fetchUserInformation()
         }
     }
+}
+
+// MARK: - ProfileView
+private struct ProfileView: View {
+    @Bindable var viewModel: AccountViewModel
     
-    //MARK: - 프로필 뷰
-    private var profileView: some View {
+    var body: some View {
         VStack(spacing: 11) {
             HStack(spacing: 0) {
                 Text("프로필")
@@ -176,16 +177,11 @@ struct AccountView: View {
                     .fill(Color(.pWhite))
             )
         }
-    }
-    
-    //MARK: - InformationView
-    //MARK: - LogoutButton View
-    //MARK: - ProfileImageDialogActions
-    //MARK: - SignOutAlertActions
-    //MARK: - DeleteAccountAlertActions
 
+    }
 }
 
+//MARK: - InformationView
 private struct InformationView: View {
     @Environment(\.openURL) private var openURL
     let viewModel: AccountViewModel
@@ -248,6 +244,7 @@ private struct InformationView: View {
     }
 }
 
+//MARK: - LogoutButton View
 private struct LogoutButton: View {
     let viewModel: AccountViewModel
     
@@ -268,6 +265,7 @@ private struct LogoutButton: View {
     }
 }
 
+//MARK: - ProfileImageDialogActions
 private struct ProfileImageDialogActions: View {
     @Bindable var viewModel: AccountViewModel
     
@@ -290,6 +288,7 @@ private struct ProfileImageDialogActions: View {
     }
 }
 
+//MARK: - SignOutAlertActions
 private struct SignOutAlertActions: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
@@ -306,7 +305,9 @@ private struct SignOutAlertActions: View {
     }
 }
 
+//MARK: - DeleteAccountAlertActions
 private struct DeleteAccountAlertActions: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     
     var body: some View {

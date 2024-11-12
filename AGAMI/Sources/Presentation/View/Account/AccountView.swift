@@ -19,19 +19,28 @@ struct AccountView: View {
             Color(.pLightGray)
                 .ignoresSafeArea()
             
-            VStack(spacing: 0) {
-                ScrollView {
-                    ProfileView(viewModel: viewModel)
-                        .padding(.top, 28)
-                    InformationView(viewModel: viewModel)
-                        .padding(.top, 33)
+            if !viewModel.isDeletingAccount {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        profileView
+                            .padding(.top, 28)
+                        InformationView(viewModel: viewModel)
+                            .padding(.top, 33)
+                    }
+                    Spacer()
+                    
+                    LogoutButton(viewModel: viewModel)
+                        .padding(.bottom, 20)
                 }
-                Spacer()
-                
-                LogoutButton(viewModel: viewModel)
-                    .padding(.bottom, 20)
+                .padding(.horizontal, 8)
+            } else {
+                DeleteAccountView()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                            coordinator.popToRoot()
+                        }
+                    }
             }
-            .padding(.horizontal, 8)
         }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationTitle("계정")
@@ -57,7 +66,7 @@ struct AccountView: View {
         .confirmationDialog("", isPresented: $viewModel.isProfileImageDialogPresented) {
             ProfileImageDialogActions(viewModel: viewModel)
         }
-        .photosPicker(isPresented: $viewModel.showPhotoPicker,
+        .photosPicker(isPresented: $viewModel.isShowPhotoPicker,
                       selection: $viewModel.selectedItem,
                       matching: .images)
         .onChange(of: viewModel.selectedItem) { _, newValue in
@@ -73,13 +82,13 @@ struct AccountView: View {
         } message: {
             Text("탈퇴한 계정은 복구할 수 없습니다.")
         }
+        .onAppear {
+            viewModel.fetchUserInformation()
+        }
     }
-}
-
-private struct ProfileView: View {
-    @Bindable var viewModel: AccountViewModel
     
-    var body: some View {
+    //MARK: - 프로필 뷰
+    private var profileView: some View {
         VStack(spacing: 11) {
             HStack(spacing: 0) {
                 Text("프로필")
@@ -90,9 +99,9 @@ private struct ProfileView: View {
                 
                 Button {
                     if viewModel.isEditMode {
-                        viewModel.endEditButtonTaped()
+                        viewModel.endEditButtonTapped()
                     } else {
-                        viewModel.startEditButtonTaped()
+                        viewModel.startEditButtonTapped()
                     }
                 } label: {
                     Text(viewModel.isEditMode ? "완료" : "편집")
@@ -107,7 +116,7 @@ private struct ProfileView: View {
                 
                 VStack(alignment: .center, spacing: 10) {
                     Button {
-                        viewModel.isProfileImageDialogPresented = true
+                        viewModel.showProfileImageDialog()
                     } label: {
                         Group {
                             if let postImage = viewModel.postImage {
@@ -166,11 +175,15 @@ private struct ProfileView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(.pWhite))
             )
-            .onAppear {
-                viewModel.fetchUserInformation()
-            }
         }
     }
+    
+    //MARK: - InformationView
+    //MARK: - LogoutButton View
+    //MARK: - ProfileImageDialogActions
+    //MARK: - SignOutAlertActions
+    //MARK: - DeleteAccountAlertActions
+
 }
 
 private struct InformationView: View {
@@ -214,7 +227,7 @@ private struct InformationView: View {
                 }
                 
                 Button {
-                    viewModel.isDeletingAccount = true
+                    viewModel.deleteAccountButtonTapped()
                 } label: {
                     HStack(spacing: 0) {
                         Text("회원 탈퇴")
@@ -240,7 +253,7 @@ private struct LogoutButton: View {
     
     var body: some View {
         Button {
-            viewModel.isShowingSignOutAlert = true
+            viewModel.logoutButtonTapped()
         } label: {
             Text("로그아웃")
                 .font(.pretendard(weight: .medium500, size: 20))
@@ -260,7 +273,7 @@ private struct ProfileImageDialogActions: View {
     
     var body: some View {
         Button {
-            viewModel.showPhotoPicker.toggle()
+            viewModel.albumButtonTapped()
         } label: {
             Text("앨범에서 가져오기")
                 .font(.pretendard(weight: .regular400, size: 18))
@@ -283,13 +296,12 @@ private struct SignOutAlertActions: View {
     
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.isShowingSignOutAlert = false
+            viewModel.cancelSignOutAlert()
         }
         
         Button("확인", role: .destructive) {
-            viewModel.signOut()
+            viewModel.confirmSignOut()
             coordinator.popToRoot()
-            viewModel.isShowingSignOutAlert = false
         }
     }
 }
@@ -299,7 +311,7 @@ private struct DeleteAccountAlertActions: View {
     
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.isDeletingAccount = false
+            viewModel.cancelDeleteAccountAlert()
         }
         
         Button("탈퇴", role: .destructive) {

@@ -29,7 +29,6 @@ final class PopGestureManager {
 struct PopGestureViewModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
-            .navigationBarBackButtonHidden()
             .task {
                 PopGestureManager.shared.isPopGestureEnabled = false
             }
@@ -40,7 +39,7 @@ struct PopGestureViewModifier: ViewModifier {
 }
 
 extension View {
-    func isEnablePopGesture() -> some View {
+    func disablePopGesture() -> some View {
         modifier(PopGestureViewModifier())
     }
 }

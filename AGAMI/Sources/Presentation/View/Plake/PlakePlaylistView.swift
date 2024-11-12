@@ -156,14 +156,19 @@ private struct ArchivePlaylistRow: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            KFImage(URL(string: song.albumCoverURL))
-                .resizable()
-                .cancelOnDisappear(true)
-                .placeholder {
-                    ProgressView()
-                }
-                .frame(width: 60, height: 60)
-                .padding(.trailing, 12)
+            if !song.albumCoverURL.isEmpty {
+                KFImage(URL(string: song.albumCoverURL))
+                    .resizable()
+                    .cancelOnDisappear(true)
+                    .placeholder {
+                        ProgressView()
+                    }
+                    .frame(width: 60, height: 60)
+                    .padding(.trailing, 12)
+            } else {
+                Image(.musicEmpty)
+                    .padding(.trailing, 12)
+            }
             
             VStack(alignment: .leading, spacing: 0) {
                 Text(song.title)

@@ -106,24 +106,24 @@ extension AccountViewModel {
         try await firebaseService.deleteAllPlaylists(userID: uid)
         try await firebaseService.deleteAllPhotoInStorage(userID: uid)
     }
-    
-    func deleteAccount() async throws {
-        guard FirebaseAuthService.currentUID != nil else {
+        
+    func deleteAccount() {
+        guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
             return
         }
         
-        let success = await firebaseAuthService.deleteAccount(changeProgress: { })
-    }
-        
-    func deleteAccount() {
         Task {
+            try await deleteFirebaseData()
+            
             let success = await firebaseAuthService.deleteAccount {
                 self.deleteAccountProcess = .inProgress
             }
+            
             if success {
-                dump("계정 삭제 성공")
+                try await firebaseService.saveIsUserValued(userID: uid, isUserValued: false)
                 deleteAccountProcess = .finished
+                dump("계정 삭제 성공")
             } else {
                 dump("계정 삭제 실패")
             }
@@ -180,7 +180,7 @@ extension AccountViewModel {
             if isProfileImageChanged, let image = postImage {
                 await savePhotoImageToFirebase(image: image)
                 isProfileImageChanged = false
-                dump("해냈냐?")
+                dump("유저 프로필 사진이 변경되었습니다.")
             }
             
             if isDefaultImage {
@@ -188,7 +188,7 @@ extension AccountViewModel {
                 postImage = nil
                 imageURL = ""
                 isDefaultImage = false
-                dump("제거했냐")
+                dump("유저 프로필 사진이 기본 사진으로 변경되었습니다. (사진 제거)")
             }
 
             fetchUserInformation()

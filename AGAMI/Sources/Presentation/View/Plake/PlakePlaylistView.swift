@@ -172,6 +172,9 @@ private struct ArchivePlaylistRow: View {
                     .padding(.trailing, 12)
             } else {
                 Image(.songEmpty)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
                     .padding(.trailing, 12)
             }
             

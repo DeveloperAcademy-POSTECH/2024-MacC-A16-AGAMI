@@ -116,41 +116,41 @@ private struct ProfileView: View {
                 Spacer()
                 
                 VStack(alignment: .center, spacing: 10) {
-                    Button {
-                        viewModel.showProfileImageDialog()
-                    } label: {
-                        Group {
-                            if let postImage = viewModel.postImage {
-                                Image(uiImage: postImage)
-                                    .resizable()
-                            } else if !viewModel.imageURL.isEmpty {
-                                KFImage(URL(string: viewModel.imageURL))
-                                    .resizable()
-                            } else {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .resizable()
-                            }
-                        }
-                        .scaledToFill()
-                        .clipShape(Circle())
-                        .frame(width: 94, height: 94)
-                        .foregroundStyle(Color(.pGray2))
-                        .overlay(alignment: .bottomTrailing) {
-                            if viewModel.isEditMode {
-                                Circle()
-                                    .frame(width: 33, height: 33, alignment: .center)
-                                    .foregroundStyle(Color(.pLightGray))
-                                    .overlay {
-                                        Image(systemName: "camera.circle.fill")
-                                            .resizable()
-                                            .frame(width: 27, height: 27, alignment: .center)
-                                            .foregroundStyle(Color(.pPrimary))
-                                    }
-                                    .offset(x: 3, y: 3)
-                            }
+                    Group {
+                        if let postImage = viewModel.postImage {
+                            Image(uiImage: postImage)
+                                .resizable()
+                        } else if !viewModel.imageURL.isEmpty {
+                            KFImage(URL(string: viewModel.imageURL))
+                                .resizable()
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
                         }
                     }
-                    .disabled(!viewModel.isEditMode)
+                    .scaledToFill()
+                    .clipShape(Circle())
+                    .frame(width: 94, height: 94)
+                    .foregroundStyle(Color(.pGray2))
+                    .overlay(alignment: .bottomTrailing) {
+                        if viewModel.isEditMode {
+                            Circle()
+                                .frame(width: 33, height: 33, alignment: .center)
+                                .foregroundStyle(Color(.pLightGray))
+                                .overlay {
+                                    Image(systemName: "camera.circle.fill")
+                                        .resizable()
+                                        .frame(width: 27, height: 27, alignment: .center)
+                                        .foregroundStyle(Color(.pPrimary))
+                                }
+                                .offset(x: 3, y: 3)
+                        }
+                    }
+                    .onTapGesture {
+                        if viewModel.isEditMode {
+                            viewModel.showProfileImageDialog()
+                        }
+                    }
                     
                     TextField(viewModel.userName, text: $viewModel.userName)
                         .font(.pretendard(weight: .semiBold600, size: 28))
@@ -165,9 +165,9 @@ private struct ProfileView: View {
                                 .fill(Color(.pGray2))
                             : nil
                         )
-                        .disabled(!viewModel.isEditMode)
                 }
-                
+                .disabled(!viewModel.isEditMode)
+
                 Spacer()
             }
             .frame(maxWidth: .infinity)

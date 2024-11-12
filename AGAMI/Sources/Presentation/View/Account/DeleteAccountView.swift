@@ -41,5 +41,5 @@ struct SignOutView: View {
 }
 
 #Preview {
-    SignOutView()
+    DeleteAccountView()
 }

@@ -172,7 +172,7 @@ private struct ArchivePlaylistRow: View {
                     .frame(width: 60, height: 60)
                     .padding(.trailing, 12)
             } else {
-                Image(.musicEmpty)
+                Image(.songEmpty)
                     .padding(.trailing, 12)
             }
             

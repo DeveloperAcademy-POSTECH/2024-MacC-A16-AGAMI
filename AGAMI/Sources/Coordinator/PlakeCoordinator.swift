@@ -25,7 +25,7 @@ enum PlakeRoute: Hashable {
     case placeListView(viewModel: CollectionPlaceViewModel)
     
     case accountView
-    case deleteAccountView
+    case deleteAccountView(viewModel: AccountViewModel)
 
     var id: String {
         switch self {
@@ -93,8 +93,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             CollectionPlaceView(viewModel: viewModel)
         case .accountView:
             AccountView()
-        case .deleteAccountView:
-            DeleteAccountView()
+        case let .deleteAccountView(viewModel):
+            DeleteAccountView(viewModel: viewModel)
         case let .addPlakingView(viewModel):
             AddPlakingView(viewModel: viewModel)
         case let .addPlakingShazamView(viewModel):

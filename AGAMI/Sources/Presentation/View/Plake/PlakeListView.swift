@@ -109,7 +109,7 @@ private struct ListView: View {
                 Group {
                     if listCellPlaceholder.showArchiveListUpLoadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
-                    } else if viewModel.playlists.isEmpty {
+                    } else if viewModel.playlists.isEmpty && !viewModel.isFetching {
                         MakeNewPlakeCell(size: size)
                     }
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in

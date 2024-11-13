@@ -147,9 +147,7 @@ private struct ProfileView: View {
                         }
                     }
                     .onTapGesture {
-                        if viewModel.isEditMode {
-                            viewModel.showProfileImageDialog()
-                        }
+                        viewModel.showProfileImageDialog()
                     }
                     
                     TextField(viewModel.userName, text: $viewModel.userName)
@@ -165,6 +163,11 @@ private struct ProfileView: View {
                                 .fill(Color(.pGray2))
                             : nil
                         )
+                        .onChange(of: viewModel.userName) { _, newValue in
+                            if newValue.count > 8 {
+                                viewModel.userName = String(newValue.prefix(8))
+                            }
+                        }
                 }
                 .disabled(!viewModel.isEditMode)
 

@@ -19,6 +19,7 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
     }
 }
 
+// 스와이프 제스처 막는 뷰 모디파이어
 final class PopGestureManager {
     static let shared = PopGestureManager()
     private init() {}

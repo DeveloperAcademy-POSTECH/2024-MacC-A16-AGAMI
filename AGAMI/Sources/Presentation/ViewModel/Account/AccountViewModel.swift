@@ -146,7 +146,6 @@ extension AccountViewModel {
     
     func startEditButtonTapped() {
         editingUserName = userName
-        
         isEditMode = true
     }
     

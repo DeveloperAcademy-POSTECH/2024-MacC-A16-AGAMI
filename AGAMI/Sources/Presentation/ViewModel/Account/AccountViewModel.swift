@@ -164,7 +164,9 @@ extension AccountViewModel {
     }
     
     func showProfileImageDialog() {
-        isProfileImageDialogPresented = true
+        if isEditMode {
+            isProfileImageDialogPresented = true
+        }
     }
     
     func deleteAccountButtonTapped() {

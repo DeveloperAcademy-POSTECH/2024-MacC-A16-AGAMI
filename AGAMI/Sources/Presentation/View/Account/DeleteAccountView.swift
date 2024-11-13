@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SignOutView: View {
+struct DeleteAccountView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     

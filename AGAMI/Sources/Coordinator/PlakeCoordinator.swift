@@ -94,7 +94,7 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
         case .accountView:
             AccountView()
         case let .deleteAccountView(viewModel):
-            SignOutView(viewModel: viewModel)
+            DeleteAccountView(viewModel: viewModel)
         case let .addPlakingView(viewModel):
             AddPlakingView(viewModel: viewModel)
         case let .addPlakingShazamView(viewModel):

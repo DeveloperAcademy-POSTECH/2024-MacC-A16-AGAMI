@@ -36,7 +36,7 @@ struct AccountView: View {
                 }
                 .padding(.horizontal, 8)
             } else {
-                SignOutView(viewModel: viewModel)
+                DeleteAccountView(viewModel: viewModel)
             }
         }
         .onAppearAndActiveCheckUserValued(scenePhase)

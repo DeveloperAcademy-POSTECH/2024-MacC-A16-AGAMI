@@ -13,7 +13,7 @@ import PhotosUI
 final class SearchWritingViewModel {
     private let persistenceService = PersistenceService.shared
     private let firebaseService = FirebaseService()
-
+    
     // 플레이리스트 정보
     var playlist = SwiftDataPlaylistModel()
     var diggingList: [SongModel] = []
@@ -58,7 +58,7 @@ final class SearchWritingViewModel {
         } else {
             self.userTitle = userTitle
         }
-
+        
         self.currentLocality = currentLocality
         self.currentRegion = currentRegion
         
@@ -79,42 +79,59 @@ final class SearchWritingViewModel {
         defer { isSaving = false }
         
         do {
-            guard let currentLatitude = self.currentLatitude,
-                  let currentLongitude = self.currentLongitude,
-                  let currentStreetAddress = self.currentStreetAddress else { return false }
+            guard let currentLatitude = currentLatitude,
+                  let currentLongitude = currentLongitude,
+                  let currentStreetAddress = currentStreetAddress else {
+                return false
+            }
             
-            userTitle = userTitle == "" ? placeHolderAddress : userTitle
+            userTitle = userTitle.isEmpty ? placeHolderAddress : userTitle
             
-            try persistenceService.createPlaylist(playlistName: userTitle,
-                                                  playlistDescription: userDescription,
-                                                  photoURL: photoURL,
-                                                  latitude: currentLatitude,
-                                                  longitude: currentLongitude,
-                                                  streetAddress: currentStreetAddress)
-            playlist.playlistName = userTitle
-            playlist.playlistDescription = userDescription
+            // 로컬에 플레이리스트 생성 및 데이터 설정
+            try persistenceService.createPlaylist(
+                playlistName: userTitle,
+                playlistDescription: userDescription,
+                photoURL: photoURL,
+                latitude: currentLatitude,
+                longitude: currentLongitude,
+                streetAddress: currentStreetAddress
+            )
+            
+            playlist = SwiftDataPlaylistModel(
+                playlistName: userTitle,
+                playlistDescription: userDescription,
+                photoURL: photoURL,
+                latitude: currentLatitude,
+                longitude: currentLongitude,
+                streetAddress: currentStreetAddress
+            )
             playlist.songs = try persistenceService.fetchDiggingList()
-            playlist.photoURL = photoURL
-            playlist.latitude = currentLatitude
-            playlist.longitude = currentLongitude
-            playlist.streetAddress = currentStreetAddress
             
-            await playlist.photoURL = savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") ?? ""
-            try await firebaseService.savePlaylistToFirebase(userID: FirebaseAuthService.currentUID ?? "",
-                                                             playlist: ModelAdapter.toFirestorePlaylist(from: playlist))
+            // Firebase에 이미지 업로드
+            if let uploadedPhotoURL = await savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") {
+                playlist.photoURL = uploadedPhotoURL
+            } else {
+                return false
+            }
+            
+            // Firebase에 플레이리스트 저장
+            try await firebaseService.savePlaylistToFirebase(
+                userID: FirebaseAuthService.currentUID ?? "",
+                playlist: ModelAdapter.toFirestorePlaylist(from: playlist)
+            )
             return true
         } catch {
-            print("Failed to create playlist: \(error)")
+            print("Error saving playlist: \(error)")
             return false
         }
     }
-    
+
     func clearDiggingList() {
         do {
             diggingList.removeAll()
             try persistenceService.deleteAllSongs()
         } catch {
-            print("Failed to clear songs: \(error)")
+            print("Error clearing digging list: \(error)")
         }
     }
     
@@ -140,7 +157,7 @@ final class SearchWritingViewModel {
         
         self.currentDate = dateFormatter.string(from: today)
     }
-
+    
     // 앨범에서 불러오기
     func loadImageFromGallery() async {
         if let data = try? await selectedItem?.loadTransferable(type: Data.self) {

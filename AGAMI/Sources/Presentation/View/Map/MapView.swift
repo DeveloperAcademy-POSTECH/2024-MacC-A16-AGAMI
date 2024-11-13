@@ -13,12 +13,17 @@ struct MapView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
-        MKMapViewWrapper(viewModel: viewModel)
-            .onAppearAndActiveCheckUserValued(scenePhase)
-            .ignoresSafeArea()
-            .onAppear {
-                viewModel.fecthPlaylists()
-                viewModel.getCurrentLocation()
-            }
+        ZStack {
+            MKMapViewWrapper(viewModel: viewModel)
+            
+            MapController()
+                .padding(EdgeInsets(top: 62, leading: 0, bottom: 0, trailing: 24))
+        }
+        .onAppearAndActiveCheckUserValued(scenePhase)
+        .ignoresSafeArea()
+        .onAppear {
+            viewModel.fecthPlaylists()
+            viewModel.getCurrentLocation()
+        }
     }
 }

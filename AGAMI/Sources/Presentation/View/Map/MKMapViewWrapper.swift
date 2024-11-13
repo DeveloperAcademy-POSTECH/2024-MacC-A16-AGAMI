@@ -91,7 +91,7 @@ struct MKMapViewWrapper: UIViewRepresentable {
         func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             if let clusterAnnotation = view.annotation as? MKClusterAnnotation {
                 let playlistAnnotations = clusterAnnotation.memberAnnotations.compactMap { $0 as? PlaylistAnnotation }
-                let playlists = playlistAnnotations.map { $0.playlist }.sorted { $0.generationTime < $1.generationTime }
+                let playlists = playlistAnnotations.map { $0.playlist }.sorted { $0.generationTime > $1.generationTime }
 
                 Task { @MainActor in
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: playlists)

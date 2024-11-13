@@ -174,7 +174,7 @@ final class ClusterBubbleAnnotationView: MKAnnotationView {
         guard let clusterAnnotation = annotation as? MKClusterAnnotation else { return }
 
         let playlistAnnotations = clusterAnnotation.memberAnnotations.compactMap { $0 as? PlaylistAnnotation }
-        let playlists = playlistAnnotations.map { $0.playlist }
+        let playlists = playlistAnnotations.map { $0.playlist }.sorted { $0.generationTime > $1.generationTime}
 
         let count = playlists.count
         let clusterBubbleView = ClusterBubbleView(playlists: playlists, count: count)

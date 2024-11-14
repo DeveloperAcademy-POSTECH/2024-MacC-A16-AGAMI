@@ -20,7 +20,8 @@ let package = Package(
         .package(url: "https://github.com/kishikawakatsumi/KeychainAccess.git", from: "4.2.2"),
         .package(url: "https://github.com/airbnb/lottie-ios.git", from: "4.5.0"),
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", from: "10.22.0"),
-        .package(url: "https://github.com/onevcat/Kingfisher", from: "8.1.0")
+        .package(url: "https://github.com/onevcat/Kingfisher", from: "8.1.0"),
+        .package(url: "https://github.com/yamoridon/ColorThiefSwift.git", from: "0.5.0")
     ],
     targets: [
         .target(
@@ -33,7 +34,8 @@ let package = Package(
                 .product(name: "FirebaseStorage", package: "firebase-ios-sdk"),
                 .product(name: "SpotifyAPI", package: "SpotifyAPI"),
                 .product(name: "KeychainAccess", package: "KeychainAccess"),
-                .product(name: "Lottie", package: "lottie-ios")
+                .product(name: "Lottie", package: "lottie-ios"),
+                .product(name: "ColorThiefSwift", package: "ColorThiefSwift")
             ],
             path: "AGAMI/Sources"
         )

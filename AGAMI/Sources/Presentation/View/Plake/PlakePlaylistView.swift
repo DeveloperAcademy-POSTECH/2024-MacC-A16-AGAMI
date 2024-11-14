@@ -504,6 +504,7 @@ private struct TopBarTrailingItems: View {
 
 private struct MenuContents: View {
     @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(\.openURL) private var openURL
     let viewModel: PlakePlaylistViewModel
     
     var body: some View {
@@ -515,11 +516,15 @@ private struct MenuContents: View {
             Label("플레이킹 더하기", image: .menuBlackPlakeLogo)
         }
         
-        //        Button {
-        //
-        //        } label: {
-        //            Label("공유하기", systemImage: "square.and.arrow.up")
-        //        }
+        Button {
+            Task {
+                if let url = await viewModel.getInstagramStoryURL() {
+                    openURL(url)
+                }
+            }
+        } label: {
+            Label("공유하기", systemImage: "square.and.arrow.up")
+        }
         
         Button {
             Task {

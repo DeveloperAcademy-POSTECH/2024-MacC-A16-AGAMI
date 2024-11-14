@@ -8,22 +8,10 @@
 import Foundation
 import SwiftUI
 import PhotosUI
+import ColorThiefSwift
 
 @Observable
 final class PlakePlaylistViewModel: Hashable {
-    struct PlaylistPresentationState {
-        var isEditing: Bool = false
-        var isExportDialogPresented: Bool = false
-        var isPhotoDialogPresented: Bool = false
-        var isShowingDeletePhotoAlert: Bool = false
-        var isShowingDeletePlakeAlert: Bool = false
-        var isShowingPicker: Bool = false
-        var isUpdating: Bool = false
-        var isLoading: Bool = false
-        var isShowingExportingAppleMusicFailedAlert: Bool = false
-        var isShowingExportingSpotifyFailedAlert: Bool = false
-        var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
-    }
     let id: UUID = .init()
     
     var playlist: PlaylistModel
@@ -275,5 +263,74 @@ final class PlakePlaylistViewModel: Hashable {
     func resetPlaylist() {
         playlist = initialPlaylist
     }
+
+    func loadImage(urlString: String) async throws -> UIImage {
+        guard let url = URL(string: urlString) else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        guard let image = UIImage(data: data) else {
+            throw URLError(.cannotDecodeContentData)
+        }
+        return image
+    }
+
+    func getColors(dominant: MMCQ.Color, palette: [MMCQ.Color]) -> (String, String) {
+        let backgroundColor = UIColor(red: CGFloat(dominant.r) / 255.0,
+                                      green: CGFloat(dominant.g) / 255.0,
+                                      blue: CGFloat(dominant.b) / 255.0,
+                                      alpha: 1.0).toHexString()
+        var secondaryColor = backgroundColor
+
+        if palette.count > 1 {
+            secondaryColor = UIColor(red: CGFloat(palette[1].r) / 255.0,
+                                     green: CGFloat(palette[1].g) / 255.0,
+                                     blue: CGFloat(palette[1].b) / 255.0,
+                                     alpha: 1.0).toHexString()
+        }
+
+        return (backgroundColor, secondaryColor)
+    }
+
+    func getInstagramStoryURL() async -> URL? {
+        guard let image = try? await loadImage(urlString: playlist.photoURL),
+              let imageData = image.jpegData(compressionQuality: 0.5),
+              let instaAppID = Bundle.main.object(forInfoDictionaryKey: "INSTA_APP_ID") as? String,
+              let instagramURL = URL(string: "instagram-stories://share?source_application=\(instaAppID)"),
+              let dominantColor = ColorThief.getColor(from: image),
+              let palette = ColorThief.getPalette(from: image, colorCount: 5)
+        else { return nil }
+
+        let (backgroundColor, secondaryColor) = getColors(dominant: dominantColor, palette: palette)
+
+        let pasteboardItems: [String: Any] = [
+            "com.instagram.sharedSticker.stickerImage": imageData,
+            "com.instagram.sharedSticker.backgroundTopColor": backgroundColor,
+            "com.instagram.sharedSticker.backgroundBottomColor": secondaryColor
+        ]
+
+        UIPasteboard.general.setItems([pasteboardItems], options: [:])
+
+        if await UIApplication.shared.canOpenURL(instagramURL) {
+            return instagramURL
+        } else if let appStoreURL = URL(string: "https://apps.apple.com/app/instagram/id389801252") {
+            return appStoreURL
+        }
+
+        return nil
+    }
 }
 
+struct PlaylistPresentationState {
+    var isEditing: Bool = false
+    var isExportDialogPresented: Bool = false
+    var isPhotoDialogPresented: Bool = false
+    var isShowingDeletePhotoAlert: Bool = false
+    var isShowingDeletePlakeAlert: Bool = false
+    var isShowingPicker: Bool = false
+    var isUpdating: Bool = false
+    var isLoading: Bool = false
+    var isShowingExportingAppleMusicFailedAlert: Bool = false
+    var isShowingExportingSpotifyFailedAlert: Bool = false
+    var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
+}

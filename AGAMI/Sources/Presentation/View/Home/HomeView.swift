@@ -13,7 +13,7 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-    
+
     var body: some View {
         ZStack(alignment: .bottom) {
             if viewModel.selectedTab == .plake {
@@ -21,10 +21,10 @@ struct HomeView: View {
             } else {
                 coordinator.build(route: .mapView)
             }
-            
+
             HStack(spacing: 0) {
                 Spacer()
-                
+
                 Image(systemName: "person.circle.fill")
                     .font(.system(size: 39, weight: .regular))
                     .symbolRenderingMode(.palette)
@@ -32,7 +32,7 @@ struct HomeView: View {
                     .onTapGesture {
                         coordinator.push(route: .accountView)
                     }
-                
+
                 Capsule()
                     .foregroundStyle(Color(.pGray2))
                     .frame(width: 179, height: 39)
@@ -44,7 +44,7 @@ struct HomeView: View {
                                 .shadow(color: Color(.pBlack).opacity(0.12), radius: 8, x: 0, y: 3)
                                 .offset(x: viewModel.selectedTab == .plake ? -43 : 43)
                                 .animation(.easeInOut(duration: 0.3), value: viewModel.selectedTab)
-                            
+
                             HStack(spacing: 0) {
                                 Text("Plake")
                                     .font(.pretendard(weight: .semiBold600, size: 13))
@@ -56,7 +56,7 @@ struct HomeView: View {
                                         }
                                     }
                                 Spacer()
-                                
+
                                 Text("Map")
                                     .font(.pretendard(weight: .semiBold600, size: 13))
                                     .kerning(-0.08)
@@ -71,7 +71,7 @@ struct HomeView: View {
                         }
                     }
                     .padding(.horizontal, 29)
-                
+
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 39, weight: .regular))
                     .symbolRenderingMode(.palette)
@@ -79,12 +79,12 @@ struct HomeView: View {
                     .onTapGesture {
                         coordinator.push(route: .newPlakeView)
                     }
-                
+
                 Spacer()
             }
             .background(Color(.clear))
             .padding(.bottom, 50)
-            
+
         }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .ignoresSafeArea(edges: .bottom)

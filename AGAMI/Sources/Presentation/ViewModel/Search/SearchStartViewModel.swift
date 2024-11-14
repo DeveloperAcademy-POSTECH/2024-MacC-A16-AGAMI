@@ -121,7 +121,7 @@ final class SearchStartViewModel {
             diggingList.removeAll()
             try persistenceService.deleteAllSongs()
         } catch {
-            print("Failed to clear songs: \(error)")
+            dump("Failed to clear songs: \(error)")
         }
     }
 }

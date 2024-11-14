@@ -124,7 +124,7 @@ private struct ListView: View {
                 .conditionalModifier(viewModel.presentationState.isEditing) { view in
                     view
                         .onDelete { indexSet in
-                            viewModel.deleteMusic(indexSet: indexSet)
+                            viewModel.deleteMusic(at: indexSet)
                         }
                         .onMove { indices, newOffset in
                             viewModel.moveMusic(from: indices, to: newOffset)

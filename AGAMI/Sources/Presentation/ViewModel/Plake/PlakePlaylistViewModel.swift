@@ -37,8 +37,6 @@ final class PlakePlaylistViewModel: Hashable {
     var exportingState: ExportingState = .none
     var presentationState: PlaylistPresentationState = .init()
     
-    let exportAppleMusicURLString: String = "itms-apps://itunes.apple.com/app/apple-music/id1108187390"
-    
     var selectedItem: PhotosPickerItem? {
         didSet { Task { await handleAndUploadPhotoFromAlbum() } }
     }
@@ -63,31 +61,7 @@ final class PlakePlaylistViewModel: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-    
-//    func exportPlaylistToAppleMusic() async -> URL? {
-//        guard await musicService.checkAppleMusicSubscriptionStatus() else {
-//            self.presentationState.isShowingExportingAppleMusicFailedAlert = true
-//            return nil
-//        }
-//        
-//        exportingState = .isAppleMusicExporting
-//        do {
-//            musicService.clearSongs()
-//            for song in playlist.songs {
-//                dump("song")
-//                let appleMusicSong = try await musicService.searchSongById(songId: song.songID)
-//                musicService.addSongToSongs(song: appleMusicSong)
-//            }
-//            try await musicService.createPlaylist(name: playlist.playlistName, description: playlist.playlistDescription)
-//        } catch {
-//            dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
-//        }
-//        exportingState = .none
-//        guard let urlString = musicService.getCurrentPlaylistUrl() else {
-//            return nil
-//        }
-//        return URL(string: urlString)
-//    }
+
     func exportPlaylistToAppleMusic() async -> URL? {
         guard await musicService.checkAppleMusicSubscriptionStatus() else {
             self.presentationState.isShowingExportingAppleMusicFailedAlert = true

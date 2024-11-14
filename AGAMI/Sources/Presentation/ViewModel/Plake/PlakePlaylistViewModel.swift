@@ -162,7 +162,7 @@ final class PlakePlaylistViewModel: Hashable {
     func handleURL(_ url: URL) {
         if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
            let decodedRedirectURL = redirectURL.removingPercentEncoding,
-               url.absoluteString.contains(decodedRedirectURL) {
+           url.absoluteString.contains(decodedRedirectURL) {
             exportingState = .none
         }
     }

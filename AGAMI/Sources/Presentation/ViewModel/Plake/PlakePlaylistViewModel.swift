@@ -160,11 +160,10 @@ final class PlakePlaylistViewModel: Hashable {
     }
     
     func handleURL(_ url: URL) {
-        if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
-           let decodedRedirectURL = redirectURL.removingPercentEncoding,
-           url.absoluteString.contains(decodedRedirectURL) {
-            exportingState = .none
-        }
+        guard let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
+              let decodedRedirectURL = redirectURL.removingPercentEncoding,
+              url.absoluteString.contains(decodedRedirectURL) else { return }
+        exportingState = .none
     }
     
     func setPhotoFromCamera(photo: UIImage) {
@@ -193,11 +192,10 @@ final class PlakePlaylistViewModel: Hashable {
         defer { presentationState.isLoading = false }
         
         guard let userID = FirebaseAuthService.currentUID,
-              let image = photoFromCamera else { return }
+              let image = photoFromCamera,
+              let url = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
+        else { return }
 
-        guard let url = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image) else {
-            return
-        }
         await MainActor.run { playlist.photoURL = url }
     }
     

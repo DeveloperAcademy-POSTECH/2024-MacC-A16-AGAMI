@@ -1,5 +1,3 @@
-// swiftlint:disable cyclomatic_complexity
-
 //
 //  ArchiveCoordinator.swift
 //  AGAMI
@@ -73,6 +71,7 @@ enum PlakeFullScreenCover: String, Identifiable {
 
 final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
     @ViewBuilder
+    // swiftlint:disable:next cyclomatic_complexity
     func build(route: PlakeRoute) -> some View {
         switch route {
         case .homeView:

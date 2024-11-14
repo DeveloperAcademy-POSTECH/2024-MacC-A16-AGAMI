@@ -70,7 +70,7 @@ final class SearchWritingViewModel {
         do {
             self.diggingList = try persistenceService.loadDiggingListWithOrder()
         } catch {
-            print("Failed to load saved songs: \(error)")
+            dump("Failed to load saved songs: \(error)")
         }
     }
     
@@ -121,7 +121,7 @@ final class SearchWritingViewModel {
             )
             return true
         } catch {
-            print("Error saving playlist: \(error)")
+            dump("Failed to create playlist: \(error)")
             return false
         }
     }
@@ -131,7 +131,7 @@ final class SearchWritingViewModel {
             diggingList.removeAll()
             try persistenceService.deleteAllSongs()
         } catch {
-            print("Error clearing digging list: \(error)")
+            dump("Failed to clear songs: \(error)")
         }
     }
     
@@ -144,7 +144,7 @@ final class SearchWritingViewModel {
             do {
                 photoURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             } catch {
-                print("이미지 저장 실패: \(error.localizedDescription)")
+                dump("이미지 저장 실패: \(error.localizedDescription)")
             }
         }
         return photoURL

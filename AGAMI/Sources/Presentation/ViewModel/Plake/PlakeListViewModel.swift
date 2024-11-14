@@ -32,7 +32,7 @@ final class PlakeListViewModel {
         isFetching = true
         
         guard let uid = FirebaseAuthService.currentUID else {
-            print("UID를 가져오는 데 실패했습니다.")
+            dump("UID를 가져오는 데 실패했습니다.")
             isFetching = false
             return
         }
@@ -45,7 +45,7 @@ final class PlakeListViewModel {
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 await updatePlaylists(sortPlaylistsByDate(playlistModels))
             } else {
-                print("플레이리스트 데이터를 가져오는 데 실패했습니다.")
+                dump("플레이리스트 데이터를 가져오는 데 실패했습니다.")
             }
         }
     }

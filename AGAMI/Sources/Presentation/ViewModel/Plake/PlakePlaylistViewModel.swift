@@ -103,7 +103,7 @@ final class PlakePlaylistViewModel: Hashable {
             try await musicService.createPlaylist(name: playlist.playlistName, description: playlist.playlistDescription)
             return URL(string: musicService.getCurrentPlaylistUrl() ?? "")
         } catch {
-            print("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
+            dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
             return nil
         }
     }

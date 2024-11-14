@@ -67,15 +67,15 @@ final class SpotifyService {
                     AuthorizationCodeFlowManager.self,
                     from: authManagerData
                 )
-                print("found authorization information in keychain")
+                dump("found authorization information in keychain")
 
                 self.spotifyAPI.authorizationManager = authorizationManager
 
             } catch {
-                print("could not decode authorizationManager from data:\n\(error)")
+                dump("could not decode authorizationManager from data:\n\(error)")
             }
         } else {
-            print("did NOT find authorization information in keychain")
+            dump("did NOT find authorization information in keychain")
         }
     }
 
@@ -89,7 +89,7 @@ final class SpotifyService {
                 .playlistModifyPublic
             ]
         ) else {
-            print("Failed to create authorization URL.")
+            dump("Failed to create authorization URL.")
             return
         }
         UIApplication.shared.open(url)
@@ -99,21 +99,21 @@ final class SpotifyService {
         self.isAuthorized = self.spotifyAPI.authorizationManager.isAuthorized()
 
         if self.isAuthorized {
-            print("Authorization successful: isAuthorized is true.")
+            dump("Authorization successful: isAuthorized is true.")
         } else {
-            print("Authorization failed: isAuthorized is false.")
+            dump("Authorization failed: isAuthorized is false.")
         }
 
-        print("Spotify.authorizationManagerDidChange: isAuthorized:", self.isAuthorized)
+        dump("Spotify.authorizationManagerDidChange: isAuthorized:", self.isAuthorized)
         self.retrieveCurrentUser()
 
         do {
             let authManagerData = try JSONEncoder().encode(self.spotifyAPI.authorizationManager)
-            print("authManagerData: \(authManagerData)")
+            dump("authManagerData: \(authManagerData)")
             self.keychain[data: self.authorizationManagerKey] = authManagerData
-            print("Did save authorization manager to keychain.")
+            dump("Did save authorization manager to keychain.")
         } catch {
-            print("Couldn't encode authorizationManager for storage in keychain:\n\(error)")
+            dump("Couldn't encode authorizationManager for storage in keychain:\n\(error)")
         }
     }
 
@@ -123,10 +123,10 @@ final class SpotifyService {
 
         do {
             try self.keychain.remove(self.authorizationManagerKey)
-            print("did remove authorization manager from keychain")
+            dump("did remove authorization manager from keychain")
 
         } catch {
-            print(
+            dump(
                 "couldn't remove authorization manager " +
                 "from keychain: \(error)"
             )
@@ -143,7 +143,7 @@ final class SpotifyService {
             .sink(
                 receiveCompletion: { completion in
                     if case .failure(let error) = completion {
-                        print("couldn't retrieve current user: \(error)")
+                        dump("couldn't retrieve current user: \(error)")
                     }
                 },
                 receiveValue: { user in
@@ -155,11 +155,11 @@ final class SpotifyService {
 
     public func handleURL(_ url: URL) {
         guard url.scheme == self.loginCallbackURL.scheme else {
-            print("not handling URL: unexpected scheme: '\(url)'")
+            dump("not handling URL: unexpected scheme: '\(url)'")
             return
         }
 
-        print("received redirect from Spotify: '\(url)'")
+        dump("received redirect from Spotify: '\(url)'")
 
         self.isRetrievingTokens = true
 
@@ -172,7 +172,7 @@ final class SpotifyService {
             self.isRetrievingTokens = false
 
             if case .failure(let error) = completion {
-                print("couldn't retrieve access and refresh tokens:\n\(error)")
+                dump("couldn't retrieve access and refresh tokens:\n\(error)")
                 if let authError = error as? SpotifyAuthorizationError,
                    authError.accessWasDenied {
                 }
@@ -209,12 +209,12 @@ final class SpotifyService {
             return Publishers.Sequence(sequence: musicList)
                 .flatMap(maxPublishers: .max(1)) { song -> AnyPublisher<String?, Never> in
                     let query = "\(song.1 ?? "") \(song.0)"
-                    print("@LOG query: \(query)")
+                    dump("@LOG query: \(query)")
                     let categories: [IDCategory] = [.artist, .track]
 
                     return self.spotifyAPI.search(query: query, categories: categories, limit: 1)
                         .map { searchResult in
-                            print("@LOG searchResult \(searchResult.tracks?.items.first?.name ?? "nil")")
+                            dump("@LOG searchResult \(searchResult.tracks?.items.first?.name ?? "nil")")
                             return searchResult.tracks?.items.first?.uri
                         }
                         .replaceError(with: nil)
@@ -240,7 +240,7 @@ final class SpotifyService {
 
             return self.spotifyAPI.createPlaylist(for: userURI, playlistDetails)
                 .map { playlist in
-                    print("Playlist created: \(playlist)")
+                    dump("Playlist created: \(playlist)")
                     playlistUri = playlist.uri
                 }
                 .eraseToAnyPublisher()
@@ -255,7 +255,7 @@ final class SpotifyService {
 
             return self.spotifyAPI.addToPlaylist(playlistUri, uris: uris)
                 .map { result in
-                    print("Items added successfully. Result: \(result)")
+                    dump("Items added successfully. Result: \(result)")
                 }
                 .eraseToAnyPublisher()
         }
@@ -266,10 +266,10 @@ final class SpotifyService {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    print("Playlist creation completed successfully.")
+                    dump("Playlist creation completed successfully.")
                     completionHandler(playlistUri)
                 case .failure(let error):
-                    print("Error: \(error)")
+                    dump("Error: \(error)")
                     completionHandler(nil)
                 }
             }, receiveValue: {})

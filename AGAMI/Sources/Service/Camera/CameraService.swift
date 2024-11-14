@@ -32,7 +32,7 @@ final class CameraService: NSObject {
                 if session.canAddInput(videoInput) {
                     session.addInput(videoInput)
                 } else {
-                    print("비디오 입력 에러")
+                    dump("비디오 입력 에러")
                 }
                 
                 if session.canAddOutput(output) {
@@ -41,7 +41,7 @@ final class CameraService: NSObject {
                     if let supportedFormat = device.activeFormat.supportedMaxPhotoDimensions.first {
                         output.maxPhotoDimensions = supportedFormat
                     } else {
-                        print("지원되는 해상도를 찾을 수 없음")
+                        dump("지원되는 해상도를 찾을 수 없음")
                     }
                     output.maxPhotoQualityPrioritization = .quality
                 }
@@ -50,7 +50,7 @@ final class CameraService: NSObject {
                     self.session.startRunning()
                 }
             } catch {
-                print("카메라 셋업 실패")
+                dump("카메라 셋업 실패")
             }
         }
     }
@@ -78,7 +78,7 @@ final class CameraService: NSObject {
         case .authorized:
             setUpCamera()
         default:
-            print("권한 확인 실패")
+            dump("권한 확인 실패")
         }
     }
     
@@ -92,7 +92,7 @@ final class CameraService: NSObject {
         guard let image = UIImage(data: imageData) else { return }
                 
         UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
-        print("사진 저장")
+        dump("사진 저장")
     }
     
     func changeCamera() {
@@ -130,7 +130,7 @@ final class CameraService: NSObject {
             device.videoZoomFactor = factor
             device.unlockForConfiguration()
         } catch {
-            print(error.localizedDescription)
+            dump(error.localizedDescription)
         }
     }
 }

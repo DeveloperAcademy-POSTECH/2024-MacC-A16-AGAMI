@@ -80,7 +80,7 @@ final class CameraViewModel {
             do {
                 photoURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             } catch {
-                print("이미지 저장 실패: \(error.localizedDescription)")
+                dump("이미지 저장 실패: \(error.localizedDescription)")
             }
         }
         return photoURL

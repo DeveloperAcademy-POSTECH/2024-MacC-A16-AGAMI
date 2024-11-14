@@ -112,7 +112,7 @@ struct SearchWritingView: View {
                             listCellPlaceholder.resetListCellPlaceholderModel()
                             viewModel.clearDiggingList()
                         } else {
-                            print("Failed to save playlist. Please try again.")
+                            dump("Failed to save playlist. Please try again.")
                         }
                     }
                 } label: {

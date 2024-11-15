@@ -61,6 +61,12 @@ let project = Project(
                                 ])
                             ]),
                             "UIUserInterfaceStyle": "Light",
+                            "NSUbiquitousContainerIdentifier": "iCloud.io.tuist.AGAMI",
+                            "NSUbiquitousContainers": .dictionary([
+                                "iCloud.io.tuist.AGAMI": .dictionary([
+                                    "NSUbiquitousContainerIsDocumentScopePublic": .boolean(true)
+                                ])
+                            ]),
                             "CLIENT_ID": .string("$(CLIENT_ID)"),
                             "CLIENT_SECRET": .string("$(CLIENT_SECRET)"),
                             "REDIRECT_URL": .string("$(REDIRECT_URL)"),

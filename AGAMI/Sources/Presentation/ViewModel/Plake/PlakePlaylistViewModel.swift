@@ -36,7 +36,9 @@ final class PlakePlaylistViewModel: Hashable {
     
     var exportingState: ExportingState = .none
     var presentationState: PlaylistPresentationState = .init()
-    
+
+    let exportAppleMusicURLString: String = "itms-apps://itunes.apple.com/app/apple-music/id1108187390"
+
     var selectedItem: PhotosPickerItem? {
         didSet { Task { await handleAndUploadPhotoFromAlbum() } }
     }

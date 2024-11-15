@@ -104,7 +104,7 @@ final class SpotifyService {
             dump("Authorization failed: isAuthorized is false.")
         }
 
-        dump("Spotify.authorizationManagerDidChange: isAuthorized:", self.isAuthorized)
+        dump("Spotify.authorizationManagerDidChange: isAuthorized: \(self.isAuthorized)")
         self.retrieveCurrentUser()
 
         do {

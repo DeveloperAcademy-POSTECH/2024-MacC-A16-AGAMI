@@ -11,14 +11,14 @@ import ShazamKit
 import SwiftData
 
 final class PersistenceService {
-    let modelContainer: ModelContainer
-    let modelContext: ModelContext
-
-    static let shared: PersistenceService = .init()
+    private let modelContainer: ModelContainer
+    private let modelContext: ModelContext
     
     private let diggingListOrderKey = "diggingListOrder"
 
     private var model: SwiftDataPlaylistModel?
+
+    static let shared: PersistenceService = .init()
 
     private init() {
         let schema = Schema([SwiftDataPlaylistModel.self])

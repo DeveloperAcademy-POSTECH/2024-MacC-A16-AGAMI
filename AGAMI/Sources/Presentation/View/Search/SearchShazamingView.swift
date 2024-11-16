@@ -78,9 +78,8 @@ struct SearchShazamingView: View {
         }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationBarBackButtonHidden()
-        .onAppear {
-            viewModel.startRecognition()
-        }
+        .onAppear(perform: viewModel.startRecognition)
+        .onDisappear(perform: viewModel.stopRecognition)
         .onChange(of: viewModel.shazamStatus) { _, newStatus in
             if newStatus == .found {
                 coordinator.pop()

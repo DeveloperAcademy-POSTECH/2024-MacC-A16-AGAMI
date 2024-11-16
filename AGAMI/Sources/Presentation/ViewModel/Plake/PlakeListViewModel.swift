@@ -16,6 +16,13 @@ final class PlakeListViewModel {
     private let musicService = MusicService()
 
     var isFetching: Bool = false
+    var isSearching: Bool {
+        !searchText.isEmpty
+    }
+    var isShowingNewPlake: Bool {
+        playlists.isEmpty && !isFetching && !isSearching
+    }
+
     var playlists: [PlaylistModel] = []
     private var unfilteredPlaylists: [PlaylistModel] = []
     var isUploading: Bool = false
@@ -38,10 +45,8 @@ final class PlakeListViewModel {
         }
         
         Task {
-            defer {
-                isFetching = false
-            }
-            
+            defer { isFetching = false }
+
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 await updatePlaylists(sortPlaylistsByDate(playlistModels))
             } else {
@@ -147,7 +152,11 @@ final class PlakeListViewModel {
             exportingState = .none
         }
     }
-    
+
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
+
 // MARK: - FirebaseListner 코드
 //    private let listenerService = FirebaseListenerService()
 

@@ -10,4 +10,8 @@ import Foundation
 @Observable
 final class HomeViewModel {
     var selectedTab: TabSelection = .plake
+
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
 }

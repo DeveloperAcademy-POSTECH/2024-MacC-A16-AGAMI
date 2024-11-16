@@ -92,6 +92,9 @@ private struct SearchBar: View {
                 }
             }
         }
+        .onChange(of: isFocused) {
+            viewModel.simpleHaptic()
+        }
     }
 }
 
@@ -109,7 +112,7 @@ private struct ListView: View {
                 Group {
                     if listCellPlaceholder.showArchiveListUpLoadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
-                    } else if viewModel.playlists.isEmpty && !viewModel.isFetching {
+                    } else if viewModel.isShowingNewPlake {
                         MakeNewPlakeCell(size: size)
                     }
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in

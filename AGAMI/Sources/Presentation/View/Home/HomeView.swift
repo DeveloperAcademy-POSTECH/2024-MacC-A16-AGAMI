@@ -31,6 +31,7 @@ struct HomeView: View {
                     .foregroundStyle(Color(.pWhite), Color(.pGray3))
                     .onTapGesture {
                         coordinator.push(route: .accountView)
+                        viewModel.simpleHaptic()
                     }
 
                 Capsule()
@@ -54,6 +55,7 @@ struct HomeView: View {
                                         withAnimation {
                                             viewModel.selectedTab = .plake
                                         }
+                                        viewModel.simpleHaptic()
                                     }
                                 Spacer()
 
@@ -65,6 +67,7 @@ struct HomeView: View {
                                         withAnimation {
                                             viewModel.selectedTab = .map
                                         }
+                                        viewModel.simpleHaptic()
                                     }
                             }
                             .padding(EdgeInsets(top: 0, leading: 29.25, bottom: 0, trailing: 32.25))
@@ -78,6 +81,7 @@ struct HomeView: View {
                     .foregroundStyle(Color(.pWhite), Color(.pPrimary))
                     .onTapGesture {
                         coordinator.push(route: .newPlakeView)
+                        viewModel.simpleHaptic()
                     }
 
                 Spacer()

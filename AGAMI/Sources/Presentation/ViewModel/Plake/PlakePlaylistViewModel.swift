@@ -298,4 +298,8 @@ final class PlakePlaylistViewModel: Hashable {
         }
         return nil
     }
+
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
 }

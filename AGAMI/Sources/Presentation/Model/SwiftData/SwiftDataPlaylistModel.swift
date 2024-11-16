@@ -19,7 +19,7 @@ final class SwiftDataPlaylistModel: PlaylistModel {
     var streetAddress: String
     var generationTime: Date
 
-    @Relationship var swiftDataSongs: [SwiftDataSongModel] = []
+    @Relationship(deleteRule: .cascade) var swiftDataSongs: [SwiftDataSongModel] = []
 
     var songs: [SongModel] {
         get { swiftDataSongs }

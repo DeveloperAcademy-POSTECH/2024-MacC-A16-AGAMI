@@ -44,7 +44,7 @@ final class SearchStartViewModel {
             userTitle: userTitle,
             currentLocality: currentLocality,
             currentRegion: currentRegion
-            )
+        )
     }
     
     func loadSavedSongs() {

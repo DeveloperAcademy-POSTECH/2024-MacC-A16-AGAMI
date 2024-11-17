@@ -31,8 +31,9 @@ struct SignInView: View {
                     .lineSpacing(4)
                     .kerning(-0.3)
                     .foregroundStyle(Color(.pBlack))
-                    .padding(EdgeInsets(top: 0, leading: 0, bottom: 228, trailing: 0))
-                
+
+                Spacer()
+
                 SignInWithAppleButton(.continue) { request in
                     viewModel.signInRequest(request: request)
                 } onCompletion: { result in

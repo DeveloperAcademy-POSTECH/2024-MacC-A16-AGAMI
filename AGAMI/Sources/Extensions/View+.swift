@@ -37,30 +37,52 @@ extension View {
             self
         }
     }
-    
+
     func onAppearAndActiveCheckUserValued(_ scenePhase: ScenePhase) -> some View {
-            self
-                .onAppear {
+        self
+            .onAppear {
+                Task {
+                    do {
+                        try await FirebaseAuthService.checkUserValued()
+                        dump("User valued status is checked successfully on appear.")
+                    } catch {
+                        dump("Error checking user valued status on appear: \(error.localizedDescription)")
+                    }
+                }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
                     Task {
                         do {
                             try await FirebaseAuthService.checkUserValued()
-                            dump("User valued status is checked successfully on appear.")
+                            dump("User valued status is checked successfully in active state.")
                         } catch {
-                            dump("Error checking user valued status on appear: \(error.localizedDescription)")
+                            dump("Error checking user valued status in active state: \(error.localizedDescription)")
                         }
                     }
                 }
-                .onChange(of: scenePhase) { _, newPhase in
-                    if newPhase == .active {
-                        Task {
-                            do {
-                                try await FirebaseAuthService.checkUserValued()
-                                dump("User valued status is checked successfully in active state.")
-                            } catch {
-                                dump("Error checking user valued status in active state: \(error.localizedDescription)")
-                            }
-                        }
-                    }
-                }
+            }
+    }
+
+    func asUIImage(size: CGSize) -> UIImage? {
+        let controller = UIHostingController(rootView: self)
+        guard let view = controller.view else { return nil }
+
+        view.bounds = CGRect(origin: .zero, size: size)
+        view.backgroundColor = .clear
+
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            view.drawHierarchy(in: view.bounds, afterScreenUpdates: true)
         }
+    }
+
+    @ViewBuilder
+    func instagramStickerStyle() -> some View {
+        self
+            .padding(.horizontal, 64)
+            .frame(width: 480, height: 640)
+            .background(.black.opacity(0.2))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+    }
 }

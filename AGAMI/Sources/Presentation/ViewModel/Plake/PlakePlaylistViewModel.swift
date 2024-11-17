@@ -258,36 +258,40 @@ final class PlakePlaylistViewModel: Hashable {
         return image
     }
 
-    func getColors(dominant: MMCQ.Color, palette: [MMCQ.Color]) -> (String, String) {
-        let backgroundColor = UIColor(red: CGFloat(dominant.r) / 255.0,
-                                      green: CGFloat(dominant.g) / 255.0,
-                                      blue: CGFloat(dominant.b) / 255.0,
-                                      alpha: 1.0).toHexString()
-        let secondaryColor = palette.count > 1
-                             ? UIColor(red: CGFloat(palette[1].r) / 255.0,
-                                       green: CGFloat(palette[1].g) / 255.0,
-                                       blue: CGFloat(palette[1].b) / 255.0,
-                                       alpha: 1.0).toHexString()
-                             : backgroundColor
-        return (backgroundColor, secondaryColor)
-    }
-
-    func getInstagramStoryURL() async -> URL? {
-        guard let image = try? await loadImage(urlString: playlist.photoURL),
-              let imageData = image.jpegData(compressionQuality: 0.5),
-              let instaAppID = Bundle.main.object(forInfoDictionaryKey: "INSTA_APP_ID") as? String,
-              let instagramURL = URL(string: "instagram-stories://share?source_application=\(instaAppID)"),
-              let dominantColor = ColorThief.getColor(from: image),
-              let palette = ColorThief.getPalette(from: image, colorCount: 5)
+    func loadBackgroundImage(urlString: String, targetSize: CGSize) async throws -> UIImage? {
+        guard let image = try? await loadImage(urlString: urlString),
+              let resized = image.resizedAndCropped(to: targetSize),
+              let blurred = resized.applyBlur()
         else { return nil }
 
-        let (backgroundColor, secondaryColor) = getColors(dominant: dominantColor, palette: palette)
+        return blurred
+    }
 
-        let pasteboardItems: [String: Any] = [
-            "com.instagram.sharedSticker.stickerImage": imageData,
-            "com.instagram.sharedSticker.backgroundTopColor": backgroundColor,
-            "com.instagram.sharedSticker.backgroundBottomColor": secondaryColor
-        ]
+
+    func getInstagramStoryURL() async -> URL? {
+        guard let instaAppID = Bundle.main.object(forInfoDictionaryKey: "INSTA_APP_ID") as? String,
+              let instagramURL = URL(string: "instagram-stories://share?source_application=\(instaAppID)")
+        else { return nil }
+
+        let songImages = await getSongImages()
+
+        let backgroundImage = try? await loadBackgroundImage(
+            urlString: playlist.photoURL,
+            targetSize: .init(width: 1080, height: 1920)
+        )
+        let stickerImage = InstagramStickerView(playlist: playlist, images: songImages)
+
+        let pasteboardItems: [String: Any]
+        if let stickerImageData = await stickerImage.asUIImage(size: .init(width: 480, height: 800)) {
+            if let backgroundImageData = backgroundImage?.jpegData(compressionQuality: 0.5) {
+                pasteboardItems = [
+                    "com.instagram.sharedSticker.stickerImage": stickerImageData,
+                    "com.instagram.sharedSticker.backgroundImage": backgroundImageData
+                ]
+            } else {
+                pasteboardItems = [ "com.instagram.sharedSticker.stickerImage": stickerImageData ]
+            }
+        } else { pasteboardItems = [:] }
 
         UIPasteboard.general.setItems([pasteboardItems], options: [:])
 
@@ -297,6 +301,17 @@ final class PlakePlaylistViewModel: Hashable {
             return appStoreURL
         }
         return nil
+    }
+
+    private func getSongImages() async -> [UIImage] {
+        let suffix = playlist.songs.suffix(3)
+        var songImages: [UIImage] = []
+        for song in suffix {
+            if let songImage = try? await loadImage(urlString: song.albumCoverURL) {
+                songImages.append(songImage)
+            }
+        }
+        return songImages
     }
 
     func simpleHaptic() {

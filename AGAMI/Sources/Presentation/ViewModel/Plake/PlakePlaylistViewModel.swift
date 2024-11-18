@@ -267,7 +267,6 @@ final class PlakePlaylistViewModel: Hashable {
         return blurred
     }
 
-
     func getInstagramStoryURL() async -> URL? {
         guard let instaAppID = Bundle.main.object(forInfoDictionaryKey: "INSTA_APP_ID") as? String,
               let instagramURL = URL(string: "instagram-stories://share?source_application=\(instaAppID)")

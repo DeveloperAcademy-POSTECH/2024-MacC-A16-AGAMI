@@ -66,6 +66,12 @@ final class PersistenceService {
         }
     }
 
+    private func fetchPlaylists() -> [SwiftDataPlaylistModel] {
+        let fetchDescriptor = FetchDescriptor<SwiftDataPlaylistModel>()
+        guard let result = try? modelContext.fetch(fetchDescriptor) else { return [] }
+        return result
+    }
+
     func updatePlaylist() {
         do {
             try modelContext.save()
@@ -74,11 +80,11 @@ final class PersistenceService {
         }
     }
 
-    func deletePlaylist() {
-        guard let playlist = _playlist else { return }
-        modelContext.delete(playlist)
-        _playlist = nil
-        updatePlaylist()
+    func deleteAllPlaylists() {
+        let playlists = fetchPlaylists()
+        for playlist in playlists {
+            modelContext.delete(playlist)
+        }
     }
     
     func fetchDiggingList() throws -> [SongModel] {

@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-//import CoreLocation
+import CoreLocation
 
 @Observable
 final class SearchStartViewModel {

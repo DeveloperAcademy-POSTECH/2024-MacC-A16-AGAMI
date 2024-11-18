@@ -67,63 +67,63 @@ final class SearchWritingViewModel {
     }
     
     func loadSavedSongs() {
-        do {
-            self.diggingList = try persistenceService.loadDiggingListWithOrder()
-        } catch {
-            dump("Failed to load saved songs: \(error)")
-        }
+//        do {
+//            self.diggingList = try persistenceService.loadDiggingListWithOrder()
+//        } catch {
+//            dump("Failed to load saved songs: \(error)")
+//        }
     }
     
     func savedPlaylist() async -> Bool {
-        isSaving = true
-        defer { isSaving = false }
-        
-        do {
-            guard let currentLatitude = currentLatitude,
-                  let currentLongitude = currentLongitude,
-                  let currentStreetAddress = currentStreetAddress else {
-                return false
-            }
-            
-            userTitle = userTitle.isEmpty ? placeHolderAddress : userTitle
-            
-            // 로컬에 플레이리스트 생성 및 데이터 설정
-            try persistenceService.createPlaylist(
-                playlistName: userTitle,
-                playlistDescription: userDescription,
-                photoURL: photoURL,
-                latitude: currentLatitude,
-                longitude: currentLongitude,
-                streetAddress: currentStreetAddress
-            )
-            
-            playlist = SwiftDataPlaylistModel(
-                playlistName: userTitle,
-                playlistDescription: userDescription,
-                photoURL: photoURL,
-                latitude: currentLatitude,
-                longitude: currentLongitude,
-                streetAddress: currentStreetAddress
-            )
-            playlist.songs = try persistenceService.fetchDiggingList()
-            
-            // Firebase에 이미지 업로드
-            if let uploadedPhotoURL = await savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") {
-                playlist.photoURL = uploadedPhotoURL
-            } else {
-                return false
-            }
-            
-            // Firebase에 플레이리스트 저장
-            try await firebaseService.savePlaylistToFirebase(
-                userID: FirebaseAuthService.currentUID ?? "",
-                playlist: ModelAdapter.toFirestorePlaylist(from: playlist)
-            )
+//        isSaving = true
+//        defer { isSaving = false }
+//        
+//        do {
+//            guard let currentLatitude = currentLatitude,
+//                  let currentLongitude = currentLongitude,
+//                  let currentStreetAddress = currentStreetAddress else {
+//                return false
+//            }
+//            
+//            userTitle = userTitle.isEmpty ? placeHolderAddress : userTitle
+//            
+//            // 로컬에 플레이리스트 생성 및 데이터 설정
+//            try persistenceService.createPlaylist(
+//                playlistName: userTitle,
+//                playlistDescription: userDescription,
+//                photoURL: photoURL,
+//                latitude: currentLatitude,
+//                longitude: currentLongitude,
+//                streetAddress: currentStreetAddress
+//            )
+//            
+//            playlist = SwiftDataPlaylistModel(
+//                playlistName: userTitle,
+//                playlistDescription: userDescription,
+//                photoURL: photoURL,
+//                latitude: currentLatitude,
+//                longitude: currentLongitude,
+//                streetAddress: currentStreetAddress
+//            )
+//            playlist.songs = try persistenceService.fetchDiggingList()
+//            
+//            // Firebase에 이미지 업로드
+//            if let uploadedPhotoURL = await savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "") {
+//                playlist.photoURL = uploadedPhotoURL
+//            } else {
+//                return false
+//            }
+//            
+//            // Firebase에 플레이리스트 저장
+//            try await firebaseService.savePlaylistToFirebase(
+//                userID: FirebaseAuthService.currentUID ?? "",
+//                playlist: ModelAdapter.toFirestorePlaylist(from: playlist)
+//            )
             return true
-        } catch {
-            dump("Failed to create playlist: \(error)")
-            return false
-        }
+//        } catch {
+//            dump("Failed to create playlist: \(error)")
+//            return false
+//        }
     }
 
     func clearDiggingList() {

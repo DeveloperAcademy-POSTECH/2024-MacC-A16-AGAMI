@@ -6,30 +6,22 @@
 //
 
 import SwiftUI
-import CoreLocation
+//import CoreLocation
 
 @Observable
 final class SearchStartViewModel {
     private let persistenceService = PersistenceService.shared
     private let locationService = LocationService.shared
 
-    // 플레이크 타이틀
-    var placeHolderAddress: String = "" {
-        didSet {
-            playlist.playlistName = placeHolderAddress
-            persistenceService.updatePlaylist()
-        }
+    var playlist: PlaylistModel {
+        didSet { handleChangeOfName(oldValue: oldValue, newValue: playlist) }
+    }
+    var diggingList: [SongModel] {
+        playlist.songs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
     }
 
     var isLoaded: Bool {
         playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty
-    }
-
-    var userTitle: String = ""
-
-    var playlist: PlaylistModel
-    var diggingList: [SongModel] {
-        playlist.songs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
     }
 
     var showBackButtonAlert: Bool = false
@@ -37,18 +29,11 @@ final class SearchStartViewModel {
     init() {
         playlist = persistenceService.fetchPlaylist()
         locationService.delegate = self
+        requestCurrentLocation()
     }
     
     func createSearchWritingViewModel() -> SearchWritingViewModel {
-        return SearchWritingViewModel(
-            currentLatitude: 0.0,
-            currentLongitude: 0.0,
-            currentStreetAddress: "",
-            placeHolderAddress: "",
-            userTitle: "",
-            currentLocality: "",
-            currentRegion: ""
-        )
+        SearchWritingViewModel(playlist: playlist)
     }
     
     func loadSavedSongs() {
@@ -64,26 +49,27 @@ final class SearchStartViewModel {
         playlist.latitude = currentLocation.coordinate.latitude
         playlist.longitude = currentLocation.coordinate.longitude
         persistenceService.updatePlaylist()
-        
+
         locationService.coordinateToStreetAddress { [weak self] address in
             guard let self = self else { return }
-            
+
             self.playlist.streetAddress = address ?? ""
             persistenceService.updatePlaylist()
-
-            self.setPlaceHolderAddress()
+            self.setPlaylistName()
         }
     }
     
-    func setPlaceHolderAddress() {
-        let address = playlist.streetAddress
+    func setPlaylistName() {
+        if playlist.playlistName.isEmpty {
+            let address = playlist.streetAddress
 
-        if let range = address.range(of: "로") ?? address.range(of: "길") {
-            placeHolderAddress = String(address[..<range.upperBound])
-            placeHolderAddress += "에서 만난 플레이크"
-        } else {
-            placeHolderAddress = address
-            placeHolderAddress += "에서 만난 플레이크"
+            if let range = address.range(of: "로") ?? address.range(of: "길") {
+                playlist.playlistName = String(address[..<range.upperBound])
+                playlist.playlistName += "에서 만난 플레이크"
+            } else {
+                playlist.playlistName = address
+                playlist.playlistName += "에서 만난 플레이크"
+            }
         }
     }
     
@@ -101,7 +87,13 @@ final class SearchStartViewModel {
     }
     
     func clearDiggingList() {
-        persistenceService.deletePlaylist()
+        persistenceService.deleteAllPlaylists()
+    }
+
+    private func handleChangeOfName(oldValue: PlaylistModel, newValue: PlaylistModel) {
+        if oldValue.playlistName != newValue.playlistName {
+            persistenceService.updatePlaylist()
+        }
     }
 }
 

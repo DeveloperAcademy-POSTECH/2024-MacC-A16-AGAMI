@@ -86,11 +86,15 @@ final class PersistenceService {
         return try modelContext.fetch(fetchDescriptor)
     }
     
-    func saveSongToDiggingList(from mediaItem: SHMediaItem) throws {
-        guard let playlist = fetchPlaylist() as? SwiftDataPlaylistModel
-        else { return }
+    func appendSong(from mediaItem: SHMediaItem) {
+        guard let playlist = _playlist else { return }
 
         let song = ModelAdapter.fromSHtoSwiftDataSong(mediaItem)
+        let index = playlist.songs.count
+        song.orderIndex = index
+        if playlist.swiftDataSongs.contains(where: { $0.songID == song.songID }) {
+            return
+        }
         playlist.swiftDataSongs.append(song)
         updatePlaylist()
     }

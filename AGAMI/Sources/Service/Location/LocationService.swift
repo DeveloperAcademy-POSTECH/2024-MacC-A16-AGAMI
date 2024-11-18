@@ -10,7 +10,6 @@ import CoreLocation
 
 protocol LocationServiceDelegate: AnyObject {
     func locationService(_ service: LocationService, didUpdate location: [CLLocation])
-    func locationService(_ service: LocationService, didGetReverseGeocode location: String)
 }
 
 final class LocationService: NSObject {
@@ -85,7 +84,6 @@ final class LocationService: NSObject {
                     }
                     
                     self.streetAddress = currentAddress
-                    self.delegate?.locationService(self, didGetReverseGeocode: currentAddress)
                     completion(currentAddress)
                 }
             }

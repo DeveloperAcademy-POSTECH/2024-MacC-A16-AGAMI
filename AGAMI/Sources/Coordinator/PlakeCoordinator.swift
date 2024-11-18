@@ -25,7 +25,7 @@ enum PlakeRoute: Hashable {
     case placeListView(viewModel: CollectionPlaceViewModel)
     
     case accountView
-    case deleteAccountView
+    case deleteAccountView(viewModel: AccountViewModel)
 
     var id: String {
         switch self {
@@ -71,6 +71,7 @@ enum PlakeFullScreenCover: String, Identifiable {
 
 final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
     @ViewBuilder
+    // swiftlint:disable:next cyclomatic_complexity
     func build(route: PlakeRoute) -> some View {
         switch route {
         case .homeView:
@@ -93,8 +94,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             CollectionPlaceView(viewModel: viewModel)
         case .accountView:
             AccountView()
-        case .deleteAccountView:
-            SignOutView()
+        case let .deleteAccountView(viewModel):
+            SignOutView(viewModel: viewModel)
         case let .addPlakingView(viewModel):
             AddPlakingView(viewModel: viewModel)
         case let .addPlakingShazamView(viewModel):

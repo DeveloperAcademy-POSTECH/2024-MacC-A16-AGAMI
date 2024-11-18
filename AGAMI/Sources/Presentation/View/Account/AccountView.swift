@@ -11,6 +11,7 @@ import Kingfisher
 
 struct AccountView: View {
     @State var viewModel: AccountViewModel = .init()
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     
     var body: some View {
@@ -18,36 +19,34 @@ struct AccountView: View {
             Color(.pLightGray)
                 .ignoresSafeArea()
             
-            VStack(spacing: 0) {
-                ScrollView {
-                    ProfileView(viewModel: viewModel)
-                        .padding(.top, 28)
-                    InformationView(viewModel: viewModel)
-                        .padding(.top, 33)
-                }
-                Spacer()
-                
-                LogoutButton(viewModel: viewModel)
-                    .padding(.bottom, 20)
-            }
-            .padding(.horizontal, 8)
-            
-            if viewModel.isScucessDeleteAccount {
-                SignOutView()
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                            viewModel.isScucessDeleteAccount = false
-                            UserDefaults.standard.removeObject(forKey: "isSignedIn")
-                        }
+            if case .none = viewModel.deleteAccountProcess {
+                VStack(spacing: 0) {
+                    ScrollView {
+                        ProfileView(viewModel: viewModel)
+                            .padding(.top, 28)
+                        
+                        InformationView(viewModel: viewModel)
+                            .padding(.top, 33)
                     }
+                    
+                    Spacer()
+                    
+                    LogoutButton(viewModel: viewModel)
+                        .padding(.bottom, 20)
+                }
+                .padding(.horizontal, 8)
+            } else {
+                SignOutView(viewModel: viewModel)
             }
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationTitle("계정")
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden()
+        .ignoresSafeArea(.keyboard)
         .toolbar {
-            if !viewModel.isScucessDeleteAccount {
-                ToolbarItem(placement: .topBarLeading) {
+            ToolbarItem(placement: .topBarLeading) {
+                if viewModel.deleteAccountProcess == .none {
                     Button {
                         coordinator.pop()
                     } label: {
@@ -61,16 +60,14 @@ struct AccountView: View {
         .onTapGesture {
             hideKeyboard()
         }
-        .confirmationDialog("", isPresented: $viewModel.isPresented) {
+        .confirmationDialog("", isPresented: $viewModel.isProfileImageDialogPresented) {
             ProfileImageDialogActions(viewModel: viewModel)
         }
-        .photosPicker(isPresented: $viewModel.showPhotoPicker,
+        .photosPicker(isPresented: $viewModel.isShowPhotoPicker,
                       selection: $viewModel.selectedItem,
                       matching: .images)
         .onChange(of: viewModel.selectedItem) { _, newValue in
-            Task {
-                await viewModel.convertImage(item: newValue)
-            }
+            viewModel.convertImage(item: newValue)
         }
         .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
             SignOutAlertActions(viewModel: viewModel)
@@ -81,6 +78,9 @@ struct AccountView: View {
             DeleteAccountAlertActions(viewModel: viewModel)
         } message: {
             Text("탈퇴한 계정은 복구할 수 없습니다.")
+        }
+        .onAppear {
+            viewModel.fetchUserInformation()
         }
     }
 }
@@ -99,16 +99,10 @@ private struct ProfileView: View {
                 
                 Button {
                     if viewModel.isEditMode {
-                        Task {
-                            await viewModel.saveUserName(nickname: viewModel.userName)
-                            
-                            if let image = viewModel.postImage {
-                                await viewModel.saveUserProfileImage(image: image)
-                            }
-                        }
+                        viewModel.endEditButtonTapped()
+                    } else {
+                        viewModel.startEditButtonTapped()
                     }
-                    
-                    viewModel.isEditMode.toggle()
                 } label: {
                     Text(viewModel.isEditMode ? "완료" : "편집")
                         .font(.pretendard(weight: .regular400, size: 16))
@@ -121,45 +115,38 @@ private struct ProfileView: View {
                 Spacer()
                 
                 VStack(alignment: .center, spacing: 10) {
-                    Button {
+                    Group {
+                        if let postImage = viewModel.postImage {
+                            Image(uiImage: postImage)
+                                .resizable()
+                        } else if !viewModel.imageURL.isEmpty {
+                            KFImage(URL(string: viewModel.imageURL))
+                                .resizable()
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                        }
+                    }
+                    .scaledToFill()
+                    .clipShape(Circle())
+                    .frame(width: 94, height: 94)
+                    .foregroundStyle(Color(.pGray2))
+                    .overlay(alignment: .bottomTrailing) {
                         if viewModel.isEditMode {
-                            viewModel.isPresented = true
+                            Circle()
+                                .frame(width: 33, height: 33, alignment: .center)
+                                .foregroundStyle(Color(.pLightGray))
+                                .overlay {
+                                    Image(systemName: "camera.circle.fill")
+                                        .resizable()
+                                        .frame(width: 27, height: 27, alignment: .center)
+                                        .foregroundStyle(Color(.pPrimary))
+                                }
+                                .offset(x: 3, y: 3)
                         }
-                    } label: {
-                        Group {
-                            if let postImage = viewModel.postImage {
-                                Image(uiImage: postImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .clipShape(Circle())
-                            } else if !viewModel.imageURL.isEmpty {
-                                KFImage(URL(string: viewModel.imageURL))
-                                    .resizable()
-                                    .scaledToFill()
-                                    .clipShape(Circle())
-                            } else {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .clipShape(Circle())
-                            }
-                        }
-                        .frame(width: 94, height: 94)
-                        .foregroundStyle(Color(.pGray2))
-                        .overlay(alignment: .bottomTrailing) {
-                            if viewModel.isEditMode {
-                                Circle()
-                                    .frame(width: 33, height: 33, alignment: .center)
-                                    .foregroundStyle(Color(.pLightGray))
-                                    .overlay {
-                                        Image(systemName: "camera.circle.fill")
-                                            .resizable()
-                                            .frame(width: 27, height: 27, alignment: .center)
-                                            .foregroundStyle(Color(.pPrimary))
-                                    }
-                                    .offset(x: 3, y: 3)
-                            }
-                        }
+                    }
+                    .onTapGesture {
+                        viewModel.showProfileImageDialog()
                     }
                     
                     TextField(viewModel.userName, text: $viewModel.userName)
@@ -179,11 +166,10 @@ private struct ProfileView: View {
                             if newValue.count > 8 {
                                 viewModel.userName = String(newValue.prefix(8))
                             }
-                            
                         }
-                        .disabled(!viewModel.isEditMode)
                 }
-                
+                .disabled(!viewModel.isEditMode)
+
                 Spacer()
             }
             .frame(maxWidth: .infinity)
@@ -192,12 +178,8 @@ private struct ProfileView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(Color(.pWhite))
             )
-            .onAppear {
-                Task {
-                    await viewModel.fetchUserInformation()
-                }
-            }
         }
+        
     }
 }
 
@@ -242,7 +224,7 @@ private struct InformationView: View {
                 }
                 
                 Button {
-                    viewModel.isDeletingAccount = true
+                    viewModel.deleteAccountButtonTapped()
                 } label: {
                     HStack(spacing: 0) {
                         Text("회원 탈퇴")
@@ -268,7 +250,7 @@ private struct LogoutButton: View {
     
     var body: some View {
         Button {
-            viewModel.isShowingSignOutAlert = true
+            viewModel.logoutButtonTapped()
         } label: {
             Text("로그아웃")
                 .font(.pretendard(weight: .medium500, size: 20))
@@ -288,51 +270,45 @@ private struct ProfileImageDialogActions: View {
     
     var body: some View {
         Button {
-            viewModel.showPhotoPicker.toggle()
+            viewModel.albumButtonTapped()
         } label: {
             Text("앨범에서 가져오기")
                 .font(.pretendard(weight: .regular400, size: 18))
                 .foregroundStyle(Color(.pBlack))
         }
-        
-        Button {
-            viewModel.postImage = nil
-            viewModel.imageURL.removeAll()
-        } label: {
-            Text("기본 이미지로 변경")
-                .font(.pretendard(weight: .regular400, size: 18))
-                .foregroundStyle(Color(.pPrimary))
+        Button("기본 이미지로 변경", role: .destructive) {
+            viewModel.changeDefaultImage()
         }
     }
 }
 
 private struct SignOutAlertActions: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.isShowingSignOutAlert = false
+            viewModel.cancelSignOutAlert()
         }
         
         Button("확인", role: .destructive) {
-            viewModel.signOut()
-            viewModel.isShowingSignOutAlert = false
+            viewModel.confirmSignOut()
+            coordinator.popToRoot()
         }
     }
 }
 
 private struct DeleteAccountAlertActions: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.isDeletingAccount = false
+            viewModel.cancelDeleteAccountAlert()
         }
         
         Button("탈퇴", role: .destructive) {
-            Task {
-                await viewModel.deleteAccount()
-            }
+            viewModel.deleteAccount()
         }
     }
 }

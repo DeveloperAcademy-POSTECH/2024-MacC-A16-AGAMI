@@ -69,21 +69,43 @@ final class FirebaseService {
             return nil
         }
     }
-
+    
     func uploadImageToFirebase(userID: String, image: UIImage) async throws -> String {
-        guard let imageData = image.jpegData(compressionQuality: 0.7) else {
+        guard let resizedImage = resizeImage(image: image, targetSize: CGSize(width: 1024, height: 1024)),
+              let imageData = resizedImage.jpegData(compressionQuality: 0.7) else {
             throw NSError(domain: "ImageConversionError", code: -1, userInfo: [NSLocalizedDescriptionKey: "이미지를 데이터로 변환하는 데 실패했습니다."])
         }
 
         let uniqueID = UUID().uuidString
-        let storageRef = firestorage.reference()
+        let storageRef = Storage.storage().reference()
             .child("\(userID)/\(uniqueID)/image.jpg")
+        
+        do {
+            _ = try await storageRef.putDataAsync(imageData, metadata: nil)
+            
+            let downloadURL = try await storageRef.downloadURL()
+            return downloadURL.absoluteString
+        } catch {
+            print("Failed to upload image to Firebase: \(error)")
+            throw error
+        }
+    }
 
-        _ = try await storageRef.putDataAsync(imageData, metadata: nil)
-
-        let downloadURL = try await storageRef.downloadURL()
-
-        return downloadURL.absoluteString
+    // 이미지 크기 조정 함수
+    func resizeImage(image: UIImage, targetSize: CGSize) -> UIImage? {
+        let size = image.size
+        let widthRatio = targetSize.width / size.width
+        let heightRatio = targetSize.height / size.height
+        let newSize = widthRatio < heightRatio
+            ? CGSize(width: size.width * widthRatio, height: size.height * widthRatio)
+            : CGSize(width: size.width * heightRatio, height: size.height * heightRatio)
+        
+        UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+        image.draw(in: CGRect(origin: .zero, size: newSize))
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        return newImage
     }
 
     func deletePlaylist(userID: String, playlistID: String) async throws {
@@ -158,7 +180,8 @@ final class FirebaseService {
             firestore
                 .collection("UserInformation")
                 .document(userID)
-                .setData(["UserNickname": nickname]) { error in
+                .setData(["UserNickname": nickname], merge: true) { error in
+                    
                 if let error = error {
                     dump("Failed to save UserNickname: \(error.localizedDescription)")
                     continuation.resume(throwing: error)
@@ -204,6 +227,11 @@ final class FirebaseService {
                                 .child("\(userID)/UserImage")
         
         try await deleteFilesRecursively(in: imageIDFolder)
+        
+        try await firestore
+                    .collection("UserInformation")
+                    .document(userID)
+                    .updateData(["UserImageURL": ""])
         dump("Image files in storage successfully deleted")
     }
     
@@ -224,7 +252,23 @@ final class FirebaseService {
         if let userImageURL = data["UserImageURL"] {
             result["UserImageURL"] = userImageURL
         }
-        
         return result
+    }
+    
+    func saveIsUserValued(userID: String, isUserValued: Bool) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            firestore
+                .collection("UserInformation")
+                .document(userID)
+                .setData(["isUserValued": isUserValued], merge: true) { error in
+                if let error = error {
+                    dump("Failed to save isUserValued: \(error.localizedDescription)")
+                    continuation.resume(throwing: error)
+                } else {
+                    dump("isUserValued successfully saved to Firestore!")
+                    continuation.resume(returning: ())
+                }
+            }
+        }
     }
 }

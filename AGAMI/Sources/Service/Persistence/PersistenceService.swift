@@ -11,13 +11,15 @@ import ShazamKit
 import SwiftData
 
 final class PersistenceService {
-    let modelContainer: ModelContainer
-    let modelContext: ModelContext
-
-    static let shared: PersistenceService = .init()
+    private let modelContainer: ModelContainer
+    private let modelContext: ModelContext
     
     private let diggingListOrderKey = "diggingListOrder"
-    
+
+    private var model: SwiftDataPlaylistModel?
+
+    static let shared: PersistenceService = .init()
+
     private init() {
         let schema = Schema([SwiftDataPlaylistModel.self])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
@@ -28,7 +30,12 @@ final class PersistenceService {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }
-    
+
+    func getCurrentPlaylist() -> PlaylistModel? {
+        guard let model = model else { return nil }
+        return model
+    }
+
     func createPlaylist(
         playlistName: String,
         playlistDescription: String,
@@ -37,7 +44,7 @@ final class PersistenceService {
         longitude: Double,
         streetAddress: String
     ) throws {
-        let item = SwiftDataPlaylistModel(
+        model = SwiftDataPlaylistModel(
             playlistName: playlistName,
             playlistDescription: playlistDescription,
             photoURL: photoURL,
@@ -45,37 +52,44 @@ final class PersistenceService {
             longitude: longitude,
             streetAddress: streetAddress
         )
-        modelContext.insert(item)
+        guard let model = model else { return }
+        modelContext.insert(model)
         try modelContext.save()
     }
     
-    func updatePlaylistName(for item: SwiftDataPlaylistModel, to newPlaylistName: String) throws {
-        item.playlistName = newPlaylistName
+    func updatePlaylistName(to newPlaylistName: String) throws {
+        guard let model = model else { return }
+        model.playlistName = newPlaylistName
         try modelContext.save()
     }
     
-    func updatePlaylistDescription(for item: SwiftDataPlaylistModel, to newPlaylistDescription: String) throws {
-        item.playlistDescription = newPlaylistDescription
+    func updatePlaylistDescription(to newPlaylistDescription: String) throws {
+        guard let model = model else { return }
+        model.playlistDescription = newPlaylistDescription
         try modelContext.save()
     }
     
-    func updatePhotoURL(for item: SwiftDataPlaylistModel, to newPhotoURL: String) throws {
-        item.photoURL = newPhotoURL
+    func updatePhotoURL(to newPhotoURL: String) throws {
+        guard let model = model else { return }
+        model.photoURL = newPhotoURL
         try modelContext.save()
     }
     
-    func updateCoordinates(for item: SwiftDataPlaylistModel, latitude: Double, longitude: Double) throws {
-        item.latitude = latitude
-        item.longitude = longitude
+    func updateCoordinates(latitude: Double, longitude: Double) throws {
+        guard let model = model else { return }
+        model.latitude = latitude
+        model.longitude = longitude
         try modelContext.save()
     }
     
-    func deletePlaylist(item: SwiftDataPlaylistModel) throws {
-        modelContext.delete(item)
+    func deletePlaylist() throws {
+        guard let model = model else { return }
+        modelContext.delete(model)
+        self.model = nil
         try modelContext.save()
     }
     
-    func fetchDiggingList() throws -> [SwiftDataSongModel] {
+    func fetchDiggingList() throws -> [SongModel] {
         let fetchDescriptor = FetchDescriptor<SwiftDataSongModel>()
         return try modelContext.fetch(fetchDescriptor)
     }
@@ -87,16 +101,17 @@ final class PersistenceService {
         try modelContext.save()
     }
     
-    func deleteSong(item: SwiftDataSongModel) throws {
-        modelContext.delete(item)
+    func deleteSong(item: SongModel) throws {
+        guard let model = model,
+              let swiftDataSong = model.swiftDataSongs.first(where: { $0.songID == item.songID })
+        else { return }
+        modelContext.delete(swiftDataSong)
         try modelContext.save()
     }
     
     func deleteAllSongs() throws {
-        let songs = try fetchDiggingList()
-        for song in songs {
-            modelContext.delete(song)
-        }
+        guard let model = model else { return }
+        model.songs = []
         try modelContext.save()
     }
     

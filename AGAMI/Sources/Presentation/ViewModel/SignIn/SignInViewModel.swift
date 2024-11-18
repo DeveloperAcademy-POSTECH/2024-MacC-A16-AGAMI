@@ -7,10 +7,11 @@
 
 import Foundation
 import AuthenticationServices
+import FirebaseFirestore
 
 @Observable
 final class SignInViewModel {
-        
+    private let firebaseService = FirebaseService()
     private let firebaseAuthService = FirebaseAuthService()
 
     func signInRequest(request: ASAuthorizationAppleIDRequest) {
@@ -39,6 +40,14 @@ final class SignInViewModel {
                 switch result {
                 case .success(let uid):
                     dump("Firebase에 사용자 로그인 완료: \(uid)")
+                    Task {
+                        do {
+                            try await self.updateUserToValued()
+                            dump("isUserValued is true")
+                        } catch {
+                            dump("failed to update isUserValued")
+                        }
+                    }
                     UserDefaults.standard.set(true, forKey: "isSignedIn")
                 case .failure(let error):
                     dump("Firebase 로그인 에러: \(error.localizedDescription)")
@@ -58,5 +67,14 @@ final class SignInViewModel {
     
     func handleLoginError(with error: Error) {
         dump("인증 실패: \(error.localizedDescription)")
+    }
+    
+    func updateUserToValued() async throws {
+        guard let uid = FirebaseAuthService.currentUID else {
+            dump("UID를 가져오는 데 실패했습니다.")
+            return
+        }
+        
+       try await firebaseService.saveIsUserValued(userID: uid, isUserValued: true)
     }
 }

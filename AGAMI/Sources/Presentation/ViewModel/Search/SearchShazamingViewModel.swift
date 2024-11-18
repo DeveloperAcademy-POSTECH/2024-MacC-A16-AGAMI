@@ -76,6 +76,7 @@ extension SearchShazamingViewModel: ShazamServiceDelegate {
         
         if let item = currentItem {
             do {
+                HapticService.shared.playLongHaptic()
                 try persistenceService.saveSongToDiggingList(from: item)
             } catch {
                 dump("Failed to save song: \(error)")
@@ -84,11 +85,13 @@ extension SearchShazamingViewModel: ShazamServiceDelegate {
     }
     
     func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
+        HapticService.shared.playLongHaptic()
         shazamStatus = .failed
         stopRecognition()
     }
     
     func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
+        HapticService.shared.playLongHaptic()
         shazamStatus = .failed
         stopRecognition()
     }

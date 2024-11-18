@@ -13,9 +13,8 @@ import PhotosUI
 
 struct PlakePlaylistView: View {
     @State var viewModel: PlakePlaylistViewModel
-    @Environment(\.openURL) private var openURL
-    @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
     
     init(viewModel: PlakePlaylistViewModel) {
         _viewModel = State(wrappedValue: viewModel)
@@ -36,22 +35,16 @@ struct PlakePlaylistView: View {
                 ProgressView()
             }
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture { hideKeyboard() }
         .refreshable { viewModel.refreshPlaylist() }
         .background(Color(.pLightGray))
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    coordinator.pop()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(Color(.pPrimary))
-                }
+                TopBarLeadingItems(viewModel: viewModel)
             }
             ToolbarItem(placement: .topBarTrailing) {
                 TopBarTrailingItems(viewModel: viewModel)
-                    .foregroundStyle(Color(.pPrimary))
             }
         }
         .navigationTitle(viewModel.presentationState.isEditing ? "편집하기" : "")
@@ -120,7 +113,7 @@ private struct ListView: View {
                 .conditionalModifier(viewModel.presentationState.isEditing) { view in
                     view
                         .onDelete { indexSet in
-                            viewModel.deleteMusic(indexSet: indexSet)
+                            viewModel.deleteMusic(at: indexSet)
                         }
                         .onMove { indices, newOffset in
                             viewModel.moveMusic(from: indices, to: newOffset)
@@ -146,6 +139,9 @@ private struct ListView: View {
         }
         .listStyle(.plain)
         .scrollIndicators(.hidden)
+        .onAppear {
+            viewModel.refreshPlaylist()
+        }
     }
 }
 
@@ -155,14 +151,22 @@ private struct ArchivePlaylistRow: View {
     
     var body: some View {
         HStack(spacing: 0) {
-            KFImage(URL(string: song.albumCoverURL))
-                .resizable()
-                .cancelOnDisappear(true)
-                .placeholder {
-                    ProgressView()
-                }
-                .frame(width: 60, height: 60)
-                .padding(.trailing, 12)
+            if !song.albumCoverURL.isEmpty {
+                KFImage(URL(string: song.albumCoverURL))
+                    .resizable()
+                    .cancelOnDisappear(true)
+                    .placeholder {
+                        ProgressView()
+                    }
+                    .frame(width: 60, height: 60)
+                    .padding(.trailing, 12)
+            } else {
+                Image(.songEmpty)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .padding(.trailing, 12)
+            }
             
             VStack(alignment: .leading, spacing: 0) {
                 Text(song.title)
@@ -437,13 +441,42 @@ private struct PhotoConfirmationDialogActions: View {
     }
 }
 
+private struct TopBarLeadingItems: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakePlaylistViewModel
+
+    var body: some View {
+        if !viewModel.presentationState.isEditing {
+            Button {
+                viewModel.simpleHaptic()
+                coordinator.pop()
+            } label: {
+                Image(systemName: "chevron.backward")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Color(.pPrimary))
+            }
+        }
+    }
+}
+
 private struct TopBarTrailingItems: View {
     let viewModel: PlakePlaylistViewModel
     
     var body: some View {
         HStack {
             if viewModel.presentationState.isEditing {
+                Button {
+                    viewModel.simpleHaptic()
+                    viewModel.resetPlaylist()
+                    viewModel.presentationState.isEditing = false
+                } label: {
+                    Text("취소")
+                        .font(.pretendard(weight: .semiBold600, size: 17))
+                        .foregroundStyle(Color(.pPrimary))
+                }
+                
                 Button(role: .cancel) {
+                    viewModel.simpleHaptic()
                     Task {
                         await viewModel.applyChangesToFirestore()
                         viewModel.presentationState.isEditing = false
@@ -460,6 +493,7 @@ private struct TopBarTrailingItems: View {
                 .disabled(viewModel.presentationState.isUpdating)
             } else if viewModel.exportingState == .none {
                 Button {
+                    viewModel.simpleHaptic()
                     viewModel.presentationState.isEditing = true
                 } label: {
                     Text("편집")
@@ -475,15 +509,18 @@ private struct TopBarTrailingItems: View {
                 }
             }
         }
+        .foregroundStyle(Color(.pPrimary))
     }
 }
 
 private struct MenuContents: View {
     @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(\.openURL) private var openURL
     let viewModel: PlakePlaylistViewModel
     
     var body: some View {
         Button {
+            viewModel.simpleHaptic()
             coordinator.push(route: .addPlakingView(
                 viewModel: AddPlakingViewModel(playlist: viewModel.playlist)
             ))
@@ -491,13 +528,19 @@ private struct MenuContents: View {
             Label("플레이킹 더하기", image: .menuBlackPlakeLogo)
         }
         
-        //        Button {
-        //
-        //        } label: {
-        //            Label("공유하기", systemImage: "square.and.arrow.up")
-        //        }
+        Button {
+            viewModel.simpleHaptic()
+            Task {
+                if let url = await viewModel.getInstagramStoryURL() {
+                    openURL(url)
+                }
+            }
+        } label: {
+            Label("공유하기", systemImage: "square.and.arrow.up")
+        }
         
         Button {
+            viewModel.simpleHaptic()
             Task {
                 await viewModel.downloadPhotoAndSaveToAlbum()
             }
@@ -506,6 +549,7 @@ private struct MenuContents: View {
         }
         
         Button(role: .destructive) {
+            viewModel.simpleHaptic()
             viewModel.presentationState.isShowingDeletePlakeAlert = true
         } label: {
             Label("삭제하기", systemImage: "trash")

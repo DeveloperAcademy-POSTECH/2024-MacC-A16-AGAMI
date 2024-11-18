@@ -10,6 +10,7 @@ import SwiftUI
 import PhotosUI
 
 struct SearchWritingView: View {
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     @State var viewModel: SearchWritingViewModel
@@ -54,6 +55,7 @@ struct SearchWritingView: View {
             }
             
         }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .confirmationDialog("", isPresented: $viewModel.showSheet) {
             Button("카메라") {
                 coordinator.push(route: .cameraView(
@@ -110,7 +112,7 @@ struct SearchWritingView: View {
                             listCellPlaceholder.resetListCellPlaceholderModel()
                             viewModel.clearDiggingList()
                         } else {
-                            print("Failed to save playlist. Please try again.")
+                            dump("Failed to save playlist. Please try again.")
                         }
                     }
                 } label: {

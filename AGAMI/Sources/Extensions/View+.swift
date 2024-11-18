@@ -37,4 +37,30 @@ extension View {
             self
         }
     }
+    
+    func onAppearAndActiveCheckUserValued(_ scenePhase: ScenePhase) -> some View {
+            self
+                .onAppear {
+                    Task {
+                        do {
+                            try await FirebaseAuthService.checkUserValued()
+                            dump("User valued status is checked successfully on appear.")
+                        } catch {
+                            dump("Error checking user valued status on appear: \(error.localizedDescription)")
+                        }
+                    }
+                }
+                .onChange(of: scenePhase) { _, newPhase in
+                    if newPhase == .active {
+                        Task {
+                            do {
+                                try await FirebaseAuthService.checkUserValued()
+                                dump("User valued status is checked successfully in active state.")
+                            } catch {
+                                dump("Error checking user valued status in active state: \(error.localizedDescription)")
+                            }
+                        }
+                    }
+                }
+        }
 }

@@ -31,21 +31,21 @@ final class MusicService {
     func checkAppleMusicSubscriptionStatus() async -> Bool {
         let authorizationStatus = await MusicAuthorization.request()
         guard authorizationStatus == .authorized else {
-            print("Apple Music 접근 권한이 없습니다.")
+            dump("Apple Music 접근 권한이 없습니다.")
             return false
         }
         
         do {
             let subscription = try await MusicSubscription.current
             if subscription.canPlayCatalogContent {
-                print("사용자는 Apple Music 구독 중입니다.")
+                dump("사용자는 Apple Music 구독 중입니다.")
                 return true
             } else {
-                print("사용자는 Apple Music을 구독하지 않았거나 구독이 만료되었습니다.")
+                dump("사용자는 Apple Music을 구독하지 않았거나 구독이 만료되었습니다.")
                 return false
             }
         } catch {
-            print("Apple Music 구독 상태 확인 중 오류 발생: \(error.localizedDescription)")
+            dump("Apple Music 구독 상태 확인 중 오류 발생: \(error.localizedDescription)")
             return false
         }
     }

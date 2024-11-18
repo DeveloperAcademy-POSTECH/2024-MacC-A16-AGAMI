@@ -50,7 +50,10 @@ let project = Project(
                                 "UIInterfaceOrientationPortraitUpsideDown"
                             ],
                             "UIAppFonts": .array( fonts .map { .string( $0 ) }),
-                            "LSApplicationQueriesSchemes": .array( ["spotify"] ),
+                            "LSApplicationQueriesSchemes": .array([
+                                "spotify",
+                                "instagram-stories"
+                            ]),
                             "CFBundleURLTypes": .array([
                                 .dictionary([
                                     "CFBundleURLSchemes" : .array(["plake-agami"]),
@@ -61,6 +64,7 @@ let project = Project(
                             "CLIENT_ID": .string("$(CLIENT_ID)"),
                             "CLIENT_SECRET": .string("$(CLIENT_SECRET)"),
                             "REDIRECT_URL": .string("$(REDIRECT_URL)"),
+                            "INSTA_APP_ID": .string("$(INSTA_APP_ID)"),
                             "CFBundleDisplayName": "Plake",
                             "CFBundleShortVersionString": "1.0.0",
                             "CFBundleVersion": "1"
@@ -78,7 +82,8 @@ let project = Project(
                 .external(name: "SpotifyAPI"),
                 .external(name: "KeychainAccess"),
                 .external(name: "Lottie"),
-                .external(name: "Kingfisher")
+                .external(name: "Kingfisher"),
+                .external(name: "ColorThiefSwift")
             ]
         )
     ]

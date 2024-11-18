@@ -11,24 +11,32 @@ import Kingfisher
 
 struct PlaylistRow: View {
     let song: SongModel
-
+    
     var body: some View {
         HStack(spacing: 0) {
-            KFImage(URL(string: song.albumCoverURL))
-                .resizable()
-                .cancelOnDisappear(true)
-                .placeholder({
-                    ProgressView()
-                        .frame(width: 60, height: 60)
-                })
-                .frame(width: 60, height: 60)
-                .padding(.trailing, 20)
-
+            if !song.albumCoverURL.isEmpty {
+                KFImage(URL(string: song.albumCoverURL))
+                    .resizable()
+                    .cancelOnDisappear(true)
+                    .placeholder({
+                        ProgressView()
+                            .frame(width: 60, height: 60)
+                    })
+                    .frame(width: 60, height: 60)
+                    .padding(.trailing, 20)
+            } else {
+                Image(.songEmpty)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
+                    .padding(.trailing, 20)
+            }
+            
             VStack(alignment: .leading, spacing: 0) {
                 Text(song.title)
                     .font(.system(size: 17, weight: .semibold))
                     .kerning(-0.43)
-
+                
                 Text(song.artist)
                     .font(.system(size: 15, weight: .regular))
                     .kerning(-0.23)

@@ -15,6 +15,14 @@ final class PlakeListViewModel {
     private let authService = FirebaseAuthService()
     private let musicService = MusicService()
 
+    var isFetching: Bool = false
+    var isSearching: Bool {
+        !searchText.isEmpty
+    }
+    var isShowingNewPlake: Bool {
+        playlists.isEmpty && !isFetching && !isSearching
+    }
+
     var playlists: [PlaylistModel] = []
     private var unfilteredPlaylists: [PlaylistModel] = []
     var isUploading: Bool = false
@@ -29,13 +37,21 @@ final class PlakeListViewModel {
     var exportingState: ExportingState = .none
     
     func fetchPlaylists() {
+        isFetching = true
+        
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
+            isFetching = false
             return
         }
+        
         Task {
+            defer { isFetching = false }
+
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 await updatePlaylists(sortPlaylistsByDate(playlistModels))
+            } else {
+                dump("플레이리스트 데이터를 가져오는 데 실패했습니다.")
             }
         }
     }
@@ -43,39 +59,6 @@ final class PlakeListViewModel {
     func clearSearchText() {
         searchText = ""
         isSearchResultEmpty = false
-    }
-
-    func logout() {
-        authService.signOut { result in
-            switch result {
-            case .success:
-                UserDefaults.standard.removeObject(forKey: "isSignedIn")
-            case .failure(let err):
-                dump(err.localizedDescription)
-            }
-        }
-    }
-
-    func deleteAllDataInFirebase() async throws {
-        guard let userID = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는 데 실패했습니다.")
-            return
-        }
-        
-        do {
-            try await firebaseService.deleteAllPhotoInStorage(userID: userID)
-            try await firebaseService.deleteAllPlaylists(userID: userID)
-        } catch {
-            dump("\(error.localizedDescription) while deleting account")
-        }
-    }
-    
-    func deleteAccountAndSignOut() async {
-        if await authService.deleteAccount() {
-            logout()
-        } else {
-            dump("계정 삭제에 실패했습니다.")
-        }
     }
 
     private func sortPlaylistsByDate(_ playlistModels: [PlaylistModel]) -> [PlaylistModel] {
@@ -174,7 +157,10 @@ final class PlakeListViewModel {
         }
     }
 
-    
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
+
 // MARK: - FirebaseListner 코드
 //    private let listenerService = FirebaseListenerService()
 

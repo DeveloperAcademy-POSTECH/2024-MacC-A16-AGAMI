@@ -82,13 +82,13 @@ extension LocationService: CLLocationManagerDelegate {
         
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
-            print("위치 서비스 권한이 허용되었습니다.")
+            dump("위치 서비스 권한이 허용되었습니다.")
             manager.requestLocation()
         case .denied, .restricted:
-            print("위치 서비스 권한이 거부되었습니다.")
+            dump("위치 서비스 권한이 거부되었습니다.")
             manager.requestWhenInUseAuthorization()
         case .notDetermined:
-            print("위치 서비스 권한이 결정되지 않았습니다.")
+            dump("위치 서비스 권한이 결정되지 않았습니다.")
             manager.requestWhenInUseAuthorization()
         @unknown default:
             break

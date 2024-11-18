@@ -24,14 +24,17 @@ final class SearchStartViewModel {
     var placeHolderAddress: String = ""
     var isLoaded: Bool = false
     var userTitle: String = ""
-    
-    // 수집한 노래
-    var diggingList: [SongModel] = []
-    
+
+    var playlist: PlaylistModel
+
+    var diggingList: [SongModel] {
+        playlist.songs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
+    }
+
     var showBackButtonAlert: Bool = false
     
     init() {
-        loadSavedSongs()
+        playlist = persistenceService.fetchPlaylist()
         locationService.delegate = self
     }
     
@@ -48,11 +51,7 @@ final class SearchStartViewModel {
     }
     
     func loadSavedSongs() {
-        do {
-            self.diggingList = try persistenceService.loadDiggingListWithOrder()
-        } catch {
-            dump("Failed to load saved songs: \(error)")
-        }
+        playlist = persistenceService.fetchPlaylist()
     }
     
     func requestCurrentLocation() {
@@ -95,34 +94,19 @@ final class SearchStartViewModel {
     
     func deleteSong(indexSet: IndexSet) {
         for index in indexSet {
-            let songToDelete = diggingList[index]
-            diggingList.remove(at: index)
-            
-            if let song = songToDelete as? SwiftDataSongModel {
-                do {
-                    try persistenceService.deleteSong(item: song)
-                    loadSavedSongs()
-                } catch {
-                    dump("Error deleting song: \(error)")
-                }
-            } else {
-                dump("Error: Song is not of type SwiftDataSongModel")
-            }
+            let song = diggingList[index]
+            persistenceService.deleteSong(item: song)
         }
+        loadSavedSongs()
     }
     
     func moveSong(from source: IndexSet, to destination: Int) {
-        diggingList.move(fromOffsets: source, toOffset: destination)
-        persistenceService.saveDiggingListOrder(diggingList)
+        persistenceService.moveSong(from: source, to: destination)
+        loadSavedSongs()
     }
     
     func clearDiggingList() {
-        do {
-            diggingList.removeAll()
-            try persistenceService.deleteAllSongs()
-        } catch {
-            dump("Failed to clear songs: \(error)")
-        }
+        persistenceService.deletePlaylist()
     }
 }
 

@@ -15,10 +15,7 @@ struct MapView: View {
         MKMapViewWrapper(viewModel: viewModel)
             .ignoresSafeArea()
             .onAppear {
-                Task {
-                    viewModel.fetchPlaylists()
-                    await viewModel.fetchCurrentLocation()
-                }
+                viewModel.initializeView()
             }
     }
 }

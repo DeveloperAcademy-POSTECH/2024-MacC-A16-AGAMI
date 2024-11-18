@@ -34,6 +34,13 @@ final class SearchStartViewModel {
         loadSavedSongs()
     }
     
+    func initializeView() {
+        loadSavedSongs()
+        Task {
+            await fetchCurrentLocation()
+        }
+    }
+    
     func createSearchWritingViewModel() -> SearchWritingViewModel {
         return SearchWritingViewModel(
             currentLatitude: currentLatitude,
@@ -120,7 +127,7 @@ final class SearchStartViewModel {
             diggingList.removeAll()
             try persistenceService.deleteAllSongs()
         } catch {
-            print("노래를 모두 삭제하는 데 실패했습니다: \(error)")
+            dump("노래를 모두 삭제하는 데 실패했습니다: \(error)")
         }
     }
 }

@@ -18,7 +18,6 @@ struct MKMapViewWrapper: UIViewRepresentable {
         let mapView = MKMapView()
 
         mapView.delegate = context.coordinator
-
         mapView.register(BubbleAnnotationView.self, forAnnotationViewWithReuseIdentifier: NSStringFromClass(BubbleAnnotationView.self))
         mapView.register(ClusterBubbleAnnotationView.self, forAnnotationViewWithReuseIdentifier: NSStringFromClass(ClusterBubbleAnnotationView.self))
 

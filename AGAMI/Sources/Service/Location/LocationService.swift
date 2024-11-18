@@ -15,7 +15,7 @@ protocol LocationServiceDelegate: AnyObject {
 
 final class LocationService: NSObject {
     private var currentLocation: CLLocation?
-    private var locationManager: CLLocationManager = CLLocationManager()
+    private var locationManager: CLLocationManager
     private var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var streetAddress: String?
     var locality: String?
@@ -32,7 +32,7 @@ final class LocationService: NSObject {
         locationManager = CLLocationManager()
         super.init()
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
     }
     
     func requestLocationAuthorization() {

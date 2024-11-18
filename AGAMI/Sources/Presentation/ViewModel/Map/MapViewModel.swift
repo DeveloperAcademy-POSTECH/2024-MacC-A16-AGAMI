@@ -24,6 +24,13 @@ final class MapViewModel {
 
     var playlists: [PlaylistModel] = []
     
+    func initializeView() {
+        Task {
+            fetchPlaylists()
+            await fetchCurrentLocation()
+        }
+    }
+    
     func fetchPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는데 실패했습니다.")

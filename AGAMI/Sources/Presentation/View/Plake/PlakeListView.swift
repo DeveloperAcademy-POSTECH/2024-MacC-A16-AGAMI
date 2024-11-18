@@ -108,7 +108,7 @@ private struct ListView: View {
             LazyVStack(spacing: verticalSpacingValue) {
                 Group {
                     if !viewModel.searchText.isEmpty && viewModel.isSearchResultEmpty {
-                        EntpyResult()
+                        EmtpyResult()
                     } else if listCellPlaceholder.showArchiveListUpLoadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
                     } else if viewModel.playlists.isEmpty {
@@ -333,7 +333,7 @@ private struct ContextMenuItems: View {
     }
 }
 
-private struct EntpyResult: View {
+private struct EmtpyResult: View {
     var body: some View {
         Text("검색 결과가 없습니다.")
             .font(.pretendard(weight: .medium500, size: 20))

@@ -53,13 +53,7 @@ struct SearchStartView: View {
         }
         .ignoresSafeArea(.keyboard)
         .onAppearAndActiveCheckUserValued(scenePhase)
-        .onAppear {
-            viewModel.requestCurrentLocation()
-            viewModel.loadSavedSongs()
-        }
-        .onTapGesture {
-            hideKeyboard()
-        }
+        .onTapGesture(perform: hideKeyboard)
         .navigationTitle("새로운 플레이크")
         .navigationBarTitleDisplayMode(.large)
         .navigationBarBackButtonHidden(true)
@@ -123,7 +117,7 @@ private struct SearchPlakeTitleTextField: View {
                 .padding(.leading, 16)
                 .padding(.bottom, 14)
             
-            TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
+            TextField(viewModel.playlist.playlistName, text: $viewModel.playlist.playlistName)
                 .font(.pretendard(weight: .medium500, size: 20))
                 .foregroundStyle(Color(.pBlack))
                 .tint(Color(.pPrimary))

@@ -111,6 +111,10 @@ final class PersistenceService {
         else { return }
 
         playlist.swiftDataSongs.remove(at: index)
+        let updatedSongs = playlist.swiftDataSongs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
+        for (index, song) in updatedSongs.enumerated() {
+            song.orderIndex = index
+        }
         updatePlaylist()
     }
     

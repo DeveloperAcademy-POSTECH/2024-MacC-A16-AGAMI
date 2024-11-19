@@ -13,63 +13,65 @@ struct CameraView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     @State private var viewModel = CameraViewModel()
     let viewModelContainer: CoordinatorViewModelContainer?
-
+    
     var body: some View {
-        ZStack {
-            Color.black.edgesIgnoringSafeArea(.all)
-            
-            VStack(spacing: 0) {
-                Spacer()
+        GeometryReader { geometry in
+            ZStack {
+                Color.black.edgesIgnoringSafeArea(.all)
                 
-                if viewModel.isPhotoCaptured, let recentImage = viewModel.photoUIImage {
-                    Image(uiImage: recentImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4 / 5)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                        .clipped()
-                } else {
-                    viewModel.cameraPreView
-                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4 / 5)
-                        .onAppear {
-                            viewModel.configure()
-                        }
-                        .gesture(
-                            MagnificationGesture()
-                                .onChanged { val in
-                                    viewModel.zoom(factor: val)
-                                }
-                                .onEnded { _ in
-                                    viewModel.zoomInitialize()
-                                }
-                        )
-                }
-                
-                HStack(spacing: 44) {
-                    if !viewModel.isPhotoCaptured {
-                        switchFlashButton
-                        captureButton
-                        changeCameraButton
+                VStack(spacing: 0) {
+                    Spacer()
+                    
+                    if viewModel.isPhotoCaptured, let recentImage = viewModel.photoUIImage {
+                        Image(uiImage: recentImage)
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: geometry.size.width, height: geometry.size.width * 4 / 5)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .clipped()
                     } else {
-                        resetPhotoButton
-                        usedPhotoButton
-                        savePhotoButton
+                        viewModel.cameraPreView
+                            .frame(width: geometry.size.width, height: geometry.size.width * 4 / 5)
+                            .onAppear {
+                                viewModel.configure()
+                            }
+                            .gesture(
+                                MagnificationGesture()
+                                    .onChanged { val in
+                                        viewModel.zoom(factor: val)
+                                    }
+                                    .onEnded { _ in
+                                        viewModel.zoomInitialize()
+                                    }
+                            )
                     }
+                    
+                    HStack(spacing: 44) {
+                        if !viewModel.isPhotoCaptured {
+                            switchFlashButton
+                            captureButton
+                            changeCameraButton
+                        } else {
+                            resetPhotoButton
+                            usedPhotoButton
+                            savePhotoButton
+                        }
+                    }
+                    .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
                 }
-                .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
             }
-        }
-        .navigationTitle("사진 촬영")
-        .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    coordinator.pop()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.pretendard(weight: .semiBold600, size: 17))
-                        .foregroundStyle(Color(.pPrimary))
+            .navigationTitle("사진 촬영")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        coordinator.pop()
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                            .font(.pretendard(weight: .semiBold600, size: 17))
+                            .foregroundStyle(Color(.pPrimary))
+                    }
                 }
             }
         }

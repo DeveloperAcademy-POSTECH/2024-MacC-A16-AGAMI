@@ -16,7 +16,7 @@ final class PersistenceService {
     
     private let diggingListOrderKey = "diggingListOrder"
 
-    private var model: SwiftDataPlaylistModel?
+    private var _playlist: SwiftDataPlaylistModel?
 
     static let shared: PersistenceService = .init()
 
@@ -31,20 +31,15 @@ final class PersistenceService {
         }
     }
 
-    func getCurrentPlaylist() -> PlaylistModel? {
-        guard let model = model else { return nil }
-        return model
-    }
-
-    func createPlaylist(
-        playlistName: String,
-        playlistDescription: String,
-        photoURL: String,
-        latitude: Double,
-        longitude: Double,
-        streetAddress: String
-    ) throws {
-        model = SwiftDataPlaylistModel(
+    private func createPlaylist(
+        playlistName: String = "",
+        playlistDescription: String = "",
+        photoURL: String = "",
+        latitude: Double = 0.0,
+        longitude: Double = 0.0,
+        streetAddress: String = ""
+    ) -> SwiftDataPlaylistModel {
+        let playlist = SwiftDataPlaylistModel(
             playlistName: playlistName,
             playlistDescription: playlistDescription,
             photoURL: photoURL,
@@ -52,41 +47,44 @@ final class PersistenceService {
             longitude: longitude,
             streetAddress: streetAddress
         )
-        guard let model = model else { return }
-        modelContext.insert(model)
-        try modelContext.save()
+
+        _playlist = playlist
+        modelContext.insert(playlist)
+        return playlist
     }
-    
-    func updatePlaylistName(to newPlaylistName: String) throws {
-        guard let model = model else { return }
-        model.playlistName = newPlaylistName
-        try modelContext.save()
+
+    func fetchPlaylist() -> PlaylistModel {
+        let fetchDescriptor = FetchDescriptor<SwiftDataPlaylistModel>()
+        guard let result = try? modelContext.fetch(fetchDescriptor)
+        else { return SwiftDataPlaylistModel() }
+
+        if result.isEmpty {
+            return createPlaylist()
+        } else {
+            _playlist = result.first
+            return _playlist ?? SwiftDataPlaylistModel()
+        }
     }
-    
-    func updatePlaylistDescription(to newPlaylistDescription: String) throws {
-        guard let model = model else { return }
-        model.playlistDescription = newPlaylistDescription
-        try modelContext.save()
+
+    private func fetchPlaylists() -> [SwiftDataPlaylistModel] {
+        let fetchDescriptor = FetchDescriptor<SwiftDataPlaylistModel>()
+        guard let result = try? modelContext.fetch(fetchDescriptor) else { return [] }
+        return result
     }
-    
-    func updatePhotoURL(to newPhotoURL: String) throws {
-        guard let model = model else { return }
-        model.photoURL = newPhotoURL
-        try modelContext.save()
+
+    func updatePlaylist() {
+        do {
+            try modelContext.save()
+        } catch {
+            dump(error)
+        }
     }
-    
-    func updateCoordinates(latitude: Double, longitude: Double) throws {
-        guard let model = model else { return }
-        model.latitude = latitude
-        model.longitude = longitude
-        try modelContext.save()
-    }
-    
-    func deletePlaylist() throws {
-        guard let model = model else { return }
-        modelContext.delete(model)
-        self.model = nil
-        try modelContext.save()
+
+    func deleteAllPlaylists() {
+        let playlists = fetchPlaylists()
+        for playlist in playlists {
+            modelContext.delete(playlist)
+        }
     }
     
     func fetchDiggingList() throws -> [SongModel] {
@@ -94,38 +92,46 @@ final class PersistenceService {
         return try modelContext.fetch(fetchDescriptor)
     }
     
-    func saveSongToDiggingList(from mediaItem: SHMediaItem) throws {
-        let songModel = ModelAdapter.fromSHtoSwiftDataSong(mediaItem)
-        
-        modelContext.insert(songModel)
-        try modelContext.save()
+    func appendSong(from mediaItem: SHMediaItem) {
+        guard let playlist = _playlist else { return }
+
+        let song = ModelAdapter.fromSHtoSwiftDataSong(mediaItem)
+        let index = playlist.songs.count
+        song.orderIndex = index
+        if playlist.swiftDataSongs.contains(where: { $0.songID == song.songID }) {
+            return
+        }
+        playlist.swiftDataSongs.append(song)
+        updatePlaylist()
     }
     
-    func deleteSong(item: SongModel) throws {
-        guard let model = model,
-              let swiftDataSong = model.swiftDataSongs.first(where: { $0.songID == item.songID })
+    func deleteSong(item: SongModel) {
+        guard let playlist = _playlist,
+              let index = playlist.swiftDataSongs.firstIndex(where: { $0.songID == item.songID })
         else { return }
-        modelContext.delete(swiftDataSong)
-        try modelContext.save()
+
+        playlist.swiftDataSongs.remove(at: index)
+        let updatedSongs = playlist.swiftDataSongs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
+        for (index, song) in updatedSongs.enumerated() {
+            song.orderIndex = index
+        }
+        updatePlaylist()
     }
     
-    func deleteAllSongs() throws {
-        guard let model = model else { return }
-        model.songs = []
-        try modelContext.save()
+    func deleteAllSongs() {
+        guard let playlist = _playlist else { return }
+        playlist.swiftDataSongs.removeAll()
+        updatePlaylist()
     }
-    
-    func saveDiggingListOrder(_ list: [SongModel]) {
-        let ids = list.map { $0.songID }
-        UserDefaults.standard.set(ids, forKey: diggingListOrderKey)
+
+    func moveSong(from source: IndexSet, to destination: Int) {
+        guard let playlist = _playlist else { return }
+        var updatedSongs = playlist.swiftDataSongs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
+        updatedSongs.move(fromOffsets: source, toOffset: destination)
+        for (index, song) in updatedSongs.enumerated() {
+            song.orderIndex = index
+        }
+        updatePlaylist()
     }
-    
-    func loadDiggingListWithOrder() throws -> [SongModel] {
-        let savedOrder = UserDefaults.standard.stringArray(forKey: diggingListOrderKey) ?? []
-        let fetchedSongs = try fetchDiggingList()
-        
-        return savedOrder.compactMap { id in
-            fetchedSongs.first { $0.songID == id }
-        } + fetchedSongs.filter { !savedOrder.contains($0.songID) }
-    }
+
 }

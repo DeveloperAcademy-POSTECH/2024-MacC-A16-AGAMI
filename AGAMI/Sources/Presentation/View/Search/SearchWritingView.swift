@@ -16,7 +16,7 @@ struct SearchWritingView: View {
     @State var viewModel: SearchWritingViewModel
     
     init(viewModel: SearchWritingViewModel) {
-        self._viewModel = State(initialValue: viewModel)
+        _viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {
@@ -104,10 +104,10 @@ struct SearchWritingView: View {
                     Task {
                         coordinator.popToRoot()
                         listCellPlaceholder.setListCellPlaceholderModel(
-                                userTitle: viewModel.userTitle,
-                                streetAddress: viewModel.currentStreetAddress ?? "",
-                                generationTime: Date()
-                            )
+                            userTitle: viewModel.playlist.playlistName,
+                            streetAddress: viewModel.playlist.streetAddress,
+                            generationTime: Date()
+                        )
                         if await viewModel.savedPlaylist() {
                             listCellPlaceholder.resetListCellPlaceholderModel()
                             viewModel.clearDiggingList()
@@ -147,11 +147,11 @@ private struct PlaylistCoverImageView: View {
                         .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
                         .overlay(alignment: .bottom) {
                             VStack(spacing: 0) {
-                                Text("\(viewModel.currentRegion), \(viewModel.currentLocality)")
+                                Text(viewModel.cellAddress)
                                     .font(.pretendard(weight: .medium500, size: 14))
                                     .foregroundStyle(Color(.pWhite))
                                 
-                                Text(viewModel.currentDate)
+                                Text(viewModel.cellDate)
                                     .font(.pretendard(weight: .medium500, size: 14))
                                     .foregroundStyle(Color(.pWhite))
                                     .padding(.top, 4)
@@ -202,7 +202,7 @@ private struct PlaylistTitleTextField: View {
                 .foregroundStyle(Color(.pBlack))
                 .padding(EdgeInsets(top: 0, leading: 16, bottom: 14, trailing: 0))
             
-            TextField("\(viewModel.placeHolderAddress)", text: $viewModel.userTitle)
+            TextField(viewModel.playlist.playlistName, text: $viewModel.playlist.playlistName)
                 .font(.pretendard(weight: .medium500, size: 20))
                 .foregroundStyle(Color(.pGray1))
                 .focused($isFocused)
@@ -252,7 +252,7 @@ private struct PlaylistDescriptionTextField: View {
         RoundedRectangle(cornerRadius: 10)
             .foregroundStyle(Color(.pWhite))
             .overlay(alignment: .topLeading) {
-                TextField("플레이크에 대한 설명 추가하기", text: $viewModel.userDescription, axis: .vertical)
+                TextField("플레이크에 대한 설명 추가하기", text: $viewModel.playlist.playlistDescription, axis: .vertical)
                     .background(.clear)
                     .foregroundStyle(.black)
                     .padding()

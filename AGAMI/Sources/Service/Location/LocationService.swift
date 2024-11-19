@@ -10,7 +10,6 @@ import CoreLocation
 
 protocol LocationServiceDelegate: AnyObject {
     func locationService(_ service: LocationService, didUpdate location: [CLLocation])
-    func locationService(_ service: LocationService, didGetReverseGeocode location: String)
 }
 
 final class LocationService: NSObject {
@@ -57,6 +56,35 @@ final class LocationService: NSObject {
     
     func getCurrentLocation() -> CLLocation? {
         currentLocation
+    }
+    
+    func coordinateToStreetAddress(completion: @escaping (String?) -> Void) {
+        guard let currentLocation else { return }
+        
+        let geocoder = CLGeocoder()
+        let locale = Locale(identifier: "ko_KR")
+        
+        geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: { [weak self] (placemarks, _) in
+            if let self = self {
+                if let address: [CLPlacemark] = placemarks {
+                    var currentAddress: String = ""
+                                        
+                    if let name: String = address.last?.name {
+                        currentAddress += name
+                        placeHolderAddress = name
+                        region = name
+                    }
+                    
+                    if let area: String = address.last?.locality {
+                        currentAddress += (", \(area)")
+                        locality = area
+                    }
+                    
+                    self.streetAddress = currentAddress
+                    completion(currentAddress)
+                }
+            }
+        })
     }
 }
 

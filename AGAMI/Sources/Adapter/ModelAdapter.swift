@@ -19,7 +19,9 @@ struct ModelAdapter {
     }
 
     static func toFirestorePlaylist(from playlistModel: PlaylistModel) -> FirestorePlaylistModel {
-        return FirestorePlaylistModel(from: playlistModel)
+        var firestorePlaylist = FirestorePlaylistModel(from: playlistModel)
+        firestorePlaylist.songs.sort { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
+        return firestorePlaylist
     }
 
     static func toFirestoreSong(from songModel: SongModel) -> FirestoreSongModel {

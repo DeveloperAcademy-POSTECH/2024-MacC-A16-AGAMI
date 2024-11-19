@@ -12,53 +12,37 @@ import CoreLocation
 final class SearchStartViewModel {
     private let persistenceService = PersistenceService.shared
     private let locationService = LocationService.shared
-    
-    // 유저 위치
-    var currentLatitude: Double?
-    var currentLongitude: Double?
-    var currentStreetAddress: String?
-    var currentLocality: String = ""
-    var currentRegion: String = ""
-    
-    // 플레이크 타이틀
-    var placeHolderAddress: String = ""
-    var isLoaded: Bool = false
-    var userTitle: String = ""
-    
-    // 수집한 노래
-    var diggingList: [SongModel] = []
-    
+
+    var playlist: PlaylistModel {
+        didSet { handleChangeOfName(oldValue: oldValue, newValue: playlist) }
+    }
+    var diggingList: [SongModel] {
+        playlist.songs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
+    }
+
+    var isLoaded: Bool {
+        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty
+    }
+
     var showBackButtonAlert: Bool = false
     
     init() {
-        loadSavedSongs()
+        playlist = persistenceService.fetchPlaylist()
+        locationService.delegate = self
+        requestCurrentLocation()
     }
     
-    func initializeView() {
+   func initializeView() {
         loadSavedSongs()
         Task {
             await fetchCurrentLocation()
         }
-    }
-    
     func createSearchWritingViewModel() -> SearchWritingViewModel {
-        return SearchWritingViewModel(
-            currentLatitude: currentLatitude,
-            currentLongitude: currentLongitude,
-            currentStreetAddress: currentStreetAddress,
-            placeHolderAddress: placeHolderAddress,
-            userTitle: userTitle,
-            currentLocality: currentLocality,
-            currentRegion: currentRegion
-        )
+        SearchWritingViewModel(playlist: playlist)
     }
     
     func loadSavedSongs() {
-        do {
-            self.diggingList = try persistenceService.loadDiggingListWithOrder()
-        } catch {
-            dump("저장된 노래를 불러오는 데 실패했습니다: \(error)")
-        }
+        playlist = persistenceService.fetchPlaylist()
     }
 
     func fetchCurrentLocation() async {
@@ -72,62 +56,61 @@ final class SearchStartViewModel {
         }
     }
     
-    func fetchCurrentStreetAddress() async {
-        if let address = await locationService.coordinateToStreetAddress() {
-            currentStreetAddress = address
-            setPlaceHolderAddress()
-            if currentLatitude != nil && currentLongitude != nil && currentStreetAddress != nil {
-                isLoaded = true
-            }
+    func getCurrentLocation() {
+        guard let currentLocation = locationService.getCurrentLocation() else { return }
+        playlist.latitude = currentLocation.coordinate.latitude
+        playlist.longitude = currentLocation.coordinate.longitude
+        persistenceService.updatePlaylist()
+
+        locationService.coordinateToStreetAddress { [weak self] address in
+            guard let self = self else { return }
+
+            self.playlist.streetAddress = address ?? ""
+            persistenceService.updatePlaylist()
+            self.setPlaylistName()
         }
     }
     
-    func setPlaceHolderAddress() {
-        if let address = locationService.placeHolderAddress {
+    func setPlaylistName() {
+        if playlist.playlistName.isEmpty {
+            let address = playlist.streetAddress
+
             if let range = address.range(of: "로") ?? address.range(of: "길") {
-                placeHolderAddress = String(address[..<range.upperBound])
-                placeHolderAddress += "에서 만난 플레이크"
+                playlist.playlistName = String(address[..<range.upperBound])
+                playlist.playlistName += "에서 만난 플레이크"
             } else {
-                placeHolderAddress = address
-                placeHolderAddress += "에서 만난 플레이크"
-            }
-            self.currentRegion = address
-            
-            if let locality = locationService.locality {
-                self.currentLocality = locality
+                playlist.playlistName = address
+                playlist.playlistName += "에서 만난 플레이크"
             }
         }
     }
     
     func deleteSong(indexSet: IndexSet) {
         for index in indexSet {
-            let songToDelete = diggingList[index]
-            diggingList.remove(at: index)
-            
-            if let song = songToDelete as? SwiftDataSongModel {
-                do {
-                    try persistenceService.deleteSong(item: song)
-                    loadSavedSongs()
-                } catch {
-                    dump("노래 삭제 중 오류 발생: \(error)")
-                }
-            } else {
-                dump("오류: Song이 SwiftDataSongModel 타입이 아닙니다")
-            }
+            let song = diggingList[index]
+            persistenceService.deleteSong(item: song)
         }
+        loadSavedSongs()
     }
     
     func moveSong(from source: IndexSet, to destination: Int) {
-        diggingList.move(fromOffsets: source, toOffset: destination)
-        persistenceService.saveDiggingListOrder(diggingList)
+        persistenceService.moveSong(from: source, to: destination)
+        loadSavedSongs()
     }
     
     func clearDiggingList() {
-        do {
-            diggingList.removeAll()
-            try persistenceService.deleteAllSongs()
-        } catch {
-            dump("Failed to clear songs: \(error)")
+        persistenceService.deleteAllPlaylists()
+    }
+
+    private func handleChangeOfName(oldValue: PlaylistModel, newValue: PlaylistModel) {
+        if oldValue.playlistName != newValue.playlistName {
+            persistenceService.updatePlaylist()
         }
+    }
+}
+
+extension SearchStartViewModel: LocationServiceDelegate {
+    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
+        getCurrentLocation()
     }
 }

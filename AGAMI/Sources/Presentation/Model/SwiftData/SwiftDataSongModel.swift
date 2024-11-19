@@ -14,17 +14,20 @@ final class SwiftDataSongModel: SongModel {
     var title: String
     var artist: String
     var albumCoverURL: String
+    var orderIndex: Int?
 
     init(
         songID: String = "",
         title: String = "",
         artist: String = "",
-        albumCoverURL: String = ""
+        albumCoverURL: String = "",
+        orderIndex: Int? = nil
     ) {
         self.songID = songID
         self.title = title
         self.artist = artist
         self.albumCoverURL = albumCoverURL
+        self.orderIndex = orderIndex
     }
 
     init(from songModel: SongModel) {
@@ -32,5 +35,6 @@ final class SwiftDataSongModel: SongModel {
         self.title = songModel.title
         self.artist = songModel.artist
         self.albumCoverURL = songModel.albumCoverURL
+        self.orderIndex = songModel.orderIndex
     }
 }

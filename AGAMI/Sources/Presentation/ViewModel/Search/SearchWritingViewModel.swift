@@ -96,7 +96,7 @@ final class SearchWritingViewModel {
     
     func loadImageFromGallery() async {
         if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
-            photoUIImage = UIImage(data: data)?.cropSquare()
+            photoUIImage = UIImage(data: data)?.cropToFiveByFour()
         }
     }
 

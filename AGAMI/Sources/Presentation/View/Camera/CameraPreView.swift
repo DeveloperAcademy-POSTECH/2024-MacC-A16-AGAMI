@@ -30,7 +30,7 @@ struct CameraPreview: UIViewRepresentable {
         
         view.backgroundColor = .white // 기본 백그라운드 색 지정
         view.videoPreviewLayer.videoGravity = .resizeAspectFill // 카메라 프리뷰 ratio 조절(fit, fill)
-        view.videoPreviewLayer.cornerRadius = 10 // 프리뷰 모서리에 CornerRadius를 결정
+        view.videoPreviewLayer.cornerRadius = 4 // 프리뷰 모서리에 CornerRadius를 결정
         view.videoPreviewLayer.session = session // 카메라 세션 지정(필수)
 
         return view

@@ -179,7 +179,7 @@ final class PlakePlaylistViewModel: Hashable {
         guard let item = selectedItem,
               let data = try? await item.loadTransferable(type: Data.self),
               let rawImage = UIImage(data: data),
-              let image = rawImage.cropSquare(),
+              let image = rawImage.cropToFiveByFour(),
               let userID = FirebaseAuthService.currentUID else { return }
 
         await deletePhoto(userID: userID)

@@ -8,17 +8,30 @@
 import UIKit
 
 extension UIImage {
-    func cropSquare() -> UIImage? {
-        let shortLength = min(size.width, size.height)
+    func cropToFiveByFour() -> UIImage? {
+        let ratio: CGFloat = 5.0 / 4.0
+        let imageRatio = size.width / size.height
+
+        var cropWidth: CGFloat
+        var cropHeight: CGFloat
+
+        if imageRatio > ratio {
+            cropHeight = size.height
+            cropWidth = cropHeight * ratio
+        } else {
+            cropWidth = size.width
+            cropHeight = cropWidth / ratio
+        }
+
         let origin = CGPoint(
-            x: (size.width - shortLength) / 2,
-            y: (size.height - shortLength) / 2
+            x: (size.width - cropWidth) / 2,
+            y: (size.height - cropHeight) / 2
         )
-        let squareRect = CGRect(origin: origin, size: CGSize(width: shortLength, height: shortLength))
-        
-        let renderer = UIGraphicsImageRenderer(size: squareRect.size)
+        let cropRect = CGRect(origin: origin, size: CGSize(width: cropWidth, height: cropHeight))
+
+        let renderer = UIGraphicsImageRenderer(size: cropRect.size)
         return renderer.image { _ in
-            self.draw(at: CGPoint(x: -squareRect.origin.x, y: -squareRect.origin.y))
+            self.draw(at: CGPoint(x: -cropRect.origin.x, y: -cropRect.origin.y))
         }
     }
 

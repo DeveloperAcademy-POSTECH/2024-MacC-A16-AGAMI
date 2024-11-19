@@ -25,12 +25,12 @@ struct CameraView: View {
                     Image(uiImage: recentImage)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(height: 400)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4 / 5)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
                         .clipped()
                 } else {
                     viewModel.cameraPreView
-                        .frame(height: 400)
+                        .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.width * 4 / 5)
                         .onAppear {
                             viewModel.configure()
                         }
@@ -106,7 +106,7 @@ struct CameraView: View {
     
     private var usedPhotoButton: some View {
         Button {
-            guard let croppedImage = viewModel.photoUIImage?.cropSquare() else { return }
+            guard let croppedImage = viewModel.photoUIImage?.cropToFiveByFour() else { return }
 
             switch viewModelContainer {
             case let .searchWriting(viewModel):

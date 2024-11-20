@@ -37,15 +37,15 @@ enum PretendardWeight: String {
 }
 
 enum SCoreDreamWeight: String {
-    case dream1 = "SCoreDream1"
-    case dream2 = "SCoreDream2"
-    case dream3 = "SCoreDream3"
-    case dream4 = "SCoreDream4"
-    case dream5 = "SCoreDream5"
-    case dream6 = "SCoreDream6"
-    case dream7 = "SCoreDream7"
-    case dream8 = "SCoreDream8"
-    case dream9 = "SCoreDream9"
+    case dream1 = "S-CoreDream-1Thin"
+    case dream2 = "S-CoreDream-2ExtraLight"
+    case dream3 = "S-CoreDream-3Light"
+    case dream4 = "S-CoreDream-4Regular"
+    case dream5 = "S-CoreDream-5Medium"
+    case dream6 = "S-CoreDream-6Bold"
+    case dream7 = "S-CoreDream-7ExtraBold"
+    case dream8 = "S-CoreDream-8Heavy"
+    case dream9 = "S-CoreDream-9Black"
     
     var fontName: String {
         return self.rawValue

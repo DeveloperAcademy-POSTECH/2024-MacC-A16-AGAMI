@@ -110,11 +110,14 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 Group {
-                    if listCellPlaceholder.showArchiveListUpLoadingCell {
+                    if !viewModel.searchText.isEmpty && viewModel.isSearchResultEmpty {
+                        EmtpyResult()
+                    } else if listCellPlaceholder.showArchiveListUpLoadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
                     } else if viewModel.isShowingNewPlake {
                         MakeNewPlakeCell(size: size)
                     }
+                    
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                         PlakeListCell(
                             viewModel: viewModel,
@@ -338,5 +341,13 @@ private struct ContextMenuItems: View {
         } label: {
             Label("삭제", systemImage: "trash")
         }
+    }
+}
+
+private struct EmtpyResult: View {
+    var body: some View {
+        Text("검색 결과가 없습니다.")
+            .font(.pretendard(weight: .medium500, size: 20))
+            .foregroundStyle(Color(.pGray1))
     }
 }

@@ -17,8 +17,7 @@ struct MapView: View {
             .onAppearAndActiveCheckUserValued(scenePhase)
             .ignoresSafeArea()
             .onAppear {
-                viewModel.fecthPlaylists()
-                viewModel.getCurrentLocation()
+                viewModel.initializeView()
             }
     }
 }

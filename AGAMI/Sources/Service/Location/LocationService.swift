@@ -14,7 +14,7 @@ protocol LocationServiceDelegate: AnyObject {
 
 final class LocationService: NSObject {
     private var currentLocation: CLLocation?
-    private var locationManager: CLLocationManager = CLLocationManager()
+    private var locationManager: CLLocationManager
     private var authorizationStatus: CLAuthorizationStatus = .notDetermined
     var streetAddress: String?
     var locality: String?
@@ -25,11 +25,13 @@ final class LocationService: NSObject {
     
     weak var delegate: LocationServiceDelegate?
     
+    private var locationContinuation: CheckedContinuation<CLLocation, Error>?
+
     private override init() {
         locationManager = CLLocationManager()
         super.init()
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
     }
     
     func requestLocationAuthorization() {
@@ -45,15 +47,10 @@ final class LocationService: NSObject {
         }
     }
     
-    func requestCurrentLocation() {
-        dump("service currentLocation")
-        let status = self.locationManager.authorizationStatus
-        
-        switch status {
-        case .authorizedWhenInUse, .authorizedAlways:
+    func requestCurrentLocation() async throws -> CLLocation {
+        return try await withCheckedThrowingContinuation { continuation in
             self.locationManager.requestLocation()
-        default:
-            self.locationManager.requestWhenInUseAuthorization()
+            self.locationContinuation = continuation
         }
     }
     
@@ -95,12 +92,16 @@ extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         if let location = locations.last {
             currentLocation = location
+            locationContinuation?.resume(returning: location)
+            locationContinuation = nil
         }
 
         self.delegate?.locationService(self, didUpdate: locations)
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        locationContinuation?.resume(throwing: error)
+        locationContinuation = nil
         dump("위치 정보 가져오기 실패: \(error.localizedDescription)")
     }
     
@@ -122,3 +123,36 @@ extension LocationService: CLLocationManagerDelegate {
         }
     }
 }
+
+extension LocationService {
+    func coordinateToStreetAddress() async -> String? {
+          guard let currentLocation else { return nil }
+          return await withCheckedContinuation { continuation in
+              let geocoder = CLGeocoder()
+              let locale = Locale(identifier: "ko_KR")
+
+              geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale) { [weak self] (placemarks, _) in
+                  guard let self = self else { return }
+                  if let address = placemarks?.last {
+                      var currentAddress = ""
+
+                      if let name = address.name {
+                          currentAddress += name
+                          self.placeHolderAddress = name
+                          self.region = name
+                      }
+
+                      if let area = address.locality {
+                          currentAddress += ", \(area)"
+                          self.locality = area
+                      }
+
+                      self.streetAddress = currentAddress
+                      continuation.resume(returning: currentAddress)
+                  } else {
+                      continuation.resume(returning: nil)
+                  }
+              }
+          }
+      }
+  }

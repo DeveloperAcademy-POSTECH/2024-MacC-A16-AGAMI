@@ -29,9 +29,15 @@ final class SearchStartViewModel {
     init() {
         playlist = persistenceService.fetchPlaylist()
         locationService.delegate = self
-        requestCurrentLocation()
     }
     
+    func initializeView() {
+        loadSavedSongs()
+        Task {
+            await fetchCurrentLocation()
+        }
+    }
+        
     func createSearchWritingViewModel() -> SearchWritingViewModel {
         SearchWritingViewModel(playlist: playlist)
     }
@@ -39,9 +45,15 @@ final class SearchStartViewModel {
     func loadSavedSongs() {
         playlist = persistenceService.fetchPlaylist()
     }
-    
-    func requestCurrentLocation() {
-        locationService.requestCurrentLocation()
+        
+    func fetchCurrentLocation() async {
+        do {
+            let location = try await locationService.requestCurrentLocation()
+            playlist.latitude = location.coordinate.latitude
+            playlist.longitude = location.coordinate.longitude
+        } catch {
+            dump("현재 위치를 가져오는 데 실패했습니다: \(error)")
+        }
     }
     
     func getCurrentLocation() {

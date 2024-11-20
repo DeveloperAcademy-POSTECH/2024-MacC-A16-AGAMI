@@ -183,7 +183,3 @@ private struct ShazamButton: View {
         .background(Color(.pLightGray))
     }
 }
-
-#Preview {
-    SearchStartView()
-}

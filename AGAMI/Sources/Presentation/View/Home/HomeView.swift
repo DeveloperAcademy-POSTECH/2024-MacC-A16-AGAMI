@@ -80,7 +80,7 @@ struct HomeView: View {
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(Color(.pWhite), Color(.pPrimary))
                     .onTapGesture {
-                        coordinator.push(route: .newPlakeView)
+                        coordinator.push(route: .searchWritingView)
                         viewModel.simpleHaptic()
                     }
 

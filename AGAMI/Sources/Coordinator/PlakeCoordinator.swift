@@ -16,9 +16,8 @@ enum PlakeRoute: Hashable {
     case addPlakingView(viewModel: AddPlakingViewModel)
     case addPlakingShazamView(viewModel: AddPlakingViewModel)
 
-    case newPlakeView
-    case searchShazamingView
-    case searchWritingView(viewModel: SearchWritingViewModel)
+    case searchWritingView
+    case searchAddSongView(viewModel: SearchAddSongViewModel)
     case cameraView(viewModelContainer: CoordinatorViewModelContainer)
     
     case mapView
@@ -33,9 +32,8 @@ enum PlakeRoute: Hashable {
         case .listView: return "listView"
         case .playlistView: return "playlistView"
             
-        case .newPlakeView: return "newPlakeView"
-        case .searchShazamingView: return "searchShazamingView"
         case .searchWritingView: return "searchWritingView"
+        case .searchAddSongView: return "searchAddSongView"
         case .cameraView: return "cameraView"
             
         case .mapView: return "mapView"
@@ -80,12 +78,10 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             PlakeListView()
         case let .playlistView(viewModel):
             PlakePlaylistView(viewModel: viewModel)
-        case .newPlakeView:
-            SearchStartView()
-        case .searchShazamingView:
-            SearchShazamingView()
-        case .searchWritingView(let viewModel):
-            SearchWritingView(viewModel: viewModel)
+        case .searchWritingView:
+            SearchWritingView()
+        case .searchAddSongView(let viewModel):
+            SearchAddSongView(viewModel: viewModel)
         case let .cameraView(viewModelContainer):
             CameraView(viewModelContainer: viewModelContainer)
         case .mapView:

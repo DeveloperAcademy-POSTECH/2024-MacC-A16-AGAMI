@@ -8,31 +8,32 @@
 import SwiftUI
 
 struct AccountView2: View {
-    @State private var isSheetPresented = false
-    @State var isShowingSignOutAlert: Bool = false
-    @State var isShowingDeletingAccount: Bool = false
+    @State private var viewModel: AccountViewModel = .init()
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(PlakeCoordinator.self) private var coordinator
     
     var body: some View {
         VStack(spacing: 0) {
             HeaderView()
-            ContentView(isShowingDeletingAccount: $isShowingDeletingAccount, isShowingSignOutAlert: $isShowingSignOutAlert)
+            ContentView(viewModel: viewModel)
         }
         .ignoresSafeArea(edges: .bottom)
-        .alert("로그아웃", isPresented: $isShowingSignOutAlert) {
-            SignOutAlertActions()
+        .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
+            SignOutAlertActions(viewModel: viewModel)
         } message: {
             Text("로그아웃을 진행하시겠어요?\n다시 돌아오실 때를 기다릴게요!")
         }
-        .alert("회원 탈퇴", isPresented: $isShowingDeletingAccount) {
-            DeleteAccountAlertActions()
+        .alert("회원 탈퇴", isPresented: $viewModel.isShowingDeleteAccountAlert) {
+            DeleteAccountAlertActions(viewModel: viewModel)
         } message: {
             Text("회원 탈퇴 시 모든 기록이 삭제되고\n복구할 수 없습니다.")
         }
-        
     }
 }
 
 private struct HeaderView: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+
     var body: some View {
         ZStack(alignment: .center) {
             Text("계정 관리")
@@ -41,7 +42,7 @@ private struct HeaderView: View {
             
             HStack(spacing: 0) {
                 Button {
-                    // 닫기, 코디네이터 연결
+                    coordinator.dismissSheet()
                 } label: {
                     Text("닫기")
                         .font(.notoSansKR(weight: .regular400, size: 17))
@@ -59,17 +60,14 @@ private struct HeaderView: View {
 
 private struct ContentView: View {
     @Environment(\.openURL) private var openURL
-    @Binding var isShowingDeletingAccount: Bool
-    @Binding var isShowingSignOutAlert: Bool
+    let viewModel: AccountViewModel
     
     var body: some View {
         ZStack {
             Color(.sMain)
                 .ignoresSafeArea()
             
-            // 최상단 VStack (모든 버튼을 감싸는 스택)
             VStack(spacing: 32) {
-                // 이용 약관, 회원 탈퇴 버튼이 묶여있는 스택
                 VStack(spacing: 14) {
                     Button {
                         // 이용 약관 알럿
@@ -87,8 +85,7 @@ private struct ContentView: View {
                     }
                     
                     Button {
-                        // 회원 탈퇴 알럿
-                        isShowingDeletingAccount.toggle()
+                        viewModel.isShowingDeleteAccountAlert.toggle()
                     } label: {
                         ButtonLabel(
                             title: "회원 탈퇴",
@@ -99,7 +96,7 @@ private struct ContentView: View {
                 }
                 
                 Button {
-                    isShowingSignOutAlert.toggle()
+                    viewModel.isShowingSignOutAlert.toggle()
                 } label: {
                     ButtonLabel(
                         title: "로그아웃",
@@ -137,27 +134,29 @@ private struct ButtonLabel: View {
 }
 
 private struct SignOutAlertActions: View {
+    let viewModel: AccountViewModel
     
     var body: some View {
         Button("취소", role: .cancel) {
-            //
+            viewModel.cancelSignOutAlert()
         }
         
         Button("로그아웃", role: .destructive) {
-            //
+            viewModel.confirmSignOut()
         }
     }
 }
 
 private struct DeleteAccountAlertActions: View {
-    
+    let viewModel: AccountViewModel
+
     var body: some View {
         Button("취소", role: .cancel) {
-            //
+            viewModel.cancelDeleteAccountAlert()
         }
         
         Button("탈퇴하기", role: .destructive) {
-            //
+            viewModel.deleteAccount()
         }
     }
 }

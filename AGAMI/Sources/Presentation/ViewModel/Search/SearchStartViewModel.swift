@@ -32,7 +32,6 @@ final class SearchStartViewModel {
     }
     
     func initializeView() {
-        loadSavedSongs()
         Task {
             await fetchCurrentLocation()
         }

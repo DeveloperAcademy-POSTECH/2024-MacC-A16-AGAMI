@@ -2,261 +2,168 @@
 //  SearchWritingView.swift
 //  AGAMI
 //
-//  Created by Seoyeon Choi on 10/16/24.
+//  Created by Seoyeon Choi on 10/15/24.
 //
 
 import SwiftUI
 
-import PhotosUI
-
 struct SearchWritingView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
-    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-    @State var viewModel: SearchWritingViewModel
-    
-    init(viewModel: SearchWritingViewModel) {
-        _viewModel = State(initialValue: viewModel)
-    }
+    @State private var viewModel: SearchWritingViewModel = SearchWritingViewModel()
     
     var body: some View {
-        ZStack {
-            Color(.pLightGray)
+        ZStack(alignment: .top) {
+            Color(.sMain)
                 .ignoresSafeArea()
             
-            List {
-                Group {
-                    PlaylistCoverImageView(viewModel: viewModel)
-                    
-                    PlaylistTitleTextField(viewModel: viewModel)
-                        .padding(EdgeInsets(top: 12, leading: 8, bottom: 12, trailing: 8))
-                    
-                    PlaylistSongListHeader(viewModel: viewModel)
-                        .padding(EdgeInsets(top: 28, leading: 24, bottom: 10, trailing: 24))
-                }
-                .listRowSeparator(.hidden)
-                .listRowInsets(.zero)
-                .listRowBackground(Color(.pLightGray))
+            VStack(spacing: 0) {
+                SearchTitleTextField(viewModel: viewModel)
+                    .padding(.top, 7)
                 
-                PlaylistSongList(viewModel: viewModel)
-                    .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
+                SearchDescriptionTextField(viewModel: viewModel)
+                    .padding(.top, 24)
                 
-                PlaylistDescriptionTextField(viewModel: viewModel)
-                    .padding(EdgeInsets(top: 13, leading: 8, bottom: 13, trailing: 8))
-                    .listRowSeparator(.hidden)
-                    .listRowInsets(.zero)
-                    .listRowBackground(Color(.pLightGray))
-                    .padding(.bottom, 56)
+                Spacer()
+                
+                SearchAddButton()   
             }
-            
-            if viewModel.isSaving {
-                ProgressView("저장 중입니다...")
-                    .padding()
-            }
-            
         }
+        .ignoresSafeArea(edges: .bottom)
+        .ignoresSafeArea(.keyboard)
         .onAppearAndActiveCheckUserValued(scenePhase)
-        .confirmationDialog("", isPresented: $viewModel.showSheet) {
-            Button("카메라") {
-                coordinator.push(route: .cameraView(
-                    viewModelContainer: .searchWriting(viewModel: viewModel)
-                ))
-            }
-            Button("앨범에서 가져오기") {
-                viewModel.showPhotoPicker.toggle()
-            }
-            Button("기본 이미지로 변경", role: .destructive) {
-                viewModel.photoUIImage = nil
-            }
-            Button("취소", role: .cancel) {}
-        }
-        .photosPicker(isPresented: $viewModel.showPhotoPicker,
-                      selection: $viewModel.selectedItem,
-                      matching: .images)
-        .onChange(of: viewModel.selectedItem) {
-            Task {
-                await viewModel.loadImageFromGallery()
-            }
-        }
-        .onTapGesture {
-            hideKeyboard()
-        }
-        .listStyle(PlainListStyle())
-        .tint(Color(.pPrimary))
-        .scrollDisabled(viewModel.isSaving)
-        .allowsHitTesting(!viewModel.isSaving)
-        .navigationTitle("커버 사진")
-        .navigationBarTitleDisplayMode(.large)
-        .navigationBarBackButtonHidden()
-        .scrollIndicators(.hidden)
+        .onTapGesture(perform: hideKeyboard)
+        .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    coordinator.pop()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(Color(.pPrimary))
-                }
+                ToolbarLeadingItem(viewModel: viewModel)
             }
+            
             ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    Task {
-                        coordinator.popToRoot()
-                        listCellPlaceholder.setListCellPlaceholderModel(
-                            userTitle: viewModel.playlist.playlistName,
-                            streetAddress: viewModel.playlist.streetAddress,
-                            generationTime: Date()
-                        )
-                        if await viewModel.savedPlaylist() {
-                            listCellPlaceholder.resetListCellPlaceholderModel()
-                            viewModel.clearDiggingList()
-                        } else {
-                            dump("Failed to save playlist. Please try again.")
-                        }
-                    }
-                } label: {
-                    Text("저장")
-                        .font(.pretendard(weight: .semiBold600, size: 17))
-                        .foregroundStyle(Color(.pPrimary))
-                }
-                .disabled(viewModel.isSaving)
+                ToolabraTrailingItem(viewModel: viewModel)
             }
         }
     }
 }
 
-private struct PlaylistCoverImageView: View {
-    let viewModel: SearchWritingViewModel
+private struct SearchTitleTextField: View {
+    @Bindable var viewModel: SearchWritingViewModel
+    @FocusState private var isFocused: Bool
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text("어떤 곳에서 만난 플레이크인가요?")
-                .font(.pretendard(weight: .regular400, size: 16))
-                .foregroundStyle(Color(.pGray1))
-                .padding(.leading, 16)
+            Text("오늘의 기록")
+                .font(.notoSansKR(weight: .regular400, size: 15))
+                .foregroundStyle(Color(.sSubHead))
+                .padding(.bottom, 6)
             
             HStack(spacing: 0) {
-                Spacer()
-                if let uiImage = viewModel.photoUIImage {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .aspectRatio(1, contentMode: .fit)
-                        .frame(width: 277, height: 277)
-                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-                        .overlay(alignment: .bottom) {
-                            VStack(spacing: 0) {
-                                Text(viewModel.cellAddress)
-                                    .font(.pretendard(weight: .medium500, size: 14))
-                                    .foregroundStyle(Color(.pWhite))
-                                
-                                Text(viewModel.cellDate)
-                                    .font(.pretendard(weight: .medium500, size: 14))
-                                    .foregroundStyle(Color(.pWhite))
-                                    .padding(.top, 4)
-                            }
-                            .padding(.bottom, 16)
-                        }
-                } else {
-                    Image(.coverImageThumbnail)
-                        .resizable()
-                        .clipShape(RoundedRectangle(cornerRadius: 13))
-                        .frame(width: 277, height: 277)
-                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-                        .overlay {
-                            HStack(spacing: 0) {
-                                Image(systemName: "camera.viewfinder")
-                                    .font(.system(size: 17, weight: .regular))
-                                    .foregroundStyle(Color(.pPrimary))
-                                
-                                Text("사진으로 기록")
-                                    .font(.pretendard(weight: .medium500, size: 20))
-                                    .foregroundStyle(Color(.pPrimary))
-                                    .padding(.leading, 5)
-                            }
-                        }
-                }
-                Spacer()
+                TextField("타이틀 입력", text: $viewModel.playlist.playlistName)
+                    .font(.sCoreDream(weight: .dream5, size: 24))
+                    .foregroundStyle(Color(.sTitleText))
+                    .tint(Color(.sTitleText))
+                    .focused($isFocused)
+                    .background(Color(.sMain))
+                
+                Text("15/15")
+                    .font(.notoSansKR(weight: .regular400, size: 13))
+                    .foregroundStyle(Color(.sTextCaption))
             }
-            .highPriorityGesture(imageViewTapGesture())
-            .padding(.vertical, 36)
-        }
-    }
-    
-    private func imageViewTapGesture() -> some Gesture {
-        TapGesture().onEnded {
-            viewModel.showSheet.toggle()
-        }
-    }
-}
-
-private struct PlaylistTitleTextField: View {
-    @Bindable var viewModel: SearchWritingViewModel
-    @FocusState private var isFocused: Bool
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("플레이크 타이틀")
-                .font(.pretendard(weight: .semiBold600, size: 20))
-                .foregroundStyle(Color(.pBlack))
-                .padding(EdgeInsets(top: 0, leading: 16, bottom: 14, trailing: 0))
+            .padding(.bottom, 6)
             
-            TextField(viewModel.playlist.playlistName, text: $viewModel.playlist.playlistName)
-                .font(.pretendard(weight: .medium500, size: 20))
-                .foregroundStyle(Color(.pGray1))
-                .focused($isFocused)
-                .padding(16)
-                .background(Color(.pWhite))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
-                }
+            Divider()
+                .frame(height: 0.5)
+                .foregroundStyle(Color(.sLine))
         }
+        .padding(.horizontal, 20)
     }
 }
 
-private struct PlaylistSongListHeader: View {
-    let viewModel: SearchWritingViewModel
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            Text("수집한 노래")
-                .font(.pretendard(weight: .semiBold600, size: 20))
-                .foregroundStyle(Color(.pBlack))
-            Spacer()
-            Text("\(viewModel.diggingList.count)곡")
-                .font(.pretendard(weight: .medium500, size: 16))
-                .foregroundStyle(Color(.pPrimary))
-        }
-    }
-}
-
-private struct PlaylistSongList: View {
-    let viewModel: SearchWritingViewModel
-    
-    var body: some View {
-        ForEach(viewModel.diggingList, id: \.songID) { song in
-            PlaylistRow(song: song)
-        }
-        .padding(.horizontal, 8)
-    }
-}
-
-private struct PlaylistDescriptionTextField: View {
+private struct SearchDescriptionTextField: View {
     @Bindable var viewModel: SearchWritingViewModel
     @FocusState private var isFocused: Bool
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .foregroundStyle(Color(.pWhite))
-            .overlay(alignment: .topLeading) {
-                TextField("플레이크에 대한 설명 추가하기", text: $viewModel.playlist.playlistDescription, axis: .vertical)
-                    .background(.clear)
-                    .foregroundStyle(.black)
-                    .padding()
-            }
-            .frame(height: 65)
+        VStack(spacing: 0) {
+            TextField("기록하고 싶었던 순간이나 생각과 감정을 작성해보세요.",
+                      text: $viewModel.playlist.playlistDescription,
+                      axis: .vertical)
+                .font(.notoSansKR(weight: .regular400, size: 15))
+                .background(Color(.sMain))
+        }
+        .padding(.horizontal, 20)
     }
+}
+
+private struct SearchAddButton: View {
+    var body: some View {
+        HStack(alignment: .top, spacing: 0) {
+            Spacer()
+            
+            Label {
+                Text("사진 추가")
+                    .font(.notoSansKR(weight: .semiBold600, size: 15))
+            } icon: {
+                Image(systemName: "photo")
+                    .font(.system(size: 17, weight: .regular))
+            }
+            
+            Spacer()
+            
+            Divider()
+                .frame(width: 0.5, height: 20)
+                .foregroundStyle(Color(.sLine))
+            
+            Spacer()
+            
+            Label {
+                Text("음악 추가")
+                    .font(.notoSansKR(weight: .semiBold600, size: 15))
+            } icon: {
+                Image(systemName: "music.note")
+                    .font(.system(size: 17, weight: .regular))
+            }
+            
+            Spacer()
+        }
+        .padding(.top, 20)
+        .padding(.bottom, 51)
+        .foregroundStyle(Color(.sButton))
+        .background(Color(.sWhite))
+    }
+}
+
+private struct ToolbarLeadingItem: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    var viewModel: SearchWritingViewModel
+    
+    var body: some View {
+        Button {
+            coordinator.pop()
+        } label: {
+            Image(systemName: "chevron.backward")
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(Color(.sButton))
+        }
+    }
+}
+
+private struct ToolabraTrailingItem: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    var viewModel: SearchWritingViewModel
+    
+    var body: some View {
+        Button {
+            // 저장
+        } label: {
+            Text("저장")
+                .font(.pretendard(weight: .medium500, size: 17))
+                .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
+        }
+        .disabled(viewModel.saveButtonEnabled)
+    }
+}
+
+#Preview {
+    SearchWritingView()
 }

@@ -13,7 +13,7 @@ import PhotosUI
 final class SearchWritingViewModel {
     private let firebaseService = FirebaseService()
     private let persistenceService = PersistenceService.shared
-
+    
     var playlist: PlaylistModel {
         didSet { handleChangeOfName(oldValue: oldValue, newValue: playlist) }
     }
@@ -29,13 +29,16 @@ final class SearchWritingViewModel {
     // 커버 이미지
     var photoUIImage: UIImage?
     var showSheet: Bool = false
-
+    
     // 커버 이미지 - 앨범에서 가져오기
     var selectedItem: PhotosPickerItem?
     var showPhotoPicker: Bool = false
     
     // 저장 상태 관리
     var isSaving: Bool = false
+    
+    // 타이틀
+    let maximumTitleLength: Int = 15
     
     init() {
         playlist = persistenceService.fetchPlaylist()
@@ -52,11 +55,11 @@ final class SearchWritingViewModel {
     func savedPlaylist() async -> Bool {
         isSaving = true
         defer { isSaving = false }
-
+        
         guard let uploadedPhotoURL = await savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "")
         else { return false }
         playlist.photoURL = uploadedPhotoURL
-
+        
         // Firebase에 플레이리스트 저장
         do {
             try await firebaseService.savePlaylistToFirebase(
@@ -69,10 +72,10 @@ final class SearchWritingViewModel {
         }
         return true
     }
-
+    
     func savePhotoToFirebase(userID: String) async -> String? {
         guard let image = photoUIImage else { return nil }
-
+        
         let photoURL = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
         return photoURL
     }
@@ -93,7 +96,7 @@ final class SearchWritingViewModel {
     func clearDiggingList() {
         persistenceService.deleteAllPlaylists()
     }
-
+    
     private func handleChangeOfName(oldValue: PlaylistModel, newValue: PlaylistModel) {
         if oldValue.playlistName != newValue.playlistName {
             persistenceService.updatePlaylist()

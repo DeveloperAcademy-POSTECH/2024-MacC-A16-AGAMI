@@ -71,8 +71,13 @@ private struct SearchTitleTextField: View {
                     .tint(Color(.sTitleText))
                     .focused($isFocused)
                     .background(Color(.sMain))
+                    .onChange(of: viewModel.playlist.playlistName) { _, newValue in
+                        if newValue.count > viewModel.maximumTitleLength {
+                            viewModel.playlist.playlistName = String(newValue.prefix(viewModel.maximumTitleLength))
+                        }
+                    }
                 
-                Text("15/15")
+                Text("\(viewModel.playlist.playlistName.count)/\(viewModel.maximumTitleLength)")
                     .font(.notoSansKR(weight: .regular400, size: 13))
                     .foregroundStyle(Color(.sTextCaption))
             }

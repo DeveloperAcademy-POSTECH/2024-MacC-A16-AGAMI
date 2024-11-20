@@ -23,9 +23,9 @@ struct CircleAnimationView: View {
     
     private func createAnimatedCircle(delay: Double) -> some View {
         Circle()
-            .fill(Color(.pPrimary))
+            .fill(Color(.sMain))
             .frame(width: 6.14, height: 6.14)
-            .offset(y: moveUp ? -5 : 5)
+            .offset(y: moveUp ? -2 : 2)
             .animation(
                 .easeInOut(duration: 0.6)
                     .repeatForever(autoreverses: true)

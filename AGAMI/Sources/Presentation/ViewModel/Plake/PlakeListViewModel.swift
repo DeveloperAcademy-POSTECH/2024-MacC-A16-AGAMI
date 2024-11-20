@@ -33,6 +33,9 @@ final class PlakeListViewModel {
         }
     }
 
+    var itemsCount: Int { playlists.count }
+    var songsCount: Int { playlists.reduce(0) { $0 + $1.songs.count } }
+
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
     
@@ -149,7 +152,7 @@ final class PlakeListViewModel {
 
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy. MM. dd"
+        dateFormatter.dateFormat = "MM월 dd일"
         return dateFormatter.string(from: date)
     }
 

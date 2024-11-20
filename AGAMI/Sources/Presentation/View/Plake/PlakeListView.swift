@@ -11,17 +11,18 @@ import Kingfisher
 struct PlakeListView: View {
     @State var viewModel: PlakeListViewModel = PlakeListViewModel()
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-    
+
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                ListHeader()
-                SearchBar(viewModel: viewModel)
+                TopBarView()
+                CountingHeaderView(viewModel: viewModel)
                 GeometryReader { proxy in
                     ListView(viewModel: viewModel, size: proxy.size)
                 }
-                .safeAreaPadding(.horizontal, 16)
             }
+            .safeAreaPadding(.horizontal, 16)
+
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
                 AppleMusicLottieView()
@@ -30,17 +31,14 @@ struct PlakeListView: View {
             case .none:
                 EmptyView()
             }
+
+            if viewModel.isFetching { ProgressView() }
         }
+        .background(Color(.sMain))
         .toolbarBackground(.visible, for: .tabBar)
-        .onTapGesture {
-            hideKeyboard()
-        }
-        .onOpenURL { url in
-            viewModel.handleURL(url)
-        }
-        .onAppear {
-            viewModel.fetchPlaylists()
-        }
+        .onTapGesture(perform: hideKeyboard)
+        .onOpenURL { viewModel.handleURL($0) }
+        .onAppear(perform: viewModel.fetchPlaylists)
         .onChange(of: listCellPlaceholder.showArchiveListUpLoadingCell) { oldValue, newValue in
             if oldValue == true, newValue == false {
                 viewModel.fetchPlaylists()
@@ -49,20 +47,107 @@ struct PlakeListView: View {
     }
 }
 
-private struct ListHeader: View {
+private struct TopBarView: View {
     var body: some View {
-        HStack(alignment: .bottom, spacing: 0) {
-            Image(.plakeTabLogo)
+        HStack(spacing: 8) {
+            Text("앱 로고")
+                .font(.notoSansKR(weight: .bold700, size: 28))
+                .foregroundStyle(Color(.sTitleText))
+
+            Spacer()
+
+            Button {
+
+            } label: {
+                Image(systemName: "magnifyingglass.circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Color(.sButton))
+            }
+
+            Button {
+
+            } label: {
+                Image(systemName: "person.circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Color(.sButton))
+            }
+
+            Button {
+
+            } label: {
+                Image(systemName: "map.circle")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Color(.sButton))
+            }
+
+        }
+        .padding(.top, 28)
+    }
+}
+
+private struct CountingHeaderView: View {
+    let viewModel: PlakeListViewModel
+
+    var body: some View {
+        HStack(spacing: 16) {
+            HStack(alignment: .top, spacing: 4) {
+                Group {
+                    VStack {
+                        Image(systemName: "calendar")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color(.sSubHead))
+                            .padding(.horizontal, 4)
+                        Spacer()
+                    }
+
+                    VStack(alignment: .leading) {
+                        Text("순간의 소록")
+                            .font(.notoSansKR(weight: .regular400, size: 15))
+                            .foregroundStyle(Color(.sSubHead))
+                        Text("\(viewModel.itemsCount)개")
+                            .font(.notoSansKR(weight: .semiBold600, size: 17))
+                            .foregroundStyle(Color(.sTitleText))
+                    }
+                }
+                .frame(height: 40)
+            }
+
+            Divider()
+                .frame(width: 0.5, height: 40)
+                .background(Color(.sLine))
+
+            HStack(alignment: .top, spacing: 4) {
+                Group {
+                    VStack {
+                        Image(systemName: "music.note")
+                            .font(.system(size: 15))
+                            .foregroundStyle(Color(.sSubHead))
+                            .padding(.horizontal, 4)
+                        Spacer()
+                    }
+
+                    VStack(alignment: .leading) {
+                        Text("수집한 음악")
+                            .font(.notoSansKR(weight: .regular400, size: 15))
+                            .foregroundStyle(Color(.sSubHead))
+                        Text("\(viewModel.songsCount)곡")
+                            .font(.notoSansKR(weight: .semiBold600, size: 17))
+                            .foregroundStyle(Color(.sTitleText))
+                    }
+                }
+                .frame(height: 40)
+            }
+
             Spacer()
         }
-        .padding(EdgeInsets(top: 24, leading: 16, bottom: 12, trailing: 16))
+        .padding(EdgeInsets(top: 24, leading: 0, bottom: 16, trailing: 0))
     }
 }
 
 private struct SearchBar: View {
     @Bindable var viewModel: PlakeListViewModel
     @FocusState var isFocused: Bool
-    
+
     var body: some View {
         ZStack {
             TextField("당신의 아카이브", text: $viewModel.searchText)
@@ -77,7 +162,7 @@ private struct SearchBar: View {
                 )
                 .padding(.horizontal, 8)
                 .padding(.vertical, 8)
-            
+
             HStack {
                 Spacer()
                 Button {
@@ -92,9 +177,7 @@ private struct SearchBar: View {
                 }
             }
         }
-        .onChange(of: isFocused) {
-            viewModel.simpleHaptic()
-        }
+        .onChange(of: isFocused) { viewModel.simpleHaptic() }
     }
 }
 
@@ -102,10 +185,8 @@ private struct ListView: View {
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     let viewModel: PlakeListViewModel
     let size: CGSize
-    private var verticalSpacingValue: CGFloat {
-        size.width / 377 * 12
-    }
-    
+    private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
+
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
@@ -117,7 +198,7 @@ private struct ListView: View {
                     } else if viewModel.isShowingNewPlake {
                         MakeNewPlakeCell(size: size)
                     }
-                    
+
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                         PlakeListCell(
                             viewModel: viewModel,
@@ -133,91 +214,74 @@ private struct ListView: View {
                 }
             }
             .scrollTargetLayout()
-            
-            if viewModel.isFetching {
-                ProgressView("")
-                    .scaleEffect(1.5)
-                    .padding()
-                    .background(Color(.systemBackground).opacity(0.8))
-                    .cornerRadius(10)
-            }
         }
         .scrollTargetBehavior(.viewAligned(limitBehavior: getAlwaysByOneIfAvailableElseAlways()))
-        .safeAreaPadding(.vertical, size.height / 10)
     }
 }
 
 private struct PlakeListCell: View {
     @Environment(PlakeCoordinator.self) private var coord
-    @State private var kfImageOpacity: Double = 0
-    
     let viewModel: PlakeListViewModel
     let playlist: PlaylistModel
     let size: CGSize
-    private var verticalSize: CGFloat { size.width * 176 / 377 }
-    
+    private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
+
     var body: some View {
         Button {
             coord.push(route: .playlistView(viewModel: .init(playlist: playlist, initialPlaylist: playlist)))
         } label: {
-            ZStack {
+            VStack(alignment: .leading, spacing: 0) {
                 KFImage(URL(string: playlist.photoURL))
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Image(.archiveCellPlaceholder)
-                            .resizable()
-                            .scaledToFit()
+                        Rectangle()
+                            .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
                     }
                     .scaledToFill()
+                    .frame(height: imageHeight)
                     .clipped()
-                    .opacity(kfImageOpacity)
-                    .background(Color(.pGray1))
-                    .frame(width: size.width, height: verticalSize)
-                    .shadow(radius: 10, x: 2, y: 4)
-                    .onAppear {
-                        withAnimation(.easeOut(duration: 1)) {
-                            kfImageOpacity = 1
-                        }
-                    }
-                    .onDisappear {
-                        kfImageOpacity = 0
-                    }
-                
-                VStack(alignment: .leading, spacing: 0) {
-                    Group {
-                        Text(playlist.playlistName)
-                            .font(.pretendard(weight: .bold700, size: 22))
-                            .kerning(-0.3)
-                            .padding(EdgeInsets(top: 16, leading: 16, bottom: 0, trailing: 0))
-                        Text(playlist.streetAddress)
-                            .font(.pretendard(weight: .medium500, size: 16))
-                            .kerning(-0.3)
-                            .padding(EdgeInsets(top: 2, leading: 18, bottom: 0, trailing: 0))
-                    }
-                    .foregroundStyle(Color(.pWhite))
-                    .shadow(radius: 10)
-                    
-                    Spacer()
-                    
-                    HStack(alignment: .center, spacing: 0) {
-                        Spacer()
-                        Text(viewModel.formatDateToString(playlist.generationTime))
-                            .font(.pretendard(weight: .regular400, size: 14))
-                            .foregroundStyle(Color(.pWhite))
-                            .kerning(-0.5)
-                            .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-                            .background(Color(.pGray1))
-                            .clipShape(RoundedRectangle(cornerRadius: 20))
-                            .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 12))
-                    }
+                    .padding(.vertical, 15)
+
+                Text(playlist.playlistName)
+                    .font(.sCoreDream(weight: .dream5, size: 20))
+                    .foregroundStyle(Color(.sTitleText))
+
+                Divider()
+                    .frame(height: 0.5)
+                    .foregroundStyle(Color(.sLine))
+                    .padding(.bottom, 6)
+
+                HStack(spacing: 0) {
+                    Text(Image(systemName: "music.note"))
+                        .font(.system(size: 15))
+                        .foregroundStyle(Color(.sSubHead))
+                        .padding(.trailing, 2)
+                    Text("수집한 음악")
+                        .font(.notoSansKR(weight: .regular400, size: 15))
+                        .foregroundStyle(Color(.sSubHead))
+                        .padding(.trailing, 8)
+                    Text("\(playlist.songs.count)곡")
+                        .font(.notoSansKR(weight: .medium500, size: 15))
+                        .foregroundStyle(Color(.sTitleText))
                 }
+
+                Divider()
+                    .frame(height: 0.5)
+                    .foregroundStyle(Color(.sLine))
+                    .padding(.vertical, 6)
+
+                Text("\(viewModel.formatDateToString(playlist.generationTime))")
+                    .font(.notoSansKR(weight: .regular400, size: 12))
+                    .foregroundStyle(Color(.sFootNote))
+                    .padding(.bottom, 10)
             }
+            .padding(.horizontal, 10)
+            .background(Color(.sWhite))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .shadow(color: Color(.sBlack).opacity(0.15), radius: 3, x: 0, y: 1)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .contextMenu {
-            ContextMenuItems(viewModel: viewModel, playlist: playlist)
-        }
+        .contextMenu { ContextMenuItems(viewModel: viewModel, playlist: playlist) }
     }
 }
 
@@ -225,87 +289,91 @@ private struct ArchiveListUpLoadingCell: View {
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     let viewModel: PlakeListViewModel
     let size: CGSize
-    var verticalSize: CGFloat { size.width * 176 / 377 }
-    
+    private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
+
     var body: some View {
-        
-        ZStack {
-            Image(.archiveCellPlaceholder)
-                .resizable()
-                .frame(width: size.width, height: verticalSize)
-                .shadow(radius: 10, x: 2, y: 4)
-            
-            VStack(alignment: .leading, spacing: 0) {
-                Group {
-                    Text(listCellPlaceholder.name ?? "")
-                        .font(.pretendard(weight: .bold700, size: 24))
-                        .kerning(-0.5)
-                        .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
-                    
-                    Text(listCellPlaceholder.streetAddress ?? "")
-                        .font(.pretendard(weight: .medium500, size: 16))
-                        .kerning(-0.5)
-                        .padding(EdgeInsets(top: 14, leading: 18, bottom: 0, trailing: 0))
-                }
-                .foregroundStyle(Color(.pWhite))
-                .shadow(radius: 10)
-                
-                Spacer()
-                
-                HStack(alignment: .center, spacing: 0) {
-                    CircleAnimationView()
-                        .padding(EdgeInsets( top: 0, leading: 18, bottom: 10, trailing: 0))
-                    
-                    Text("업로드 중")
-                        .font(.pretendard(weight: .medium500, size: 16))
-                        .foregroundStyle(Color(.pPrimary))
-                        .padding(EdgeInsets(top: 0, leading: 14, bottom: 10, trailing: 0))
-                    
-                    Spacer()
-                    
-                    Text(viewModel.formatDateToString(listCellPlaceholder.generationTime ?? Date()))
-                        .font(.pretendard(weight: .regular400, size: 14))
-                        .foregroundStyle(Color(.pWhite))
-                        .kerning(-0.5)
-                        .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-                        .background(Color(.pGray1))
-                        .clipShape(RoundedRectangle(cornerRadius: 20))
-                        .padding(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 12))
-                }
+        VStack(alignment: .leading, spacing: 0) {
+            Rectangle()
+                .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
+                .frame(height: imageHeight)
+                .padding(.vertical, 15)
+
+            Text(listCellPlaceholder.name ?? "")
+                .font(.sCoreDream(weight: .dream5, size: 20))
+                .foregroundStyle(Color(.sTitleText))
+
+            Divider()
+                .frame(height: 0.5)
+                .foregroundStyle(Color(.sLine))
+                .padding(.bottom, 6)
+
+            HStack(spacing: 10) {
+                Text("업로드 중")
+                    .font(.notoSansKR(weight: .regular400, size: 15))
+                    .foregroundStyle(Color(.sSubHead))
+                CircleAnimationView()
             }
+
+            Divider()
+                .frame(height: 0.5)
+                .foregroundStyle(Color(.sLine))
+                .padding(.vertical, 6)
+
+            Text("\(viewModel.formatDateToString(listCellPlaceholder.generationTime ?? Date()))")
+                .font(.notoSansKR(weight: .regular400, size: 12))
+                .foregroundStyle(Color(.sFootNote))
+                .padding(.bottom, 10)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, 10)
+        .background(Color(.sWhite))
+        .clipShape(RoundedRectangle(cornerRadius: 4))
+        .shadow(color: Color(.sBlack).opacity(0.15), radius: 3, x: 0, y: 1)
     }
 }
 
 private struct MakeNewPlakeCell: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let size: CGSize
-    private var verticalSize: CGFloat { size.width * 176 / 377 }
-    
+    private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
+
     var body: some View {
         Button {
             coordinator.push(route: .searchWritingView)
         } label: {
-            ZStack {
-                Image(.makeNewPlakeCell)
-                    .resizable()
-                VStack {
-                    HStack {
-                        Text("새로운 플레이크를 디깅해보세요")
-                            .font(.pretendard(weight: .bold700, size: 22))
-                            .kerning(-0.5)
-                            .padding(EdgeInsets(top: 22, leading: 16, bottom: 0, trailing: 0))
-                            .foregroundStyle(Color(.pWhite))
-                        Spacer()
-                    }
-                    Spacer()
-                }
+            VStack(alignment: .leading, spacing: 0) {
+                Rectangle()
+                    .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
+                    .frame(height: imageHeight)
+                    .padding(.vertical, 15)
+
+                Text("지금 들려오는 음악과 함께,")
+                    .font(.sCoreDream(weight: .dream5, size: 20))
+                    .foregroundStyle(Color(.sTitleText))
+
+                Divider()
+                    .frame(height: 0.5)
+                    .foregroundStyle(Color(.sLine))
+                    .padding(.bottom, 6)
+
+                Text("순간의 소록을 시작해보세요.")
+                    .font(.sCoreDream(weight: .dream5, size: 17))
+                    .foregroundStyle(Color(.sTitleText))
+
+                Divider()
+                    .frame(height: 0.5)
+                    .foregroundStyle(Color(.sLine))
+                    .padding(.vertical, 6)
+
+                Text("언제, 어디서나 소록.")
+                    .font(.notoSansKR(weight: .regular400, size: 12))
+                    .foregroundStyle(Color(.sFootNote))
+                    .padding(.bottom, 10)
             }
+            .padding(.horizontal, 10)
+            .background(Color(.sWhite))
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .shadow(color: Color(.sBlack).opacity(0.15), radius: 3, x: 0, y: 1)
         }
-        .frame(width: size.width, height: verticalSize)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(radius: 10, x: 2, y: 4)
     }
 }
 
@@ -313,7 +381,7 @@ private struct ContextMenuItems: View {
     @Environment(\.openURL) private var openURL
     let viewModel: PlakeListViewModel
     let playlist: PlaylistModel
-    
+
     var body: some View {
         Button {
             Task {

@@ -9,7 +9,25 @@ let fonts = [
     "Pretendard-SemiBold.otf",
     "Pretendard-Bold.otf",
     "Pretendard-ExtraBold.otf",
-    "Pretendard-Black.otf"
+    "Pretendard-Black.otf",
+    "SCDream1.otf",
+    "SCDream2.otf",
+    "SCDream3.otf",
+    "SCDream4.otf",
+    "SCDream5.otf",
+    "SCDream6.otf",
+    "SCDream7.otf",
+    "SCDream8.otf",
+    "SCDream9.otf",
+    "NotoSansKR-Thin.ttf",
+    "NotoSansKR-ExtraLight.ttf",
+    "NotoSansKR-Light.ttf",
+    "NotoSansKR-Regular.ttf",
+    "NotoSansKR-Medium.ttf",
+    "NotoSansKR-SemiBold.ttf",
+    "NotoSansKR-Bold.ttf",
+    "NotoSansKR-ExtraBold.ttf",
+    "NotoSansKR-Black.ttf"
 ]
 
 let project = Project(

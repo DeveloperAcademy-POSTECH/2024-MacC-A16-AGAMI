@@ -8,8 +8,8 @@
 enum CoordinatorViewModelContainer: Hashable {
     var id: String {
         switch self {
-        case .searchAddSongView:
-            return "searchAddSongView"
+        case .searchWriting:
+            return "searchWriting"
         case .plakePlaylist:
             return "plakePlaylist"
         }
@@ -23,6 +23,6 @@ enum CoordinatorViewModelContainer: Hashable {
         hasher.combine(id)
     }
 
-    case searchAddSongView(viewModel: SearchAddSongViewModel)
+    case searchWriting(viewModel: SearchWritingViewModel)
     case plakePlaylist(viewModel: PlakePlaylistViewModel)
 }

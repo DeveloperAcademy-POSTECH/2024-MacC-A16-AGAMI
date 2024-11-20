@@ -53,6 +53,9 @@ struct SearchStartView: View {
         }
         .ignoresSafeArea(.keyboard)
         .onAppearAndActiveCheckUserValued(scenePhase)
+        .onAppear {
+            viewModel.initializeView()
+        }
         .onTapGesture(perform: hideKeyboard)
         .navigationTitle("새로운 플레이크")
         .navigationBarTitleDisplayMode(.large)

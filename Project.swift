@@ -84,8 +84,8 @@ let project = Project(
                             "REDIRECT_URL": .string("$(REDIRECT_URL)"),
                             "INSTA_APP_ID": .string("$(INSTA_APP_ID)"),
                             "CFBundleDisplayName": "Plake",
-                            "CFBundleShortVersionString": "1.0.0",
-                            "CFBundleVersion": "1"
+                            "CFBundleShortVersionString": "1.1.0",
+                            "CFBundleVersion": "2"
                         ]
                     ),
             sources: ["AGAMI/Sources/**"],

@@ -111,7 +111,7 @@ struct CameraView: View {
             guard let croppedImage = viewModel.photoUIImage?.cropToFiveByFour() else { return }
 
             switch viewModelContainer {
-            case let .searchWriting(viewModel):
+            case let .searchAddSongView(viewModel):
                 viewModel.savePhotoUIImage(photoUIImage: croppedImage)
             case let .plakePlaylist(viewModel):
                 viewModel.setPhotoFromCamera(photo: croppedImage)

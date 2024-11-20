@@ -285,7 +285,7 @@ private struct MakeNewPlakeCell: View {
     
     var body: some View {
         Button {
-            coordinator.push(route: .newPlakeView)
+            coordinator.push(route: .searchWritingView)
         } label: {
             ZStack {
                 Image(.makeNewPlakeCell)

@@ -22,9 +22,6 @@ enum PlakeRoute: Hashable {
     case mapView
     case placeListView(viewModel: CollectionPlaceViewModel)
     
-    case accountView
-    case deleteAccountView(viewModel: AccountViewModel)
-    
     var id: String {
         switch self {
         case .homeView: return "homeView"
@@ -37,8 +34,6 @@ enum PlakeRoute: Hashable {
         case .mapView: return "mapView"
         case .placeListView: return "placeListView"
             
-        case .accountView: return "accountView"
-        case .deleteAccountView: return "deleteAccountView"
         case .addPlakingView: return "addPlakingView"
         case .addPlakingShazamView: return "addPlakingShazamView"
         }
@@ -55,10 +50,12 @@ enum PlakeRoute: Hashable {
 
 enum PlakeSheet: Hashable, Identifiable {
     case searchAddSongView(viewModel: SearchAddSongViewModel)
+	case accountView
     
     var id: String {
         switch self {
         case .searchAddSongView: return "searchAddSongView"
+		case .accountView return "accountView"
         }
     }
     
@@ -97,10 +94,6 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             MapView()
         case let .placeListView(viewModel):
             CollectionPlaceView(viewModel: viewModel)
-        case .accountView:
-            AccountView()
-        case let .deleteAccountView(viewModel):
-            SignOutView(viewModel: viewModel)
         case let .addPlakingView(viewModel):
             AddPlakingView(viewModel: viewModel)
         case let .addPlakingShazamView(viewModel):

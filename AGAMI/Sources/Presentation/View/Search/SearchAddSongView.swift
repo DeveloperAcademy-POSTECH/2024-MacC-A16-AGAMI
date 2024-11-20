@@ -12,7 +12,6 @@ import PhotosUI
 struct SearchAddSongView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
-    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     @State var viewModel: SearchAddSongViewModel
     
     init(viewModel: SearchAddSongViewModel) {
@@ -20,169 +19,117 @@ struct SearchAddSongView: View {
     }
     
     var body: some View {
-        ZStack {
-            Color(.pLightGray)
-                .ignoresSafeArea()
+        ZStack(alignment: .top) {
+            Color(.sWhite).ignoresSafeArea()
             
-            PlaylistSongList(viewModel: viewModel)
+            VStack(spacing: 0) {
+                TopbarItem()
+                
+                List {
+                    SearchSongStatusView(viewModel: viewModel)
+                        .padding(.top, 14)
+                        .listRowInsets(.zero)
+                        .listRowSeparator(.hidden)
+                    
+                    SearchSongList(viewModel: viewModel)
+                        .padding(.top, 53)
+                        .listRowInsets(.zero)
+                }
+                .listStyle(.plain)
+            }
         }
         .onAppearAndActiveCheckUserValued(scenePhase)
-        .confirmationDialog("", isPresented: $viewModel.showSheet) {
-            Button("카메라") {
-
-            }
-            Button("앨범에서 가져오기") {
-                viewModel.showPhotoPicker.toggle()
-            }
-            Button("기본 이미지로 변경", role: .destructive) {
-                viewModel.photoUIImage = nil
-            }
-            Button("취소", role: .cancel) {}
-        }
-        .photosPicker(isPresented: $viewModel.showPhotoPicker,
-                      selection: $viewModel.selectedItem,
-                      matching: .images)
-        .onChange(of: viewModel.selectedItem) {
-            Task {
-                await viewModel.loadImageFromGallery()
-            }
-        }
-        .onTapGesture {
-            hideKeyboard()
-        }
-        .listStyle(PlainListStyle())
-        .tint(Color(.pPrimary))
-        .scrollDisabled(viewModel.isSaving)
-        .allowsHitTesting(!viewModel.isSaving)
-        .navigationTitle("커버 사진")
-        .navigationBarTitleDisplayMode(.large)
-        .navigationBarBackButtonHidden()
-        .scrollIndicators(.hidden)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    coordinator.pop()
-                } label: {
-                    Image(systemName: "chevron.backward")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(Color(.pPrimary))
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    Task {
-                        coordinator.popToRoot()
-                        listCellPlaceholder.setListCellPlaceholderModel(
-                            userTitle: viewModel.playlist.playlistName,
-                            streetAddress: viewModel.playlist.streetAddress,
-                            generationTime: Date()
-                        )
-                        if await viewModel.savedPlaylist() {
-                            listCellPlaceholder.resetListCellPlaceholderModel()
-                            viewModel.clearDiggingList()
-                        } else {
-                            dump("Failed to save playlist. Please try again.")
-                        }
-                    }
-                } label: {
-                    Text("저장")
-                        .font(.pretendard(weight: .semiBold600, size: 17))
-                        .foregroundStyle(Color(.pPrimary))
-                }
-                .disabled(viewModel.isSaving)
-            }
-        }
     }
 }
 
-private struct PlaylistCoverImageView: View {
+private struct SearchSongStatusView: View {
     let viewModel: SearchAddSongViewModel
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            Text("어떤 곳에서 만난 플레이크인가요?")
-                .font(.pretendard(weight: .regular400, size: 16))
-                .foregroundStyle(Color(.pGray1))
-                .padding(.leading, 16)
-            
-            HStack(spacing: 0) {
-                Spacer()
-                if let uiImage = viewModel.photoUIImage {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .aspectRatio(1, contentMode: .fit)
-                        .frame(width: 277, height: 277)
-                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-                        .overlay(alignment: .bottom) {
-                            VStack(spacing: 0) {
-                                Text(viewModel.cellAddress)
-                                    .font(.pretendard(weight: .medium500, size: 14))
-                                    .foregroundStyle(Color(.pWhite))
-                                
-                                Text(viewModel.cellDate)
-                                    .font(.pretendard(weight: .medium500, size: 14))
-                                    .foregroundStyle(Color(.pWhite))
-                                    .padding(.top, 4)
-                            }
-                            .padding(.bottom, 16)
+        VStack {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color(.sShazam))
+                .padding(.horizontal, 16)
+                .frame(height: 82)
+                .overlay {
+                    HStack(spacing: 0) {
+                        if viewModel.shazamStatus == .idle {
+                            Image(systemName: "plus")
+                                .font(.system(size: 10, weight: .semibold))
+                            Image(systemName: "music.note")
+                                .font(.system(size: 17, weight: .light))
+                                .padding(.leading, -4)
                         }
-                } else {
-                    Image(.coverImageThumbnail)
-                        .resizable()
-                        .clipShape(RoundedRectangle(cornerRadius: 13))
-                        .frame(width: 277, height: 277)
-                        .shadow(color: .black.opacity(0.25), radius: 8, x: 0, y: 4)
-                        .overlay {
-                            HStack(spacing: 0) {
-                                Image(systemName: "camera.viewfinder")
-                                    .font(.system(size: 17, weight: .regular))
-                                    .foregroundStyle(Color(.pPrimary))
-                                
-                                Text("사진으로 기록")
-                                    .font(.pretendard(weight: .medium500, size: 20))
-                                    .foregroundStyle(Color(.pPrimary))
-                                    .padding(.leading, 5)
-                            }
-                        }
+                        Text(viewModel.shazamStatus.title ?? "")
+                            .font(.notoSansKR(weight: .medium500, size: 17))
+                            .padding(.leading, 6)
+                    }
+                    .foregroundStyle(Color(.sTitleText))
                 }
-                Spacer()
-            }
-            .highPriorityGesture(imageViewTapGesture())
-            .padding(.vertical, 36)
-        }
-    }
-    
-    private func imageViewTapGesture() -> some Gesture {
-        TapGesture().onEnded {
-            viewModel.showSheet.toggle()
+                .onTapGesture {
+                    viewModel.searchButtonTapped()
+                }
+            
+            Text(viewModel.shazamStatus.subTitle ?? "")
+                .font(.notoSansKR(weight: .medium500, size: 14))
+                .foregroundStyle(Color(.sBodyText))
         }
     }
 }
 
-private struct PlaylistSongListHeader: View {
+private struct SearchSongList: View {
     let viewModel: SearchAddSongViewModel
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 0) {
+                Text("수집한 항목")
+                    .font(.notoSansKR(weight: .semiBold600, size: 20))
+                    .foregroundStyle(Color(.sTitleText))
+                Spacer()
+            }
+            .padding(.leading, 16)
+            .padding(.bottom, 16)
+            
+            ForEach(viewModel.diggingList, id: \.songID) { song in
+                PlaylistRow(song: song, isHighlighted: viewModel.currentSongId == song.songID)
+            }
+            .padding(.horizontal, 8)
+        }
+    }
+}
+
+private struct TopbarItem: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     
     var body: some View {
         HStack(spacing: 0) {
-            Text("수집한 노래")
-                .font(.pretendard(weight: .semiBold600, size: 20))
-                .foregroundStyle(Color(.pBlack))
+            Button {
+                coordinator.dismissSheet()
+            } label: {
+                Text("닫기")
+                    .font(.notoSansKR(weight: .regular400, size: 17))
+                    .foregroundStyle(Color(.sButton))
+            }
+            .frame(width: 48, height: 39)
+            
             Spacer()
-            Text("\(viewModel.diggingList.count)곡")
-                .font(.pretendard(weight: .medium500, size: 16))
-                .foregroundStyle(Color(.pPrimary))
+            
+            Text("기록에 음악 추가")
+                .font(.notoSansKR(weight: .semiBold600, size: 20))
+                .foregroundStyle(Color(.sTitleText))
+            
+            Spacer()
+            
+            Button {
+                coordinator.dismissSheet()
+            } label: {
+                Text("완료")
+                    .font(.notoSansKR(weight: .regular400, size: 17))
+                    .foregroundStyle(Color(.sButton))
+            }
+            .frame(width: 48, height: 39)
         }
-    }
-}
-
-private struct PlaylistSongList: View {
-    let viewModel: SearchAddSongViewModel
-    
-    var body: some View {
-        ForEach(viewModel.diggingList, id: \.songID) { song in
-            PlaylistRow(song: song)
-        }
-        .padding(.horizontal, 8)
+        .padding(8)
     }
 }

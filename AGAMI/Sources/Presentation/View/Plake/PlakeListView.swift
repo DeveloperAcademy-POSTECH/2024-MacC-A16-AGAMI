@@ -110,7 +110,7 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 Group {
-                    if !viewModel.searchText.isEmpty && viewModel.isSearchResultEmpty {
+                    if viewModel.hasNoResultsForSearch {
                         EmtpyResult()
                     } else if listCellPlaceholder.showArchiveListUpLoadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)

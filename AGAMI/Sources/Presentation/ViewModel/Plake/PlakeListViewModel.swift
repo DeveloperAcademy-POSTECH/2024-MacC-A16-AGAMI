@@ -36,6 +36,10 @@ final class PlakeListViewModel {
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
     
+    var hasNoResultsForSearch: Bool {
+        !searchText.isEmpty && isSearchResultEmpty
+    }
+    
     func fetchPlaylists() {
         isFetching = true
         

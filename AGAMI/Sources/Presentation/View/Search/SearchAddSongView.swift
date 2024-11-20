@@ -24,18 +24,22 @@ struct SearchAddSongView: View {
             
             VStack(spacing: 0) {
                 TopbarItem()
-                
                 List {
-                    SearchSongStatusView(viewModel: viewModel)
-                        .padding(.top, 14)
-                        .listRowInsets(.zero)
-                        .listRowSeparator(.hidden)
+                    Group {
+                        SearchSongStatusView(viewModel: viewModel)
+                            .padding(.top, 14)
+                        
+                        SearchSongListHeader()
+                            .padding(.top, 53)
+                    }
+                    .listRowInsets(.zero)
+                    .listRowSeparator(.hidden)
                     
                     SearchSongList(viewModel: viewModel)
-                        .padding(.top, 53)
                         .listRowInsets(.zero)
                 }
                 .listStyle(.plain)
+                .scrollIndicators(.hidden)
             }
         }
         .onAppearAndActiveCheckUserValued(scenePhase)
@@ -77,25 +81,27 @@ private struct SearchSongStatusView: View {
     }
 }
 
+private struct SearchSongListHeader: View {
+    var body: some View {
+        HStack(spacing: 0) {
+            Text("수집한 항목")
+                .font(.notoSansKR(weight: .semiBold600, size: 20))
+                .foregroundStyle(Color(.sTitleText))
+            
+            Spacer()
+        }
+        .padding(.leading, 16)
+        .padding(.bottom, 16)
+    }
+}
 private struct SearchSongList: View {
     let viewModel: SearchAddSongViewModel
     
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 0) {
-                Text("수집한 항목")
-                    .font(.notoSansKR(weight: .semiBold600, size: 20))
-                    .foregroundStyle(Color(.sTitleText))
-                Spacer()
-            }
-            .padding(.leading, 16)
-            .padding(.bottom, 16)
-            
-            ForEach(viewModel.diggingList, id: \.songID) { song in
-                PlaylistRow(song: song, isHighlighted: viewModel.currentSongId == song.songID)
-            }
-            .padding(.horizontal, 8)
+        ForEach(viewModel.diggingList, id: \.songID) { song in
+            PlaylistRow(song: song, isHighlighted: viewModel.currentSongId == song.songID)
         }
+        .padding(.horizontal, 8)
     }
 }
 

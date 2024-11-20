@@ -24,7 +24,14 @@ final class MapViewModel {
 
     var playlists: [PlaylistModel] = []
     
-    func fecthPlaylists() {
+    func initializeView() {
+            Task {
+                fetchPlaylists()
+                await fetchCurrentLocation()
+            }
+        }
+    
+    func fetchPlaylists() {
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는데 실패했습니다.")
             return
@@ -37,29 +44,26 @@ final class MapViewModel {
         }
     }
     
+    func fetchCurrentLocation() async {
+        do {
+            let location = try await locationService.requestCurrentLocation()
+            currentLocationCoordinate2D = location.coordinate
+            currentlatitude = location.coordinate.latitude
+            currentlongitude = location.coordinate.longitude
+            await fetchCurrentStreetAddress()
+        } catch {
+            dump("현재 위치를 가져오는 데 실패했습니다: \(error)")
+        }
+    }
+
+    func fetchCurrentStreetAddress() async {
+        if let address = await locationService.coordinateToStreetAddress() {
+            currentStreetAddress = address
+        }
+    }
+
     func requestLocationAuthorization() {
         locationService.requestLocationAuthorization()
-    }
-    
-    func requestCurrentLocation() {
-        locationService.requestCurrentLocation()
-    }
-    
-    func getCurrentLocation() {
-        guard let currentLocation = locationService.getCurrentLocation() else {
-            dump("currentLocation == nil")
-            return
-        }
-        
-        currentLocationCoordinate2D = currentLocation.coordinate
-        currentlatitude = currentLocation.coordinate.latitude
-        currentlongitude = currentLocation.coordinate.longitude
-        requestCurrentStreetAddress()
-    }
-    
-    func requestCurrentStreetAddress() {
-        locationService.coordinateToStreetAddress { _ in }
-        currentStreetAddress = locationService.streetAddress
     }
 }
 

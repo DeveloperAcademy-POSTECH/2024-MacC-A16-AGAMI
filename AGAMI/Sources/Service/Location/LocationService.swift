@@ -86,7 +86,38 @@ final class LocationService: NSObject {
             }
         })
     }
-}
+
+    func coordinateToStreetAddress() async -> String? {
+          guard let currentLocation else { return nil }
+          return await withCheckedContinuation { continuation in
+              let geocoder = CLGeocoder()
+              let locale = Locale(identifier: "ko_KR")
+
+              geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale) { [weak self] (placemarks, _) in
+                  guard let self = self else { return }
+                  if let address = placemarks?.last {
+                      var currentAddress = ""
+
+                      if let name = address.name {
+                          currentAddress += name
+                          self.placeHolderAddress = name
+                          self.region = name
+                      }
+
+                      if let area = address.locality {
+                          currentAddress += ", \(area)"
+                          self.locality = area
+                      }
+
+                      self.streetAddress = currentAddress
+                      continuation.resume(returning: currentAddress)
+                  } else {
+                      continuation.resume(returning: nil)
+                  }
+              }
+          }
+      }
+  }
 
 extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -123,36 +154,3 @@ extension LocationService: CLLocationManagerDelegate {
         }
     }
 }
-
-extension LocationService {
-    func coordinateToStreetAddress() async -> String? {
-          guard let currentLocation else { return nil }
-          return await withCheckedContinuation { continuation in
-              let geocoder = CLGeocoder()
-              let locale = Locale(identifier: "ko_KR")
-
-              geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale) { [weak self] (placemarks, _) in
-                  guard let self = self else { return }
-                  if let address = placemarks?.last {
-                      var currentAddress = ""
-
-                      if let name = address.name {
-                          currentAddress += name
-                          self.placeHolderAddress = name
-                          self.region = name
-                      }
-
-                      if let area = address.locality {
-                          currentAddress += ", \(area)"
-                          self.locality = area
-                      }
-
-                      self.streetAddress = currentAddress
-                      continuation.resume(returning: currentAddress)
-                  } else {
-                      continuation.resume(returning: nil)
-                  }
-              }
-          }
-      }
-  }

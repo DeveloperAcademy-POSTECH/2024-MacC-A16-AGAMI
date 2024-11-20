@@ -6,14 +6,17 @@
 //
 
 import SwiftUI
-import CoreLocation
-import PhotosUI
+import ShazamKit
 
 @Observable
 final class SearchAddSongViewModel {
     private let firebaseService = FirebaseService()
+    private let shazamService = ShazamService()
     let persistenceService = PersistenceService.shared
 
+    var currentItem: SHMediaItem?
+    var shazamStatus: ShazamStatus = .idle
+    
     var playlist: PlaylistModel {
         didSet { handleChangeOfNameOrDescription(oldValue: oldValue, newValue: playlist) }
     }
@@ -38,20 +41,61 @@ final class SearchAddSongViewModel {
         dateFormatter.dateFormat = "yyyy. MM. dd"
         return dateFormatter.string(from: Date())
     }
-
-    // 커버 이미지
-    var photoUIImage: UIImage?
-    var showSheet: Bool = false
-
-    // 커버 이미지 - 앨범에서 가져오기
-    var selectedItem: PhotosPickerItem?
-    var showPhotoPicker: Bool = false
+    
+    var currentSongId: String? {
+        currentItem?.appleMusicID
+    }
     
     // 저장 상태 관리
     var isSaving: Bool = false
     
     init(playlist: PlaylistModel) {
         self.playlist = playlist
+        shazamService.delegate = self
+    }
+    
+    private func checkMicrophonePermission(completion: @escaping (Bool) -> Void) {
+        switch AVAudioApplication.shared.recordPermission {
+        case .denied:
+            completion(false)
+        case .granted:
+            completion(true)
+        case .undetermined:
+            AVAudioApplication.requestRecordPermission { granted in
+                DispatchQueue.main.async {
+                    completion(granted)
+                }
+            }
+        @unknown default:
+            completion(false)
+        }
+    }
+    
+    func startRecognition() {
+        checkMicrophonePermission { [weak self] granted in
+            guard let self = self else { return }
+            if granted {
+                self.shazamStatus = .searching
+                self.shazamService.startRecognition()
+            } else {
+                self.shazamStatus = .idle
+            }
+        }
+    }
+    
+    func stopRecognition() {
+        shazamService.stopRecognition()
+    }
+    
+    func searchButtonTapped() {
+        currentItem = nil
+        
+        if shazamStatus == .searching {
+            stopRecognition()
+            shazamStatus = .idle
+        } else {
+            startRecognition()
+        }
     }
     
     func loadSavedSongs() {
@@ -61,10 +105,6 @@ final class SearchAddSongViewModel {
     func savedPlaylist() async -> Bool {
         isSaving = true
         defer { isSaving = false }
-
-        guard let uploadedPhotoURL = await savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "")
-        else { return false }
-        playlist.photoURL = uploadedPhotoURL
 
         // Firebase에 플레이리스트 저장
         do {
@@ -82,28 +122,37 @@ final class SearchAddSongViewModel {
     func clearDiggingList() {
         persistenceService.deleteAllPlaylists()
     }
-    
-    func savePhotoUIImage(photoUIImage: UIImage) {
-        self.photoUIImage = photoUIImage
-    }
-    
-    func savePhotoToFirebase(userID: String) async -> String? {
-        guard let image = photoUIImage else { return nil }
-
-        let photoURL = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
-        return photoURL
-    }
-    
-    func loadImageFromGallery() async {
-        if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
-            photoUIImage = UIImage(data: data)?.cropSquare()
-        }
-    }
 
     private func handleChangeOfNameOrDescription(oldValue: PlaylistModel, newValue: PlaylistModel) {
         if oldValue.playlistName != newValue.playlistName ||
             oldValue.playlistDescription != newValue.playlistDescription {
             persistenceService.updatePlaylist()
         }
+    }
+}
+
+extension SearchAddSongViewModel: ShazamServiceDelegate {
+    func shazamService(_ service: ShazamService, didFind match: SHMatch) {
+        guard let mediaItem = match.mediaItems.first else { return }
+        stopRecognition()
+        currentItem = mediaItem
+        shazamStatus = .idle
+        
+        if let item = currentItem {
+            HapticService.shared.playLongHaptic()
+            persistenceService.appendSong(from: item)
+        }
+    }
+    
+    func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
+        HapticService.shared.playLongHaptic()
+        shazamStatus = .failed
+        stopRecognition()
+    }
+    
+    func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
+        HapticService.shared.playLongHaptic()
+        shazamStatus = .failed
+        stopRecognition()
     }
 }

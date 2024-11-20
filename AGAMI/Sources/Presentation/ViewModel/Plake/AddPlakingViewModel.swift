@@ -74,7 +74,7 @@ extension AddPlakingViewModel: ShazamServiceDelegate {
         guard let mediaItem = match.mediaItems.first else { return }
         stopRecognition()
         currentItem = mediaItem
-        shazamStatus = .found
+        shazamStatus = .idle
         guard let item = currentItem else { return }
         let isDuplicate = diggingList.contains { $0.songID == item.appleMusicID }
         if !isDuplicate {

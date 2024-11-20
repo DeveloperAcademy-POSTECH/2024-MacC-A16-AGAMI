@@ -10,29 +10,31 @@ import SwiftUI
 enum ShazamStatus {
     case idle
     case searching
+    case moreSearching
     case found
     case failed
-
+    
     var title: String? {
         switch self {
-        case .idle: return "플레이크를 눌러 디깅하기"
-        case .searching: return "플레이킹 중 ..."
-        case .found: return "노래를 찾았습니다. 확인해보세요!"
-        case .failed: return "플레이크를 눌러 다시 디깅하기"
+        case .idle, .found: return "음악 수집하기"
+        case .searching: return "음악을 수집하는 중 ..."
+        case .moreSearching: return "음악 수집을 계속 시도하는 중 ..."
+        case .failed: return "결과 없음"
         }
     }
-
+    
     var subTitle: String? {
         switch self {
-        case .idle: return "지금 들리는 노래를 디깅해보세요."
-        case .failed: return "주변 소음을 확인해보세요."
-        case .searching, .found: return nil
+        case .idle, .found: return "지금 들려오는 음악을 수집하여 기록해보세요."
+        case .searching: return "기기가 곡을 인식하고 있습니다. 기다려주세요."
+        case .moreSearching: return "기기가 곡을 인식할 수 있도록 환경을 점검해주세요."
+        case .failed: return "일치하는 콘텐츠를 찾을 수 없습니다."
         }
     }
 
     var backgroundColor: [Color] {
         switch self {
-        case .idle, .searching, .found: return GradientColors.pink
+        case .idle, .searching, .found, .moreSearching: return GradientColors.pink
         case .failed: return GradientColors.gray
         }
     }

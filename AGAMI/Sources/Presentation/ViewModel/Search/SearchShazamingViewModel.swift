@@ -19,7 +19,7 @@ final class SearchShazamingViewModel: NSObject {
     
     override init() {
         super.init()
-        shazamService.delegate = self
+        //shazamService.delegate = self
     }
     
     func startRecognition() {
@@ -72,7 +72,7 @@ extension SearchShazamingViewModel: ShazamServiceDelegate {
         guard let mediaItem = match.mediaItems.first else { return }
         stopRecognition()
         currentItem = mediaItem
-        shazamStatus = .found
+        shazamStatus = .idle
         
         if let item = currentItem {
             HapticService.shared.playLongHaptic()

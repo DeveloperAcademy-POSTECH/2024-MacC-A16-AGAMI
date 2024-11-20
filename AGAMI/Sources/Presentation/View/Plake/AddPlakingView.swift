@@ -121,7 +121,7 @@ private struct SearchPlakeSongList: View {
 
     var body: some View {
         ForEach(viewModel.diggingList, id: \.songID) { song in
-            PlaylistRow(song: song)
+            PlaylistRow(song: song, isHighlighted: false)
         }
         .onDelete(perform: viewModel.deleteSong)
         .onMove(perform: viewModel.moveSong)

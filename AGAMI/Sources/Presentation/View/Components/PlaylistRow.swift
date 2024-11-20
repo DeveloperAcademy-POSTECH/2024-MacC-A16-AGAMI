@@ -11,6 +11,7 @@ import Kingfisher
 
 struct PlaylistRow: View {
     let song: SongModel
+    let isHighlighted: Bool
     
     var body: some View {
         HStack(spacing: 0) {
@@ -20,33 +21,33 @@ struct PlaylistRow: View {
                     .cancelOnDisappear(true)
                     .placeholder({
                         ProgressView()
-                            .frame(width: 60, height: 60)
+                            .frame(width: 54, height: 54)
                     })
-                    .frame(width: 60, height: 60)
+                    .frame(width: 54, height: 54)
                     .padding(.trailing, 20)
+                    .padding(.vertical, 3)
             } else {
                 Image(.songEmpty)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 60, height: 60)
+                    .frame(width: 54, height: 54)
                     .padding(.trailing, 20)
+                    .padding(.vertical, 3)
             }
             
             VStack(alignment: .leading, spacing: 0) {
                 Text(song.title)
-                    .font(.system(size: 17, weight: .semibold))
-                    .kerning(-0.43)
+                    .font(.system(size: 16, weight: .medium))
+                    .kerning(-0.3)
+                    .foregroundStyle(Color(.sTitleText))
                 
                 Text(song.artist)
-                    .font(.system(size: 15, weight: .regular))
-                    .kerning(-0.23)
-                    .foregroundStyle(.gray)
+                    .font(.system(size: 14, weight: .regular))
+                    .kerning(-0.3)
+                    .foregroundStyle(Color(.sBodyText))
             }
             Spacer()
-            Image(systemName: "line.3.horizontal")
-                .foregroundStyle(Color(.pGray3))
-                .font(.system(size: 16, weight: .regular))
-                .padding(.trailing, 15)
         }
+        .background(isHighlighted ? Color(.sListBack) : .clear)
     }
 }

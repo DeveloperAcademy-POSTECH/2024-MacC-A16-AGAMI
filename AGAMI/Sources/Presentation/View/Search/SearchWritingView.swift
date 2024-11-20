@@ -26,7 +26,7 @@ struct SearchWritingView: View {
                 
                 Spacer()
                 
-                SearchAddButton()   
+                SearchAddButton(viewModel: viewModel)
             }
         }
         .ignoresSafeArea(edges: .bottom)
@@ -34,11 +34,18 @@ struct SearchWritingView: View {
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture(perform: hideKeyboard)
         .navigationBarBackButtonHidden(true)
+        .photosPicker(isPresented: $viewModel.showPhotoPicker,
+                      selection: $viewModel.selectedItem,
+                      matching: .images)
+        .onChange(of: viewModel.selectedItem) {
+            Task {
+                await viewModel.loadImageFromGallery()
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 ToolbarLeadingItem(viewModel: viewModel)
             }
-            
             ToolbarItem(placement: .topBarTrailing) {
                 ToolabraTrailingItem(viewModel: viewModel)
             }
@@ -88,14 +95,17 @@ private struct SearchDescriptionTextField: View {
             TextField("기록하고 싶었던 순간이나 생각과 감정을 작성해보세요.",
                       text: $viewModel.playlist.playlistDescription,
                       axis: .vertical)
-                .font(.notoSansKR(weight: .regular400, size: 15))
-                .background(Color(.sMain))
+            .font(.notoSansKR(weight: .regular400, size: 15))
+            .background(Color(.sMain))
         }
         .padding(.horizontal, 20)
     }
 }
 
 private struct SearchAddButton: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: SearchWritingViewModel
+    
     var body: some View {
         HStack(alignment: .top, spacing: 0) {
             Spacer()
@@ -106,6 +116,9 @@ private struct SearchAddButton: View {
             } icon: {
                 Image(systemName: "photo")
                     .font(.system(size: 17, weight: .regular))
+            }
+            .onTapGesture {
+                viewModel.showPhotoPicker.toggle()
             }
             
             Spacer()
@@ -122,6 +135,10 @@ private struct SearchAddButton: View {
             } icon: {
                 Image(systemName: "music.note")
                     .font(.system(size: 17, weight: .regular))
+            }
+            .onTapGesture {
+                let searchAddSongViewModel = viewModel.createSearchAddSongViewModel()
+                coordinator.presentSheet(.searchAddSongView(viewModel: searchAddSongViewModel))
             }
             
             Spacer()

@@ -36,22 +36,24 @@ private struct HeaderView: View {
     var body: some View {
         ZStack(alignment: .center) {
             Text("계정 관리")
-                .font(.pretendard(weight: .semiBold600, size: 20))
+                .font(.notoSansKR(weight: .semiBold600, size: 20))
+                .foregroundStyle(Color(.sTitleText))
             
             HStack(spacing: 0) {
                 Button {
                     // 닫기, 코디네이터 연결
                 } label: {
                     Text("닫기")
-                        .font(.pretendard(weight: .regular400, size: 17))
-                        .foregroundStyle(.gray)
+                        .font(.notoSansKR(weight: .regular400, size: 17))
+                        .foregroundStyle(Color(.sButton))
                 }
                 
                 Spacer()
             }
             .padding(.leading, 16)
         }
-        .padding(.vertical, 20)
+        .padding(EdgeInsets(top: 15, leading: 0, bottom: 17, trailing: 0))
+        .background(Color(.sWhiteBack))
     }
 }
 
@@ -62,7 +64,7 @@ private struct ContentView: View {
     
     var body: some View {
         ZStack {
-            Color.green
+            Color(.sMain)
                 .ignoresSafeArea()
             
             // 최상단 VStack (모든 버튼을 감싸는 스택)
@@ -79,9 +81,9 @@ private struct ContentView: View {
                     } label: {
                         ButtonLabel(
                             title: "이용 약관",
-                            fontType: .pretendard(weight: .medium500, size: 17),
-                            fontColor: Color(.pBlack),
-                            backgroundColor: .white)
+                            fontType: .notoSansKR(weight: .medium500, size: 17),
+                            fontColor: Color(.sButton),
+                            backgroundColor: Color(.sWhite))
                     }
                     
                     Button {
@@ -90,9 +92,9 @@ private struct ContentView: View {
                     } label: {
                         ButtonLabel(
                             title: "회원 탈퇴",
-                            fontType: .pretendard(weight: .medium500, size: 17),
-                            fontColor: Color(.pBlack),
-                            backgroundColor: .white)
+                            fontType: .notoSansKR(weight: .medium500, size: 17),
+                            fontColor: Color(.sButton),
+                            backgroundColor: Color(.sWhite))
                     }
                 }
                 
@@ -101,9 +103,9 @@ private struct ContentView: View {
                 } label: {
                     ButtonLabel(
                         title: "로그아웃",
-                        fontType: .pretendard(weight: .semiBold600, size: 17),
-                        fontColor: Color(.pWhite),
-                        backgroundColor: .black)
+                        fontType: .notoSansKR(weight: .semiBold600, size: 17),
+                        fontColor: Color(.sWhite),
+                        backgroundColor: Color(.sTitleText))
                 }
                 
                 Spacer()
@@ -126,7 +128,7 @@ private struct ButtonLabel: View {
                 .foregroundStyle(fontColor)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 17)
+        .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: 4)
                 .fill(backgroundColor)
@@ -159,7 +161,6 @@ private struct DeleteAccountAlertActions: View {
         }
     }
 }
-
 
 #Preview {
     AccountView2()

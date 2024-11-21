@@ -170,6 +170,7 @@ private struct ListRow: View {
 }
 
 private struct ImageView: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     @Bindable var viewModel: PlakePlaylistViewModel
     @FocusState private var isFocused: Bool
     
@@ -185,6 +186,11 @@ private struct ImageView: View {
                 .scaledToFill()
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .shadow(color: .black.opacity(0.25), radius: 10)
+                .highPriorityGesture(
+                    TapGesture().onEnded {
+                        coordinator.push(route: .imageViewerView(urlString: viewModel.playlist.photoURL))
+                    }
+                )
 
             if viewModel.presentationState.isEditing {
                 DeletePhotoButton(viewModel: viewModel)

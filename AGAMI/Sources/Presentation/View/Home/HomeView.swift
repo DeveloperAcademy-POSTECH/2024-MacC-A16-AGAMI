@@ -13,7 +13,6 @@ struct HomeView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-    @State var isSheetPresented: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -31,7 +30,6 @@ struct HomeView: View {
                     .symbolRenderingMode(.palette)
                     .foregroundStyle(Color(.pWhite), Color(.pGray3))
                     .onTapGesture {
-                        isSheetPresented.toggle()
                         coordinator.presentSheet(.accountView)
                         viewModel.simpleHaptic()
                     }

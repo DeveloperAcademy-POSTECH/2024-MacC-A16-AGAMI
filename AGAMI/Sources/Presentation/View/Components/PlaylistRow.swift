@@ -37,12 +37,12 @@ struct PlaylistRow: View {
             
             VStack(alignment: .leading, spacing: 0) {
                 Text(song.title)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(.pretendard(weight: .medium500, size: 16))
                     .kerning(-0.3)
                     .foregroundStyle(Color(.sTitleText))
                 
                 Text(song.artist)
-                    .font(.system(size: 14, weight: .regular))
+                    .font(.pretendard(weight: .regular400, size: 14))
                     .kerning(-0.3)
                     .foregroundStyle(Color(.sBodyText))
             }

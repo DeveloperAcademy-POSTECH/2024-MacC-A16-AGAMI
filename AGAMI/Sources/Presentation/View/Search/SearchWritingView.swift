@@ -93,6 +93,8 @@ private struct SearchCoverImageView: View {
         if let image = viewModel.photoUIImage {
             Image(uiImage: image)
                 .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 257)
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .overlay(alignment: .topTrailing) {
                     Image(systemName: "x.circle")
@@ -105,7 +107,6 @@ private struct SearchCoverImageView: View {
                             }
                         )
                 }
-                .frame(height: 257)
                 .padding(.horizontal, 16)
         }
     }

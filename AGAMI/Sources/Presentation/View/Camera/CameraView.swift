@@ -17,7 +17,7 @@ struct CameraView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Color.black.edgesIgnoringSafeArea(.all)
+                Color(.sBlack).edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 0) {
                     Spacer()
@@ -52,25 +52,26 @@ struct CameraView: View {
                             captureButton
                             changeCameraButton
                         } else {
-                            resetPhotoButton
+//                            resetPhotoButton
                             usedPhotoButton
-                            savePhotoButton
+//                            savePhotoButton
                         }
                     }
                     .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
                 }
             }
-            .navigationTitle("사진 촬영")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        coordinator.pop()
-                    } label: {
-                        Image(systemName: "chevron.backward")
-                            .font(.pretendard(weight: .semiBold600, size: 17))
-                            .foregroundStyle(Color(.pPrimary))
+                if !viewModel.isPhotoCaptured {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button {
+                            coordinator.pop()
+                        } label: {
+                            Image(systemName: "chevron.backward")
+                                .font(.pretendard(weight: .regular400, size: 16))
+                                .foregroundStyle(Color(.sMain))
+                        }
                     }
                 }
             }
@@ -141,21 +142,21 @@ struct CameraView: View {
         }
     }
     
-    private var savePhotoButton: some View {
-        Button {
-            viewModel.savePhoto()
-        } label: {
-            Circle()
-                .foregroundColor(Color.gray.opacity(0.2))
-                .frame(width: 56, height: 56, alignment: .center)
-                .overlay(
-                    Image(systemName: "square.and.arrow.down.fill")
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(.white)
-                        .padding(.bottom, 4)
-                )
-        }
-    }
+//    private var savePhotoButton: some View {
+//        Button {
+//            viewModel.savePhoto()
+//        } label: {
+//            Circle()
+//                .foregroundColor(Color.gray.opacity(0.2))
+//                .frame(width: 56, height: 56, alignment: .center)
+//                .overlay(
+//                    Image(systemName: "square.and.arrow.down.fill")
+//                        .font(.system(size: 24, weight: .medium))
+//                        .foregroundColor(.white)
+//                        .padding(.bottom, 4)
+//                )
+//        }
+//    }
     
     private var changeCameraButton: some View {
         Button {

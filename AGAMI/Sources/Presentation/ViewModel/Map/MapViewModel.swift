@@ -22,25 +22,15 @@ final class MapViewModel {
 
     var goToDetail: Bool = false
 
-    var playlists: [PlaylistModel] = []
-    
+    let playlists: [PlaylistModel]
+
+    init(playlists: [PlaylistModel]) {
+        self.playlists = playlists
+    }
+
     func initializeView() {
-            Task {
-                fetchPlaylists()
-                await fetchCurrentLocation()
-            }
-        }
-    
-    func fetchPlaylists() {
-        guard let uid = FirebaseAuthService.currentUID else {
-            dump("UID를 가져오는데 실패했습니다.")
-            return
-        }
-        
         Task {
-            if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
-                playlists = playlistModels
-            }
+            await fetchCurrentLocation()
         }
     }
     

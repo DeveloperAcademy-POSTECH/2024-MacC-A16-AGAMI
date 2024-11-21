@@ -21,7 +21,9 @@ enum PlakeRoute: Hashable {
     
     case mapView
     case placeListView(viewModel: CollectionPlaceViewModel)
-    
+
+    case imageViewerView(urlString: String)
+
     var id: String {
         switch self {
         case .homeView: return "homeView"
@@ -36,6 +38,8 @@ enum PlakeRoute: Hashable {
             
         case .addPlakingView: return "addPlakingView"
         case .addPlakingShazamView: return "addPlakingShazamView"
+
+        case .imageViewerView: return "imageViewerView"
         }
     }
     
@@ -97,6 +101,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             AddPlakingView(viewModel: viewModel)
         case let .addPlakingShazamView(viewModel):
             AddPlakingShazamView(viewModel: viewModel)
+        case let .imageViewerView(urlString):
+            ImageViewerView(urlString: urlString)
         }
     }
     

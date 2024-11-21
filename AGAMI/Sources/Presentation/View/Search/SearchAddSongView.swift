@@ -100,7 +100,15 @@ private struct SearchSongList: View {
     var body: some View {
         ForEach(viewModel.diggingList, id: \.songID) { song in
             PlaylistRow(song: song, isHighlighted: viewModel.currentSongId == song.songID)
+                .overlay(alignment: .trailing) {
+                    Image(systemName: "line.3.horizontal")
+                        .foregroundStyle(Color(.sSubHead))
+                        .font(.system(size: 16, weight: .regular))
+                        .padding(.trailing, 16)
+                }
         }
+        .onDelete(perform: viewModel.deleteSong)
+        .onMove(perform: viewModel.moveSong)
         .padding(.horizontal, 8)
     }
 }

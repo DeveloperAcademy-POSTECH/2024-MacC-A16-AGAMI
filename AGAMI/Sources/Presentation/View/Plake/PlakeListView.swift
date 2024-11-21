@@ -93,54 +93,46 @@ private struct CountingHeaderView: View {
 
     var body: some View {
         HStack(spacing: 16) {
-            HStack(alignment: .top, spacing: 4) {
-                Group {
-                    VStack {
-                        Image(systemName: "calendar")
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color(.sSubHead))
-                            .padding(.horizontal, 4)
-                        Spacer()
-                    }
-                    VStack(alignment: .leading) {
-                        Text("순간의 소록")
-                            .font(.notoSansKR(weight: .regular400, size: 15))
-                            .foregroundStyle(Color(.sSubHead))
-                        Text("\(viewModel.itemsCount)개")
-                            .font(.notoSansKR(weight: .semiBold600, size: 17))
-                            .foregroundStyle(Color(.sTitleText))
-                    }
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Image(systemName: "calendar")
+                    .font(.notoSansKR(weight: .regular400, size: 15))
+                    .foregroundStyle(Color(.sSubHead))
+                    .padding(.horizontal, 4)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("순간의 소록")
+                        .font(.notoSansKR(weight: .regular400, size: 15))
+                        .foregroundStyle(Color(.sSubHead))
+                    Text("\(viewModel.itemsCount)개")
+                        .font(.notoSansKR(weight: .semiBold600, size: 17))
+                        .foregroundStyle(Color(.sTitleText))
                 }
-                .frame(height: 40)
             }
 
             Divider()
                 .frame(width: 0.5, height: 40)
                 .background(Color(.sLine))
 
-            HStack(alignment: .top, spacing: 4) {
-                Group {
-                    VStack {
-                        Image(systemName: "music.note")
-                            .font(.system(size: 15))
-                            .foregroundStyle(Color(.sSubHead))
-                            .padding(.horizontal, 4)
-                        Spacer()
-                    }
-                    VStack(alignment: .leading) {
-                        Text("수집한 음악")
-                            .font(.notoSansKR(weight: .regular400, size: 15))
-                            .foregroundStyle(Color(.sSubHead))
-                        Text("\(viewModel.songsCount)곡")
-                            .font(.notoSansKR(weight: .semiBold600, size: 17))
-                            .foregroundStyle(Color(.sTitleText))
-                    }
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                Image(systemName: "music.note")
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color(.sSubHead))
+                    .padding(.horizontal, 4)
+
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("수집한 음악")
+                        .font(.notoSansKR(weight: .regular400, size: 15))
+                        .foregroundStyle(Color(.sSubHead))
+                    Text("\(viewModel.songsCount)곡")
+                        .font(.notoSansKR(weight: .semiBold600, size: 17))
+                        .foregroundStyle(Color(.sTitleText))
                 }
-                .frame(height: 40)
             }
 
             Spacer()
         }
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(height: 40)
         .padding(EdgeInsets(top: 24, leading: 0, bottom: 16, trailing: 0))
     }
 }

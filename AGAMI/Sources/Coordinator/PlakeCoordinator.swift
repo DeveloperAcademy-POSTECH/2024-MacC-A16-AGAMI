@@ -106,6 +106,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
         case let .searchAddSongView(viewModel):
             SearchAddSongView(viewModel: viewModel)
                 .interactiveDismissDisabled()
+        case .accountView:
+            AccountView()
         }
     }
     

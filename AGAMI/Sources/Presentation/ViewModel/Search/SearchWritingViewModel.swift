@@ -23,12 +23,13 @@ final class SearchWritingViewModel {
     }
     
     var saveButtonEnabled: Bool {
-        !playlist.playlistName.isEmpty && !playlist.playlistDescription.isEmpty
+        !playlist.playlistName.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty
     }
     
     // 커버 이미지
     var photoUIImage: UIImage?
-    var showSheet: Bool = false
+    var showPhotoConfirmDialog: Bool = false
+    var showDeleteImageAlert: Bool = false
     
     // 커버 이미지 - 앨범에서 가져오기
     var selectedItem: PhotosPickerItem?

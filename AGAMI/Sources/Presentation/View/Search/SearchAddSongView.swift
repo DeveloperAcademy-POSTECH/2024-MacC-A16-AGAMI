@@ -22,7 +22,7 @@ struct SearchAddSongView: View {
             Color(.sWhite).ignoresSafeArea()
             
             VStack(spacing: 0) {
-                TopbarItem()
+                TopbarItem(viewModel: viewModel)
                 List {
                     Group {
                         SearchSongStatusView(viewModel: viewModel)
@@ -93,6 +93,7 @@ private struct SearchSongListHeader: View {
         .padding(.bottom, 16)
     }
 }
+
 private struct SearchSongList: View {
     let viewModel: SearchAddSongViewModel
     
@@ -106,10 +107,12 @@ private struct SearchSongList: View {
 
 private struct TopbarItem: View {
     @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: SearchAddSongViewModel
     
     var body: some View {
         HStack(spacing: 0) {
             Button {
+                viewModel.stopRecognition()
                 coordinator.dismissSheet()
             } label: {
                 Text("닫기")
@@ -127,6 +130,7 @@ private struct TopbarItem: View {
             Spacer()
             
             Button {
+                viewModel.stopRecognition()
                 coordinator.dismissSheet()
             } label: {
                 Text("완료")

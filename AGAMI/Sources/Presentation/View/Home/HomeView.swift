@@ -32,7 +32,7 @@ struct HomeView: View {
                     .foregroundStyle(Color(.pWhite), Color(.pGray3))
                     .onTapGesture {
                         isSheetPresented.toggle()
-                        coordinator.presentSheet(.accountView2)
+                        coordinator.presentSheet(.accountView)
                         viewModel.simpleHaptic()
                     }
                 

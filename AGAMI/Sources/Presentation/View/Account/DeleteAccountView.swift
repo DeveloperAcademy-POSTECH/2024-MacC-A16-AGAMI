@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SignOutView: View {
+struct DeleteAccountView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     
@@ -19,7 +19,7 @@ struct SignOutView: View {
             VStack(alignment: .center, spacing: 25) {
                 ZStack(alignment: .center) {
                     Circle()
-                        .fill(Color(.pPrimary))
+                        .fill(Color(.sTitleText))
                         .frame(width: 90, height: 90)
                     
                     Circle()
@@ -29,21 +29,22 @@ struct SignOutView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .resizable()
                         .frame(width: 76, height: 76)
-                        .foregroundStyle(Color(.pPrimary))
+                        .foregroundStyle(Color(.sTitleText))
                 }
                 
                 switch viewModel.deleteAccountProcess {
                 case .inProgress:
                     Text("회원 탈퇴중입니다...")
-                        .font(.pretendard(weight: .semiBold600, size: 24))
-                        .foregroundStyle(Color(.pBlack))
+                        .font(.notoSansKR(weight: .semiBold600, size: 22))
+                        .foregroundStyle(Color(.sTitleText))
                 default:
                     Text("회원 탈퇴 완료!")
-                        .font(.pretendard(weight: .semiBold600, size: 24))
-                        .foregroundStyle(Color(.pBlack))
+                        .font(.notoSansKR(weight: .semiBold600, size: 22))
+                        .foregroundStyle(Color(.sTitleText))
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                 UserDefaults.standard.removeObject(forKey: "isSignedIn")
+                                coordinator.dismissSheet()
                                 coordinator.popToRoot()
                             }
                         }

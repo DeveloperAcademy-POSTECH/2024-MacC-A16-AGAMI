@@ -81,19 +81,6 @@ final class SearchWritingViewModel {
         return photoURL
     }
     
-    func deleteSong(indexSet: IndexSet) {
-        for index in indexSet {
-            let song = diggingList[index]
-            persistenceService.deleteSong(item: song)
-        }
-        loadSavedSongs()
-    }
-    
-    func moveSong(from source: IndexSet, to destination: Int) {
-        persistenceService.moveSong(from: source, to: destination)
-        loadSavedSongs()
-    }
-    
     func clearDiggingList() {
         persistenceService.deleteAllPlaylists()
     }

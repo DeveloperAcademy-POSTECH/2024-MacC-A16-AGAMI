@@ -10,23 +10,21 @@ import SwiftUI
 import PhotosUI
 import ColorThiefSwift
 
+struct PlaylistPresentationState {
+    var isEditing: Bool = false
+    var isPhotoDialogPresented: Bool = false
+    var isShowingDeletePhotoAlert: Bool = false
+    var isShowingDeletePlakeAlert: Bool = false
+    var isShowingPicker: Bool = false
+    var isUpdating: Bool = false
+    var isLoading: Bool = false
+    var isShowingExportingAppleMusicFailedAlert: Bool = false
+    var isShowingExportingSpotifyFailedAlert: Bool = false
+    var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
+}
+
 @Observable
 final class PlakePlaylistViewModel: Hashable {
-
-    struct PlaylistPresentationState {
-        var isEditing: Bool = false
-        var isExportDialogPresented: Bool = false
-        var isPhotoDialogPresented: Bool = false
-        var isShowingDeletePhotoAlert: Bool = false
-        var isShowingDeletePlakeAlert: Bool = false
-        var isShowingPicker: Bool = false
-        var isUpdating: Bool = false
-        var isLoading: Bool = false
-        var isShowingExportingAppleMusicFailedAlert: Bool = false
-        var isShowingExportingSpotifyFailedAlert: Bool = false
-        var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
-    }
-
     let id: UUID = .init()
     
     var playlist: PlaylistModel
@@ -141,16 +139,17 @@ final class PlakePlaylistViewModel: Hashable {
     
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy. MM. dd"
+        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
         return dateFormatter.string(from: date)
     }
     
     func applyChangesToFirestore() async {
         presentationState.isUpdating = true
         defer { presentationState.isUpdating = false }
-        
-        guard let userID = FirebaseAuthService.currentUID else { return }
-        let firestoreModel = ModelAdapter.toFirestorePlaylist(from: playlist)
+
+        guard let userID = FirebaseAuthService.currentUID,
+              let firestoreModel = playlist as? FirestorePlaylistModel
+        else { return }
 
         do {
             try await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)

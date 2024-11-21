@@ -1,3 +1,5 @@
+// swiftlint:disable file_length
+
 //
 //  PlakeListView.swift
 //  AGAMI
@@ -36,6 +38,7 @@ struct PlakeListView: View {
         }
         .background(Color(.sMain))
         .toolbarBackground(.visible, for: .tabBar)
+        .refreshable { viewModel.fetchPlaylists() }
         .onTapGesture(perform: hideKeyboard)
         .onOpenURL { viewModel.handleURL($0) }
         .onAppear(perform: viewModel.fetchPlaylists)
@@ -60,7 +63,7 @@ private struct TopBarView: View {
 
             } label: {
                 Image(systemName: "magnifyingglass.circle")
-                    .font(.system(size: 22))
+                    .font(.system(size: 26))
                     .foregroundStyle(Color(.sButton))
             }
 
@@ -68,7 +71,7 @@ private struct TopBarView: View {
 
             } label: {
                 Image(systemName: "person.circle")
-                    .font(.system(size: 22))
+                    .font(.system(size: 26))
                     .foregroundStyle(Color(.sButton))
             }
 
@@ -76,7 +79,7 @@ private struct TopBarView: View {
 
             } label: {
                 Image(systemName: "map.circle")
-                    .font(.system(size: 22))
+                    .font(.system(size: 26))
                     .foregroundStyle(Color(.sButton))
             }
 
@@ -99,7 +102,6 @@ private struct CountingHeaderView: View {
                             .padding(.horizontal, 4)
                         Spacer()
                     }
-
                     VStack(alignment: .leading) {
                         Text("순간의 소록")
                             .font(.notoSansKR(weight: .regular400, size: 15))
@@ -125,7 +127,6 @@ private struct CountingHeaderView: View {
                             .padding(.horizontal, 4)
                         Spacer()
                     }
-
                     VStack(alignment: .leading) {
                         Text("수집한 음악")
                             .font(.notoSansKR(weight: .regular400, size: 15))
@@ -191,20 +192,14 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 Group {
-                    if viewModel.hasNoResultsForSearch {
-                        EmtpyResult()
-                    } else if listCellPlaceholder.showArchiveListUpLoadingCell {
+                    if listCellPlaceholder.showArchiveListUpLoadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
                     } else if viewModel.isShowingNewPlake {
                         MakeNewPlakeCell(size: size)
                     }
 
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in
-                        PlakeListCell(
-                            viewModel: viewModel,
-                            playlist: playlist,
-                            size: size
-                        )
+                        PlakeListCell(viewModel: viewModel, playlist: playlist, size: size)
                     }
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in
@@ -409,13 +404,5 @@ private struct ContextMenuItems: View {
         } label: {
             Label("삭제", systemImage: "trash")
         }
-    }
-}
-
-private struct EmtpyResult: View {
-    var body: some View {
-        Text("검색 결과가 없습니다.")
-            .font(.pretendard(weight: .medium500, size: 20))
-            .foregroundStyle(Color(.pGray1))
     }
 }

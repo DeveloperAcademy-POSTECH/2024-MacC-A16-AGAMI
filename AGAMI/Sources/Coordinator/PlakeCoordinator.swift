@@ -55,7 +55,7 @@ enum PlakeSheet: Hashable, Identifiable {
     var id: String {
         switch self {
         case .searchAddSongView: return "searchAddSongView"
-		case .accountView return "accountView"
+        case .accountView: return "accountView"
         }
     }
     
@@ -66,7 +66,6 @@ enum PlakeSheet: Hashable, Identifiable {
     static func == (lhs: PlakeSheet, rhs: PlakeSheet) -> Bool {
         lhs.id == rhs.id
     }
-    
 }
 
 enum PlakeFullScreenCover: String, Identifiable {

@@ -103,6 +103,10 @@ private struct ListView: View {
                     PlaylistView(viewModel: viewModel)
                         .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
 
+                    Spacer().frame(height: 60)
+                        .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
+                        .listRowSeparator(.hidden)
+
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
             }
@@ -186,6 +190,7 @@ private struct ImageView: View {
                 DeletePhotoButton(viewModel: viewModel)
             }
         }
+        .padding(.top, 4)
         .padding(.bottom, viewModel.presentationState.isEditing ? 12 : 0)
     }
 }

@@ -53,13 +53,12 @@ final class PlakeListViewModel {
         }
         
         Task {
-            defer { isFetching = false }
-
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 await updatePlaylists(sortPlaylistsByDate(playlistModels))
             } else {
                 dump("플레이리스트 데이터를 가져오는 데 실패했습니다.")
             }
+            await MainActor.run { isFetching = false }
         }
     }
 

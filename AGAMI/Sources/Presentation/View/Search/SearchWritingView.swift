@@ -18,19 +18,32 @@ struct SearchWritingView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                SearchTitleTextField(viewModel: viewModel)
-                    .padding(.top, 7)
-                
-                SearchDescriptionTextField(viewModel: viewModel)
-                    .padding(.top, 24)
-                
-                Spacer()
-                
+                List {
+                    Group {
+                        SearchCoverImageView(viewModel: viewModel)
+                            .padding(.top, 3)
+                        SearchTitleTextField(viewModel: viewModel)
+                            .padding(.top, 19)
+                        SearchDescriptionTextField(viewModel: viewModel)
+                            .padding(.top, 24)
+                        SearchSongListHeader(viewModel: viewModel)
+                            .padding(.top, 24)
+                    }
+                    .listRowInsets(.zero)
+                    .listRowBackground(Color(.sMain))
+                    .listRowSeparator(.hidden)
+                    
+                    SearchSongList(viewModel: viewModel)
+                        .listRowInsets(.zero)
+                        .listRowBackground(Color(.sMain))
+                }
+                .listStyle(.plain)
+                .scrollIndicators(.hidden)
                 SearchAddButton(viewModel: viewModel)
             }
+            
         }
         .ignoresSafeArea(edges: .bottom)
-        .ignoresSafeArea(.keyboard)
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture(perform: hideKeyboard)
         .navigationBarBackButtonHidden(true)
@@ -49,6 +62,51 @@ struct SearchWritingView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 ToolabraTrailingItem(viewModel: viewModel)
             }
+        }
+        .confirmationDialog("", isPresented: $viewModel.showPhotoConfirmDialog) {
+            PhotoConfirmationDialogActions(viewModel: viewModel)
+        }
+        .alert(isPresented: $viewModel.showDeleteImageAlert) {
+            Alert(
+                title: Text("사진 삭제하기")
+                    .font(.notoSansKR(weight: .semiBold600, size: 17))
+                    .foregroundStyle(Color(.sTitleText)),
+                message: Text("기록한 사진을 삭제할까요?")
+                    .font(.notoSansKR(weight: .regular400, size: 14))
+                    .foregroundStyle(Color(.sBodyText)),
+                primaryButton: .default(Text("취소")) {
+                    viewModel.showDeleteImageAlert = false
+                },
+                secondaryButton: .destructive(Text("삭제")) {
+                    viewModel.photoUIImage = nil
+                    viewModel.selectedItem = nil
+                }
+            )
+        }
+    }
+}
+
+private struct SearchCoverImageView: View {
+    let viewModel: SearchWritingViewModel
+    
+    var body: some View {
+        if let image = viewModel.photoUIImage {
+            Image(uiImage: image)
+                .resizable()
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .overlay(alignment: .topTrailing) {
+                    Image(systemName: "x.circle")
+                        .font(.system(size: 20, weight: .light))
+                        .foregroundStyle(Color(.sMain))
+                        .padding(8)
+                        .highPriorityGesture(
+                            TapGesture().onEnded {
+                                viewModel.showDeleteImageAlert = true
+                            }
+                        )
+                }
+                .frame(height: 257)
+                .padding(.horizontal, 16)
         }
     }
 }
@@ -123,7 +181,7 @@ private struct SearchAddButton: View {
                     .font(.system(size: 17, weight: .regular))
             }
             .onTapGesture {
-                viewModel.showPhotoPicker.toggle()
+                viewModel.showPhotoConfirmDialog.toggle()
             }
             
             Spacer()
@@ -155,6 +213,46 @@ private struct SearchAddButton: View {
     }
 }
 
+private struct SearchSongListHeader: View {
+    var viewModel: SearchWritingViewModel
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            if !viewModel.diggingList.isEmpty {
+                Divider()
+                    .frame(height: 0.5)
+                    .foregroundStyle(Color(.sLine))
+                    .padding(.horizontal, 20)
+                HStack(spacing: 0) {
+                    Text("수집한 노래")
+                        .font(.notoSansKR(weight: .medium500, size: 17))
+                        .foregroundStyle(Color(.sTitleText))
+                        .padding(.trailing, 8)
+                    
+                    Text("\(viewModel.diggingList.count)곡")
+                        .font(.notoSansKR(weight: .medium500, size: 17))
+                        .foregroundStyle(Color(.sSubHead))
+                    
+                    Spacer()
+                }
+                .padding(.leading, 20)
+                .padding(.vertical, 14)
+            }
+        }
+    }
+}
+
+private struct SearchSongList: View {
+    let viewModel: SearchWritingViewModel
+    
+    var body: some View {
+        ForEach(viewModel.diggingList, id: \.songID) { song in
+            PlaylistRow(song: song, isHighlighted: true)
+        }
+        .padding(.horizontal, 20)
+    }
+}
+
 private struct ToolbarLeadingItem: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     var viewModel: SearchWritingViewModel
@@ -176,13 +274,35 @@ private struct ToolabraTrailingItem: View {
     
     var body: some View {
         Button {
-            // 저장
+            Task {
+                coordinator.popToRoot()
+                
+                if await viewModel.savedPlaylist() {
+                    viewModel.clearDiggingList()
+                } else {
+                    dump("Failed to save playlist. Please try again.")
+                }
+            }
         } label: {
             Text("저장")
                 .font(.pretendard(weight: .medium500, size: 17))
                 .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
         }
-        .disabled(viewModel.saveButtonEnabled)
+        .disabled(!viewModel.saveButtonEnabled)
+    }
+}
+
+private struct PhotoConfirmationDialogActions: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: SearchWritingViewModel
+    
+    var body: some View {
+        Button("사진 찍기") {
+            coordinator.push(route: .cameraView(viewModelContainer: .searchWriting(viewModel: viewModel)))
+        }
+        Button("사진 보관함 열기") {
+            viewModel.showPhotoPicker = true
+        }
     }
 }
 

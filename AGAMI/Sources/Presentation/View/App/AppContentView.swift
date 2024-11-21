@@ -15,7 +15,7 @@ struct AppContentView: View {
     var body: some View {
         if isSignedIn {
             NavigationStack(path: $plakeCoordinator.path) {
-                plakeCoordinator.build(route: .homeView)
+                plakeCoordinator.build(route: .listView)
                     .onOpenURL { url in
                         handleURL(url)
                     }

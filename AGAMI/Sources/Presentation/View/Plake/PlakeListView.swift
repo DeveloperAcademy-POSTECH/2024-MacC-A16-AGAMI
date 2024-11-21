@@ -13,11 +13,12 @@ import Kingfisher
 struct PlakeListView: View {
     @State var viewModel: PlakeListViewModel = PlakeListViewModel()
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                TopBarView()
+                TopBarView(viewModel: viewModel)
                 CountingHeaderView(viewModel: viewModel)
                 GeometryReader { proxy in
                     ListView(viewModel: viewModel, size: proxy.size)
@@ -41,6 +42,7 @@ struct PlakeListView: View {
         .refreshable { viewModel.fetchPlaylists() }
         .onTapGesture(perform: hideKeyboard)
         .onOpenURL { viewModel.handleURL($0) }
+        .onAppearAndActiveCheckUserValued(scenePhase)
         .onAppear(perform: viewModel.fetchPlaylists)
         .onChange(of: listCellPlaceholder.showArchiveListUpLoadingCell) { oldValue, newValue in
             if oldValue == true, newValue == false {
@@ -51,6 +53,9 @@ struct PlakeListView: View {
 }
 
 private struct TopBarView: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakeListViewModel
+
     var body: some View {
         HStack(spacing: 8) {
             Text("앱 로고")
@@ -68,7 +73,8 @@ private struct TopBarView: View {
             }
 
             Button {
-
+                coordinator.presentSheet(.accountView)
+                viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "person.circle")
                     .font(.system(size: 26))
@@ -76,7 +82,10 @@ private struct TopBarView: View {
             }
 
             Button {
-
+                coordinator.presentSheet(.mapView(
+                    viewModel: MapViewModel(playlists: viewModel.playlists)
+                ))
+                viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "map.circle")
                     .font(.system(size: 26))

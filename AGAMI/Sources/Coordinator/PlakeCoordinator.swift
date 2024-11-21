@@ -9,8 +9,6 @@ import Foundation
 import SwiftUI
 
 enum PlakeRoute: Hashable {
-    case homeView
-    
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
     case addPlakingView(viewModel: AddPlakingViewModel)
@@ -18,22 +16,19 @@ enum PlakeRoute: Hashable {
     
     case searchWritingView
     case cameraView(viewModelContainer: CoordinatorViewModelContainer)
-    
-    case mapView
+
     case placeListView(viewModel: CollectionPlaceViewModel)
 
     case imageViewerView(urlString: String)
 
     var id: String {
         switch self {
-        case .homeView: return "homeView"
         case .listView: return "listView"
         case .playlistView: return "playlistView"
             
         case .searchWritingView: return "searchWritingView"
         case .cameraView: return "cameraView"
-            
-        case .mapView: return "mapView"
+
         case .placeListView: return "placeListView"
             
         case .addPlakingView: return "addPlakingView"
@@ -55,11 +50,13 @@ enum PlakeRoute: Hashable {
 enum PlakeSheet: Hashable, Identifiable {
     case searchAddSongView(viewModel: SearchAddSongViewModel)
 	case accountView
-    
+    case mapView(viewModel: MapViewModel)
+
     var id: String {
         switch self {
         case .searchAddSongView: return "searchAddSongView"
         case .accountView: return "accountView"
+        case .mapView: return "mapView"
         }
     }
     
@@ -80,11 +77,8 @@ enum PlakeFullScreenCover: String, Identifiable {
 
 final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
     @ViewBuilder
-    // swiftlint:disable:next cyclomatic_complexity
     func build(route: PlakeRoute) -> some View {
         switch route {
-        case .homeView:
-            HomeView()
         case .listView:
             PlakeListView()
         case let .playlistView(viewModel):
@@ -93,8 +87,6 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             SearchWritingView()
         case let .cameraView(viewModelContainer):
             CameraView(viewModelContainer: viewModelContainer)
-        case .mapView:
-            MapView()
         case let .placeListView(viewModel):
             CollectionPlaceView(viewModel: viewModel)
         case let .addPlakingView(viewModel):
@@ -114,6 +106,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
                 .interactiveDismissDisabled()
         case .accountView:
             AccountView()
+        case let .mapView(viewModel):
+            MapView(viewModel: viewModel)
         }
     }
     

@@ -9,15 +9,32 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
-    @State private var viewModel: MapViewModel = MapViewModel()
+    @State private var viewModel: MapViewModel
+    @State private var mapNavigationPath: NavigationPath = NavigationPath()
+    @Environment(PlakeCoordinator.self) private var plakeCoord
     @Environment(\.scenePhase) private var scenePhase
 
+    init(viewModel: MapViewModel) {
+        _viewModel = State(wrappedValue: viewModel)
+    }
+
     var body: some View {
-        MKMapViewWrapper(viewModel: viewModel)
-            .onAppearAndActiveCheckUserValued(scenePhase)
-            .ignoresSafeArea()
-            .onAppear {
-                viewModel.initializeView()
-            }
+        NavigationStack {
+            MKMapViewWrapper(viewModel: viewModel)
+                .onAppearAndActiveCheckUserValued(scenePhase)
+                .onAppear(perform: viewModel.initializeView)
+                .ignoresSafeArea()
+                .navigationTitle("기록 지도")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("닫기") {
+                            plakeCoord.dismissSheet()
+                        }
+                        .foregroundStyle(Color(.sButton))
+                    }
+                }
+        }
+
     }
 }

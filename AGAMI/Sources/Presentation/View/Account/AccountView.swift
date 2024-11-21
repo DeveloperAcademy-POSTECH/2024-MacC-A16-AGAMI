@@ -2,283 +2,143 @@
 //  AccountView.swift
 //  AGAMI
 //
-//  Created by yegang on 11/2/24.
+//  Created by yegang on 11/19/24.
 //
 
 import SwiftUI
-import PhotosUI
-import Kingfisher
 
 struct AccountView: View {
-    @State var viewModel: AccountViewModel = .init()
+    @State private var viewModel: AccountViewModel = .init()
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     
     var body: some View {
-        ZStack {
-            Color(.pLightGray)
-                .ignoresSafeArea()
-            
+        VStack(spacing: 0) {
             if case .none = viewModel.deleteAccountProcess {
-                VStack(spacing: 0) {
-                    ScrollView {
-                        ProfileView(viewModel: viewModel)
-                            .padding(.top, 28)
-                        
-                        InformationView(viewModel: viewModel)
-                            .padding(.top, 33)
-                    }
-                    
-                    Spacer()
-                    
-                    LogoutButton(viewModel: viewModel)
-                        .padding(.bottom, 20)
-                }
-                .padding(.horizontal, 8)
+                HeaderView()
+                ContentView(viewModel: viewModel)
             } else {
-                SignOutView(viewModel: viewModel)
+                DeleteAccountView(viewModel: viewModel)
             }
         }
-        .onAppearAndActiveCheckUserValued(scenePhase)
-        .navigationTitle("계정")
-        .navigationBarTitleDisplayMode(.large)
-        .navigationBarBackButtonHidden()
-        .ignoresSafeArea(.keyboard)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                if viewModel.deleteAccountProcess == .none {
-                    Button {
-                        coordinator.pop()
-                    } label: {
-                        Image(systemName: "chevron.backward")
-                            .font(.pretendard(weight: .semiBold600, size: 17))
-                            .foregroundStyle(Color(.pPrimary))
-                    }
-                }
-            }
-        }
-        .onTapGesture {
-            hideKeyboard()
-        }
-        .confirmationDialog("", isPresented: $viewModel.isProfileImageDialogPresented) {
-            ProfileImageDialogActions(viewModel: viewModel)
-        }
-        .photosPicker(isPresented: $viewModel.isShowPhotoPicker,
-                      selection: $viewModel.selectedItem,
-                      matching: .images)
-        .onChange(of: viewModel.selectedItem) { _, newValue in
-            viewModel.convertImage(item: newValue)
-        }
+        .interactiveDismissDisabled(!viewModel.isAbleClosed)
+        .ignoresSafeArea(edges: .bottom)
         .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
             SignOutAlertActions(viewModel: viewModel)
         } message: {
-            Text("현재 기기에서 로그아웃 합니다.")
+            Text("로그아웃을 진행하시겠어요?\n다시 돌아오실 때를 기다릴게요!")
+                .font(.notoSansKR(weight: .regular400, size: 14))
+                .foregroundStyle(Color(.sBodyText))
         }
-        .alert("회원 탈퇴", isPresented: $viewModel.isDeletingAccount) {
+        .alert("회원 탈퇴", isPresented: $viewModel.isShowingDeleteAccountAlert) {
             DeleteAccountAlertActions(viewModel: viewModel)
         } message: {
-            Text("탈퇴한 계정은 복구할 수 없습니다.")
-        }
-        .onAppear {
-            viewModel.fetchUserInformation()
+            Text("회원 탈퇴 시 모든 기록이 삭제되고\n복구할 수 없습니다.")
+                .font(.notoSansKR(weight: .regular400, size: 14))
+                .foregroundStyle(Color(.sBodyText))
         }
     }
 }
 
-private struct ProfileView: View {
-    @Bindable var viewModel: AccountViewModel
-    
+private struct HeaderView: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+
     var body: some View {
-        VStack(spacing: 11) {
-            HStack(spacing: 0) {
-                Text("프로필")
-                    .font(.pretendard(weight: .semiBold600, size: 20))
-                    .foregroundStyle(Color(.pBlack))
-                
-                Spacer()
-                
-                Button {
-                    if viewModel.isEditMode {
-                        viewModel.endEditButtonTapped()
-                    } else {
-                        viewModel.startEditButtonTapped()
-                    }
-                } label: {
-                    Text(viewModel.isEditMode ? "완료" : "편집")
-                        .font(.pretendard(weight: .regular400, size: 16))
-                        .foregroundStyle(Color(.pPrimary))
-                }
-            }
-            .padding(.horizontal, 8)
+        ZStack(alignment: .center) {
+            Text("계정 관리")
+                .font(.notoSansKR(weight: .semiBold600, size: 20))
+                .foregroundStyle(Color(.sTitleText))
             
             HStack(spacing: 0) {
-                Spacer()
-                
-                VStack(alignment: .center, spacing: 10) {
-                    Group {
-                        if let postImage = viewModel.postImage {
-                            Image(uiImage: postImage)
-                                .resizable()
-                        } else if !viewModel.imageURL.isEmpty {
-                            KFImage(URL(string: viewModel.imageURL))
-                                .resizable()
-                        } else {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
-                        }
-                    }
-                    .scaledToFill()
-                    .clipShape(Circle())
-                    .frame(width: 94, height: 94)
-                    .foregroundStyle(Color(.pGray2))
-                    .overlay(alignment: .bottomTrailing) {
-                        if viewModel.isEditMode {
-                            Circle()
-                                .frame(width: 33, height: 33, alignment: .center)
-                                .foregroundStyle(Color(.pLightGray))
-                                .overlay {
-                                    Image(systemName: "camera.circle.fill")
-                                        .resizable()
-                                        .frame(width: 27, height: 27, alignment: .center)
-                                        .foregroundStyle(Color(.pPrimary))
-                                }
-                                .offset(x: 3, y: 3)
-                        }
-                    }
-                    .onTapGesture {
-                        viewModel.showProfileImageDialog()
-                    }
-                    
-                    TextField(viewModel.userName, text: $viewModel.userName)
-                        .font(.pretendard(weight: .semiBold600, size: 28))
-                        .foregroundStyle(Color(.pBlack))
-                        .tint(Color(.pPrimary))
-                        .frame(width: 221)
-                        .multilineTextAlignment(.center)
-                        .padding(.vertical, 10)
-                        .background(
-                            viewModel.isEditMode ?
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color(.pGray2))
-                            : nil
-                        )
-                        .onChange(of: viewModel.userName) { _, newValue in
-                            if newValue.count > 8 {
-                                viewModel.userName = String(newValue.prefix(8))
-                            }
-                        }
+                Button {
+                    coordinator.dismissSheet()
+                } label: {
+                    Text("닫기")
+                        .font(.notoSansKR(weight: .regular400, size: 17))
+                        .foregroundStyle(Color(.sButton))
                 }
-                .disabled(!viewModel.isEditMode)
-
+                
                 Spacer()
             }
-            .frame(maxWidth: .infinity)
-            .padding(EdgeInsets(top: 26, leading: 0, bottom: 20, trailing: 0))
-            .background(
-                RoundedRectangle(cornerRadius: 10)
-                    .fill(Color(.pWhite))
-            )
+            .padding(.leading, 16)
         }
-        
+        .padding(EdgeInsets(top: 15, leading: 0, bottom: 17, trailing: 0))
+        .background(Color(.sWhiteBack))
     }
 }
 
-private struct InformationView: View {
+private struct ContentView: View {
     @Environment(\.openURL) private var openURL
     let viewModel: AccountViewModel
     
     var body: some View {
-        VStack(spacing: 13) {
-            HStack(spacing: 0) {
-                Text("개인정보 보호")
-                    .font(.pretendard(weight: .semiBold600, size: 20))
-                    .foregroundStyle(Color(.pBlack))
+        ZStack {
+            Color(.sMain)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 32) {
+                VStack(spacing: 14) {
+                    Button {
+                        // 이용 약관 알럿
+                        if let url = URL(string: "https://posacademy.notion.site/Plake-1302b843d5af81969d94daddfac63fde?pvs=4") {
+                            openURL(url)
+                        } else {
+                            dump("잘못된 URL입니다.")
+                        }
+                    } label: {
+                        ButtonLabel(
+                            title: "이용 약관",
+                            fontType: .notoSansKR(weight: .medium500, size: 17),
+                            fontColor: Color(.sButton),
+                            backgroundColor: Color(.sWhite))
+                    }
+                    
+                    Button {
+                        viewModel.isShowingDeleteAccountAlert.toggle()
+                    } label: {
+                        ButtonLabel(
+                            title: "회원 탈퇴",
+                            fontType: .notoSansKR(weight: .medium500, size: 17),
+                            fontColor: Color(.sButton),
+                            backgroundColor: Color(.sWhite))
+                    }
+                }
+                
+                Button {
+                    viewModel.isShowingSignOutAlert.toggle()
+                } label: {
+                    ButtonLabel(
+                        title: "로그아웃",
+                        fontType: .notoSansKR(weight: .semiBold600, size: 17),
+                        fontColor: Color(.sWhite),
+                        backgroundColor: Color(.sTitleText))
+                }
                 
                 Spacer()
             }
-            .padding(.leading, 8)
-            
-            VStack(spacing: 8) {
-                Button {
-                    if let url = URL(string: "https://posacademy.notion.site/Plake-1302b843d5af81969d94daddfac63fde?pvs=4") {
-                        openURL(url)
-                    }
-                } label: {
-                    HStack(spacing: 0) {
-                        Text("이용 약관")
-                            .font(.pretendard(weight: .medium500, size: 16))
-                            .foregroundStyle(Color(.pBlack))
-                        
-                        Spacer()
-                        
-                        Image(systemName: "arrow.forward")
-                            .font(.system(size: 17))
-                            .foregroundStyle(Color(.pPrimary))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(.pWhite))
-                    )
-                }
-                
-                Button {
-                    viewModel.deleteAccountButtonTapped()
-                } label: {
-                    HStack(spacing: 0) {
-                        Text("회원 탈퇴")
-                            .font(.pretendard(weight: .medium500, size: 16))
-                            .foregroundStyle(Color(.pBlack))
-                        
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 0))
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(.pWhite))
-                    )
-                }
-            }
+            .padding(EdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16))
         }
     }
 }
 
-private struct LogoutButton: View {
-    let viewModel: AccountViewModel
+private struct ButtonLabel: View {
+    let title: String
+    let fontType: Font
+    let fontColor: Color
+    let backgroundColor: Color
     
     var body: some View {
-        Button {
-            viewModel.logoutButtonTapped()
-        } label: {
-            Text("로그아웃")
-                .font(.pretendard(weight: .medium500, size: 20))
-                .foregroundStyle(Color(.pWhite))
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 13)
-                .background(
-                    RoundedRectangle(cornerRadius: 13)
-                        .foregroundStyle(Color(.pPrimary))
-                )
+        HStack(spacing: 0) {
+            Text(title)
+                .font(fontType)
+                .foregroundStyle(fontColor)
         }
-    }
-}
-
-private struct ProfileImageDialogActions: View {
-    @Bindable var viewModel: AccountViewModel
-    
-    var body: some View {
-        Button {
-            viewModel.albumButtonTapped()
-        } label: {
-            Text("앨범에서 가져오기")
-                .font(.pretendard(weight: .regular400, size: 18))
-                .foregroundStyle(Color(.pBlack))
-        }
-        Button("기본 이미지로 변경", role: .destructive) {
-            viewModel.changeDefaultImage()
-        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 4)
+                .fill(backgroundColor)
+        )
     }
 }
 
@@ -287,13 +147,23 @@ private struct SignOutAlertActions: View {
     let viewModel: AccountViewModel
     
     var body: some View {
-        Button("취소", role: .cancel) {
+        Button(role: .cancel) {
             viewModel.cancelSignOutAlert()
+
+        } label: {
+            Text("취소")
+                .font(.notoSansKR(weight: .regular400, size: 16))
+                .foregroundStyle(Color(.sSubHead))
         }
-        
-        Button("확인", role: .destructive) {
+
+        Button(role: .destructive) {
             viewModel.confirmSignOut()
+            coordinator.dismissSheet()
             coordinator.popToRoot()
+        } label: {
+            Text("로그아웃")
+                .font(.notoSansKR(weight: .semiBold600, size: 16))
+                .foregroundStyle(Color(.sRed))
         }
     }
 }
@@ -301,14 +171,22 @@ private struct SignOutAlertActions: View {
 private struct DeleteAccountAlertActions: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
-    
+
     var body: some View {
-        Button("취소", role: .cancel) {
+        Button(role: .cancel) {
             viewModel.cancelDeleteAccountAlert()
+        } label: {
+            Text("취소")
+                .font(.notoSansKR(weight: .regular400, size: 16))
+                .foregroundStyle(Color(.sSubHead))
         }
         
-        Button("탈퇴", role: .destructive) {
+        Button(role: .destructive) {
             viewModel.deleteAccount()
+        } label: {
+            Text("탈퇴하기")
+                .font(.notoSansKR(weight: .semiBold600, size: 16))
+                .foregroundStyle(Color(.sRed))
         }
     }
 }

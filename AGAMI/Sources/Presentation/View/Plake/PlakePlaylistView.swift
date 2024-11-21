@@ -185,7 +185,6 @@ private struct ImageView: View {
                 }
                 .scaledToFill()
                 .clipShape(RoundedRectangle(cornerRadius: 4))
-                .shadow(color: .black.opacity(0.25), radius: 10)
                 .highPriorityGesture(
                     TapGesture().onEnded {
                         coordinator.push(route: .imageViewerView(urlString: viewModel.playlist.photoURL))

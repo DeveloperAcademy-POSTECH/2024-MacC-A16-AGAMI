@@ -194,6 +194,7 @@ private struct SearchAddButton: View {
             }
             .onTapGesture {
                 viewModel.showPhotoConfirmDialog.toggle()
+                viewModel.simpleHaptic()
             }
             
             Spacer()
@@ -214,6 +215,7 @@ private struct SearchAddButton: View {
             .onTapGesture {
                 let searchAddSongViewModel = viewModel.createSearchAddSongViewModel()
                 coordinator.presentSheet(.searchAddSongView(viewModel: searchAddSongViewModel))
+                viewModel.simpleHaptic()
             }
             
             Spacer()
@@ -271,6 +273,7 @@ private struct ToolbarLeadingItem: View {
     
     var body: some View {
         Button {
+            viewModel.simpleHaptic()
             coordinator.pop()
         } label: {
             Image(systemName: "chevron.backward")
@@ -287,6 +290,7 @@ private struct ToolabraTrailingItem: View {
     var body: some View {
         Button {
             Task {
+                viewModel.simpleHaptic()
                 coordinator.popToRoot()
                 
                 if await viewModel.savedPlaylist() {

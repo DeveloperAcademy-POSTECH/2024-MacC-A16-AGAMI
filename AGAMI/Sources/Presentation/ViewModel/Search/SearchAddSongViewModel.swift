@@ -138,6 +138,10 @@ final class SearchAddSongViewModel {
             persistenceService.updatePlaylist()
         }
     }
+    
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
 }
 
 extension SearchAddSongViewModel: ShazamServiceDelegate {

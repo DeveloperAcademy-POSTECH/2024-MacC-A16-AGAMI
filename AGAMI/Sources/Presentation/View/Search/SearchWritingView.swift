@@ -20,8 +20,10 @@ struct SearchWritingView: View {
             VStack(spacing: 0) {
                 List {
                     Group {
-                        SearchCoverImageView(viewModel: viewModel)
-                            .padding(.top, 3)
+                        if viewModel.playlist.photoData != nil {
+                            SearchCoverImageView(viewModel: viewModel)
+                                .padding(.top, 3)
+                        }
                         SearchTitleTextField(viewModel: viewModel)
                             .padding(.top, 19)
                         SearchDescriptionTextField(viewModel: viewModel)

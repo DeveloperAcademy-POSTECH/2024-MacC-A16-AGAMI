@@ -10,6 +10,7 @@ protocol PlaylistModel {
     var playlistID: String { get }
     var playlistName: String { get set }
     var playlistDescription: String { get set }
+    var photoData: Data? { get set }
     var photoURL: String { get set }
     var latitude: Double { get set }
     var longitude: Double { get set }

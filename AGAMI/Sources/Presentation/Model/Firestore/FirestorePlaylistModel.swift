@@ -13,6 +13,7 @@ struct FirestorePlaylistModel: PlaylistModel, Codable, Identifiable {
     var playlistID: String
     var playlistName: String
     var playlistDescription: String
+    var photoData: Data?
     var photoURL: String
     var latitude: Double
     var longitude: Double

@@ -28,7 +28,14 @@ final class SearchWritingViewModel {
     }
     
     // 커버 이미지
-    var photoUIImage: UIImage?
+    var photoUIImage: UIImage? {
+        didSet {
+            if let image = photoUIImage {
+                playlist.photoData = image.pngData()
+                persistenceService.updatePlaylist()
+            }
+        }
+    }
     var showPhotoConfirmDialog: Bool = false
     var showDeleteImageAlert: Bool = false
     
@@ -56,28 +63,28 @@ final class SearchWritingViewModel {
     }
     
     func fetchCurrentLocation() async {
-            do {
-                let location = try await locationService.requestCurrentLocation()
-                playlist.latitude = location.coordinate.latitude
-                playlist.longitude = location.coordinate.longitude
-            } catch {
-                dump("현재 위치를 가져오는 데 실패했습니다: \(error)")
-            }
+        do {
+            let location = try await locationService.requestCurrentLocation()
+            playlist.latitude = location.coordinate.latitude
+            playlist.longitude = location.coordinate.longitude
+        } catch {
+            dump("현재 위치를 가져오는 데 실패했습니다: \(error)")
         }
+    }
     
     func getCurrentLocation() {
-            guard let currentLocation = locationService.getCurrentLocation() else { return }
-            playlist.latitude = currentLocation.coordinate.latitude
-            playlist.longitude = currentLocation.coordinate.longitude
+        guard let currentLocation = locationService.getCurrentLocation() else { return }
+        playlist.latitude = currentLocation.coordinate.latitude
+        playlist.longitude = currentLocation.coordinate.longitude
+        persistenceService.updatePlaylist()
+        
+        locationService.coordinateToStreetAddress { [weak self] address in
+            guard let self = self else { return }
+            
+            self.playlist.streetAddress = address ?? ""
             persistenceService.updatePlaylist()
-
-            locationService.coordinateToStreetAddress { [weak self] address in
-                guard let self = self else { return }
-
-                self.playlist.streetAddress = address ?? ""
-                persistenceService.updatePlaylist()
-            }
         }
+    }
     
     func savedPlaylist() async -> Bool {
         isSaving = true
@@ -101,8 +108,9 @@ final class SearchWritingViewModel {
     }
     
     func savePhotoToFirebase(userID: String) async -> String? {
-        if let photo = photoUIImage {
-            let photoURL = try? await firebaseService.uploadImageToFirebase(userID: userID, image: photo)
+        if let photoData = playlist.photoData,
+           let image = UIImage(data: photoData) {
+            let photoURL = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
             return photoURL
         } else {
             return ""
@@ -127,6 +135,12 @@ final class SearchWritingViewModel {
         if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
             photoUIImage = UIImage(data: data)?.cropToFiveByFour()
         }
+    }
+    
+    func resetImage() {
+        photoUIImage = nil
+        selectedItem = nil
+        playlist.photoData = nil
     }
 }
 

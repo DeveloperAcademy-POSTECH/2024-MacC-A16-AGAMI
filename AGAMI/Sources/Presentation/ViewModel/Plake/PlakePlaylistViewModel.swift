@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 import PhotosUI
 import ColorThiefSwift
+import MusicKit
 
 struct PlaylistPresentationState {
     var isEditing: Bool = false
@@ -18,6 +19,7 @@ struct PlaylistPresentationState {
     var isShowingPicker: Bool = false
     var isUpdating: Bool = false
     var isLoading: Bool = false
+    var isDetailViewLoading = false
     var isShowingExportingAppleMusicFailedAlert: Bool = false
     var isShowingExportingSpotifyFailedAlert: Bool = false
     var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
@@ -28,6 +30,12 @@ final class PlakePlaylistViewModel: Hashable {
     let id: UUID = .init()
     
     var playlist: PlaylistModel
+    var selectedSong: SongModel?
+    var genreNamesInDetailView: [String] = []
+    var releaseDateInDetailView: String?
+    var albumNameInDetailView: String?
+    var errorMessagInDetailView: String?
+
     private var initialPlaylist: PlaylistModel
     private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
@@ -314,5 +322,39 @@ final class PlakePlaylistViewModel: Hashable {
 
     func simpleHaptic() {
         HapticService.shared.playSimpleHaptic()
+    }
+    
+    func fetchAdditionalDetails() async {
+        do {
+            presentationState.isDetailViewLoading = true
+            defer { presentationState.isDetailViewLoading = false }
+
+            let status = await MusicAuthorization.request()
+            guard status == .authorized else {
+                errorMessagInDetailView = "Apple Music 사용 권한이 필요합니다."
+                return
+            }
+            
+            let request = MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: MusicItemID(selectedSong?.songID ?? ""))
+            let response = try await request.response()
+            guard let song = response.items.first else {
+                errorMessagInDetailView = "노래를 찾을 수 없습니다."
+                return
+            }
+            
+            genreNamesInDetailView = song.genreNames
+            releaseDateInDetailView = formatDate(song.releaseDate)
+            albumNameInDetailView = song.albumTitle
+        } catch {
+            errorMessagInDetailView = error.localizedDescription
+        }
+    }
+    
+    private func formatDate(_ date: Date?) -> String {
+        guard let date = date else { return "N/A" }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter.string(from: date)
     }
 }

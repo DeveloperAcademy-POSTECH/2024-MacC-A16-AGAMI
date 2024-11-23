@@ -78,8 +78,7 @@ struct SearchWritingView: View {
                     viewModel.showDeleteImageAlert = false
                 },
                 secondaryButton: .destructive(Text("삭제")) {
-                    viewModel.photoUIImage = nil
-                    viewModel.selectedItem = nil
+                    viewModel.resetImage()
                 }
             )
         }
@@ -90,8 +89,9 @@ private struct SearchCoverImageView: View {
     let viewModel: SearchWritingViewModel
     
     var body: some View {
-        if let image = viewModel.photoUIImage {
-            Image(uiImage: image)
+        if let photoData = viewModel.playlist.photoData,
+           let uiImage = UIImage(data: photoData) {
+            Image(uiImage: uiImage)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
                 .frame(height: 257)

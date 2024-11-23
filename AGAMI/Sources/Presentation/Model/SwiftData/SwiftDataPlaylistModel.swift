@@ -19,6 +19,7 @@ final class SwiftDataPlaylistModel: PlaylistModel {
     var streetAddress: String
     var generationTime: Date
 
+    @Attribute(.externalStorage) var photoData: Data?
     @Relationship(deleteRule: .cascade) var swiftDataSongs: [SwiftDataSongModel] = []
 
     var songs: [SongModel] {

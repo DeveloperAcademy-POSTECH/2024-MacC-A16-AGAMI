@@ -46,6 +46,7 @@ struct SearchWritingView: View {
         .ignoresSafeArea(edges: .bottom)
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture(perform: hideKeyboard)
+        .scrollDisabled(viewModel.isPhotoLoading)
         .navigationBarBackButtonHidden(true)
         .photosPicker(isPresented: $viewModel.showPhotoPicker,
                       selection: $viewModel.selectedItem,
@@ -89,25 +90,35 @@ private struct SearchCoverImageView: View {
     let viewModel: SearchWritingViewModel
     
     var body: some View {
-        if let photoData = viewModel.playlist.photoData,
-           let uiImage = UIImage(data: photoData) {
-            Image(uiImage: uiImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 257)
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .overlay(alignment: .topTrailing) {
-                    Image(systemName: "x.circle")
-                        .font(.system(size: 20, weight: .light))
-                        .foregroundStyle(Color(.sMain))
-                        .padding(8)
-                        .highPriorityGesture(
-                            TapGesture().onEnded {
-                                viewModel.showDeleteImageAlert = true
-                            }
-                        )
-                }
-                .padding(.horizontal, 16)
+        ZStack {
+            if let photoData = viewModel.playlist.photoData,
+               let uiImage = UIImage(data: photoData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 257)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .overlay(alignment: .topTrailing) {
+                        Image(systemName: "x.circle")
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundStyle(Color(.sMain))
+                            .padding(8)
+                            .highPriorityGesture(
+                                TapGesture().onEnded {
+                                    viewModel.showDeleteImageAlert = true
+                                }
+                            )
+                    }
+                    .padding(.horizontal, 16)
+            }
+            
+            if viewModel.isPhotoLoading {
+                ProgressView("사진 로딩 중...")
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .frame(height: 257)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .padding(.horizontal, 16)
+            }
         }
     }
 }

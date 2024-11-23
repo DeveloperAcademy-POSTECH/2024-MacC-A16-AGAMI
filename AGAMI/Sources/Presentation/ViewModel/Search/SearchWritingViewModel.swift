@@ -24,20 +24,22 @@ final class SearchWritingViewModel {
     }
     
     var saveButtonEnabled: Bool {
-        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.playlistName.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty
+        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.playlistName.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty && !isPhotoLoading
     }
     
     // 커버 이미지
     var photoUIImage: UIImage? {
         didSet {
-            if let image = photoUIImage {
-                playlist.photoData = image.pngData()
-                persistenceService.updatePlaylist()
+            guard let image = photoUIImage else {
+                isPhotoLoading = false
+                return
             }
+            processPhoto(image: image)
         }
     }
     var showPhotoConfirmDialog: Bool = false
     var showDeleteImageAlert: Bool = false
+    var isPhotoLoading: Bool = false
     
     // 커버 이미지 - 앨범에서 가져오기
     var selectedItem: PhotosPickerItem?
@@ -137,6 +139,27 @@ final class SearchWritingViewModel {
         }
     }
     
+    func processPhoto(image: UIImage) {
+        isPhotoLoading = true
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            
+            if let resizedAndCroppedImage = image.resizedAndCropped(to: CGSize(width: 1024, height: 1024)) {
+                let compressedImageData = resizedAndCroppedImage.jpegData(compressionQuality: 0.6)
+                
+                DispatchQueue.main.async {
+                    self.playlist.photoData = compressedImageData
+                    self.persistenceService.updatePlaylist()
+                    self.isPhotoLoading = false
+                }
+            } else {
+                DispatchQueue.main.async {
+                    self.isPhotoLoading = false
+                }
+            }
+        }
+    }
+
     func resetImage() {
         photoUIImage = nil
         selectedItem = nil

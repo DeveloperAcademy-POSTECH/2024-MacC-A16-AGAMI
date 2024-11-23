@@ -34,6 +34,9 @@ struct PlakePlaylistView: View {
             if viewModel.presentationState.isLoading {
                 ProgressView()
             }
+            if let song = viewModel.selectedSong {
+                SongDetailView(viewModel: viewModel)
+            }
         }
         .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
         .onAppear(perform: viewModel.refreshPlaylist)
@@ -298,6 +301,9 @@ private struct PlaylistView: View {
 
         ForEach(viewModel.playlist.songs, id: \.songID) { song in
             ListRow(viewModel: viewModel, song: song)
+                .onTapGesture {
+                    viewModel.selectedSong = song
+                }
         }
         .conditionalModifier(viewModel.presentationState.isEditing) { view in
             view
@@ -580,6 +586,118 @@ private struct ExportingFailedAlertActions: View {
             if let url = URL(string: viewModel.exportAppleMusicURLString) {
                 openURL(url)
             }
+        }
+    }
+}
+
+struct SongDetailView: View {
+    let viewModel: PlakePlaylistViewModel
+    
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.5)
+                .onTapGesture {
+                    viewModel.selectedSong = nil
+                }
+            VStack(spacing: 0) {
+                HStack(spacing: 0) {
+                    Spacer()
+                    Image(systemName: "xmark.circle")
+                        .font(.system(size: 21, weight: .light))
+                        .padding(EdgeInsets(top: 14, leading: 0, bottom: 0, trailing: 11))
+                        .onTapGesture {
+                            viewModel.selectedSong = nil
+                        }
+                }
+                .padding(.vertical, 0)
+                .padding(.horizontal, 0)
+
+                if viewModel.presentationState.isDetailViewLoading {
+                    ProgressView("Loading...")
+                } else {
+                    if let url = URL(string: viewModel.selectedSong?.albumCoverURL ?? "") {
+                    AsyncImage(url: url) { image in
+                            image.resizable()
+                        } placeholder: {
+                            ProgressView()
+                        }
+                        .frame(width: 155, height: 155)
+                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                    } else {
+                        Image(systemName: "music.note")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 155, height: 155)
+                            .background(Color.gray)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
+                            .padding(.top, 33)
+                    }
+                    
+                    Text(viewModel.selectedSong?.title ?? "")
+                        .font(.notoSansKR(weight: .bold700, size: 24))
+                        .padding(.horizontal, 18)
+                        .padding(.top, 18)
+                    
+                    HorizontalDivider()
+                        .padding(.top, 18)
+                    
+                    DetailInformationRow(title: "아티스트", value: viewModel.selectedSong?.artist)
+                    DetailInformationRow(title: "앨범", value: viewModel.albumNameInDetailView)
+                    DetailInformationRow(title: "장르", value: viewModel.genreNamesInDetailView.joined(separator: ", "))
+                    DetailInformationRow(title: "발매일", value: viewModel.releaseDateInDetailView)
+                }
+            }
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
+            .padding(.horizontal, 10)
+        }
+        .ignoresSafeArea()
+        .navigationBarHidden(true)
+        .task {
+            await viewModel.fetchAdditionalDetails()
+        }
+    }
+}
+
+private struct HorizontalDivider: View {
+    var body: some View {
+        Divider()
+            .foregroundStyle(Color(.sLine))
+            .padding(.horizontal, 18)
+            .padding(.vertical, 7)
+    }
+}
+
+private struct DetailInformationRow: View {
+    let title: String
+    let value: String?
+    
+    var body: some View {
+        if let value = value {
+            HStack(alignment: .top, spacing: 0) {
+                Text(title)
+                    .font(.notoSansKR(weight: .medium500, size: 15))
+                    .foregroundStyle(Color(.sSubHead))
+                    .frame(width: 56, alignment: .leading)
+                    .padding(.horizontal, 0)
+                    .padding(.vertical, 0)
+                
+                Text(value)
+                    .font(.notoSansKR(weight: .regular400, size: 17))
+                    .foregroundStyle(Color(.sTitleText))
+                    .multilineTextAlignment(.leading)
+                    .padding(0)
+                    .overlay(alignment: .leading) {
+                        Divider()
+                            .offset(x: -11)
+                    }
+                    .padding(.leading, 29)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 18)
+            .padding(.vertical, 0)
+            
+            HorizontalDivider()
         }
     }
 }

@@ -13,6 +13,7 @@ import PhotosUI
 final class SearchWritingViewModel {
     private let firebaseService = FirebaseService()
     private let persistenceService = PersistenceService.shared
+    private let locationService = LocationService.shared
     
     var playlist: PlaylistModel {
         didSet { handleChangeOfName(oldValue: oldValue, newValue: playlist) }
@@ -23,7 +24,7 @@ final class SearchWritingViewModel {
     }
     
     var saveButtonEnabled: Bool {
-        !playlist.playlistName.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty
+        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.playlistName.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty
     }
     
     // 커버 이미지
@@ -43,6 +44,7 @@ final class SearchWritingViewModel {
     
     init() {
         playlist = persistenceService.fetchPlaylist()
+        locationService.delegate = self
     }
     
     func createSearchAddSongViewModel() -> SearchAddSongViewModel {
@@ -52,6 +54,30 @@ final class SearchWritingViewModel {
     func loadSavedSongs() {
         playlist = persistenceService.fetchPlaylist()
     }
+    
+    func fetchCurrentLocation() async {
+            do {
+                let location = try await locationService.requestCurrentLocation()
+                playlist.latitude = location.coordinate.latitude
+                playlist.longitude = location.coordinate.longitude
+            } catch {
+                dump("현재 위치를 가져오는 데 실패했습니다: \(error)")
+            }
+        }
+    
+    func getCurrentLocation() {
+            guard let currentLocation = locationService.getCurrentLocation() else { return }
+            playlist.latitude = currentLocation.coordinate.latitude
+            playlist.longitude = currentLocation.coordinate.longitude
+            persistenceService.updatePlaylist()
+
+            locationService.coordinateToStreetAddress { [weak self] address in
+                guard let self = self else { return }
+
+                self.playlist.streetAddress = address ?? ""
+                persistenceService.updatePlaylist()
+            }
+        }
     
     func savedPlaylist() async -> Bool {
         isSaving = true
@@ -75,10 +101,12 @@ final class SearchWritingViewModel {
     }
     
     func savePhotoToFirebase(userID: String) async -> String? {
-        guard let image = photoUIImage else { return nil }
-        
-        let photoURL = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
-        return photoURL
+        if let photo = photoUIImage {
+            let photoURL = try? await firebaseService.uploadImageToFirebase(userID: userID, image: photo)
+            return photoURL
+        } else {
+            return ""
+        }
     }
     
     func clearDiggingList() {
@@ -99,5 +127,11 @@ final class SearchWritingViewModel {
         if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
             photoUIImage = UIImage(data: data)?.cropToFiveByFour()
         }
+    }
+}
+
+extension SearchWritingViewModel: LocationServiceDelegate {
+    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
+        getCurrentLocation()
     }
 }

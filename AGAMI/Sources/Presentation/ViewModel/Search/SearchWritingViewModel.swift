@@ -159,11 +159,15 @@ final class SearchWritingViewModel {
             }
         }
     }
-
+    
     func resetImage() {
         photoUIImage = nil
         selectedItem = nil
         playlist.photoData = nil
+    }
+    
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
     }
 }
 

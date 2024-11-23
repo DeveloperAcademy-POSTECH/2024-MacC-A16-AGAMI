@@ -70,6 +70,7 @@ private struct SearchSongStatusView: View {
                     .foregroundStyle(Color(.sTitleText))
                 }
                 .onTapGesture {
+                    viewModel.simpleHaptic()
                     viewModel.searchButtonTapped()
                 }
             
@@ -120,6 +121,7 @@ private struct TopbarItem: View {
     var body: some View {
         HStack(spacing: 0) {
             Button {
+                viewModel.simpleHaptic()
                 viewModel.stopRecognition()
                 coordinator.dismissSheet()
             } label: {
@@ -138,6 +140,7 @@ private struct TopbarItem: View {
             Spacer()
             
             Button {
+                viewModel.simpleHaptic()
                 viewModel.stopRecognition()
                 coordinator.dismissSheet()
             } label: {

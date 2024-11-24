@@ -108,6 +108,7 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             AccountView()
         case let .mapView(viewModel):
             MapView(viewModel: viewModel)
+                .interactiveDismissDisabled()
         }
     }
     

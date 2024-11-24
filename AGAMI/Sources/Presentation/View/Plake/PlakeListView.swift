@@ -224,7 +224,7 @@ private struct PlakeListCell: View {
 
     var body: some View {
         Button {
-            coord.push(route: .playlistView(viewModel: .init(playlist: playlist, initialPlaylist: playlist)))
+            coord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
         } label: {
             VStack(alignment: .leading, spacing: 0) {
                 KFImage(URL(string: playlist.photoURL))

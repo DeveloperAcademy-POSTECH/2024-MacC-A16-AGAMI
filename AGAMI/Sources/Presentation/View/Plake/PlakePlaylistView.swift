@@ -354,7 +354,7 @@ private struct BottomConfigurationBar: View {
             Spacer()
         }
         .background(Color(.sWhite))
-        .frame(height: 80)
+        .frame(height: 64)
     }
 }
 

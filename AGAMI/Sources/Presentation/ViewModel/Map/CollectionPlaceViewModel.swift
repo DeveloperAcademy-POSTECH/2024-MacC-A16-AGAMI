@@ -8,25 +8,16 @@
 import Foundation
 
 @Observable
-final class CollectionPlaceViewModel: Hashable {
-    let id = UUID()
+final class CollectionPlaceViewModel {
     let playlists: [PlaylistModel]
     
     init(playlists: [PlaylistModel]) {
         self.playlists = playlists
     }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
-    }
-    
-    static func == (lhs: CollectionPlaceViewModel, rhs: CollectionPlaceViewModel) -> Bool {
-        lhs.id == rhs.id
-    }
-    
+
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy. MM. dd."
+        dateFormatter.dateFormat = "MM월 dd일"
         return dateFormatter.string(from: date)
     }
 }

@@ -10,7 +10,7 @@ import MapKit
 
 struct MapView: View {
     @State private var viewModel: MapViewModel
-    @State private var mapNavigationPath: NavigationPath = NavigationPath()
+    @State private var mapCoord: MapCoordinator = MapCoordinator()
     @Environment(PlakeCoordinator.self) private var plakeCoord
     @Environment(\.scenePhase) private var scenePhase
 
@@ -19,11 +19,10 @@ struct MapView: View {
     }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $mapCoord.path) {
             MKMapViewWrapper(viewModel: viewModel)
                 .onAppearAndActiveCheckUserValued(scenePhase)
                 .onAppear(perform: viewModel.initializeView)
-                .ignoresSafeArea()
                 .navigationTitle("기록 지도")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
@@ -34,7 +33,11 @@ struct MapView: View {
                         .foregroundStyle(Color(.sButton))
                     }
                 }
+                .navigationDestination(for: MapRoute.self) { route in
+                    mapCoord.build(route: route)
+                }
         }
+        .environment(mapCoord)
 
     }
 }

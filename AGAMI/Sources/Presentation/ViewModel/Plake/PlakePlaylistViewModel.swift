@@ -57,9 +57,9 @@ final class PlakePlaylistViewModel: Hashable {
         !playlist.photoURL.isEmpty && presentationState.isEditing
     }
     
-    init(playlist: PlaylistModel, initialPlaylist: PlaylistModel) {
+    init(playlist: PlaylistModel) {
         self.playlist = playlist
-        self.initialPlaylist = initialPlaylist
+        self.initialPlaylist = playlist
     }
     
     static func == (lhs: PlakePlaylistViewModel, rhs: PlakePlaylistViewModel) -> Bool {

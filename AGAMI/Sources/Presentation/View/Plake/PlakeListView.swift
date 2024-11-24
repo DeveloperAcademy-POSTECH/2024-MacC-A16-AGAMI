@@ -26,6 +26,8 @@ struct PlakeListView: View {
             }
             .safeAreaPadding(.horizontal, 16)
 
+            NewPlakeButton(viewModel: viewModel)
+
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
                 AppleMusicLottieView()
@@ -278,6 +280,38 @@ private struct PlakeListCell: View {
             .shadow(color: Color(.sBlack).opacity(0.15), radius: 3, x: 0, y: 1)
         }
         .contextMenu { ContextMenuItems(viewModel: viewModel, playlist: playlist) }
+    }
+}
+
+private struct NewPlakeButton: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: PlakeListViewModel
+    var body: some View {
+        VStack {
+            Spacer()
+            HStack {
+                Spacer()
+                Button {
+                    coordinator.push(route: .searchWritingView)
+                } label: {
+                    Circle()
+                        .fill(Color(.sButton))
+                        .frame(width: 48, height: 48)
+                        .overlay(
+                            Circle()
+                                .stroke(Color(.sMain), lineWidth: 2)
+                        )
+                        .overlay(
+                            Image(systemName: "square.and.pencil")
+                                .font(.system(size: 24))
+                                .foregroundStyle(Color(.sMain))
+                        )
+                }
+                .padding(EdgeInsets(top: 16, leading: 30, bottom: 16, trailing: 30))
+            }
+            .ignoresSafeArea()
+            .background(viewModel.playlists.count > 1 ? .clear : Color(.sMainTab))
+        }
     }
 }
 

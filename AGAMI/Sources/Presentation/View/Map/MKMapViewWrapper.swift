@@ -96,6 +96,7 @@ struct MKMapViewWrapper: UIViewRepresentable {
                 let playlists = playlistAnnotations.map { $0.playlist }.sorted { $0.generationTime < $1.generationTime }
 
                 Task { @MainActor in
+                    HapticService.shared.playSimpleHaptic()
                     clusterView.setSelected(true, animated: true)
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: playlists)
                     self.parent.coordinator.push(route: .collectionPlaceView(viewModel: collectionPlaceViewModel))
@@ -107,6 +108,7 @@ struct MKMapViewWrapper: UIViewRepresentable {
                 let playlist = playlistAnnotation.playlist
 
                 Task { @MainActor in
+                    HapticService.shared.playSimpleHaptic()
                     bubbleView.setSelected(true, animated: true)
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: [playlist])
                     self.parent.coordinator.push(route: .collectionPlaceView(viewModel: collectionPlaceViewModel))

@@ -67,7 +67,8 @@ private struct TopBarView: View {
             Spacer()
 
             Button {
-
+                coordinator.push(route: .searchListView(viewModel: .init(playlists: viewModel.playlists)))
+                viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "magnifyingglass.circle")
                     .font(.system(size: 26))
@@ -148,43 +149,6 @@ private struct CountingHeaderView: View {
     }
 }
 
-private struct SearchBar: View {
-    @Bindable var viewModel: PlakeListViewModel
-    @FocusState var isFocused: Bool
-
-    var body: some View {
-        ZStack {
-            TextField("당신의 아카이브", text: $viewModel.searchText)
-                .padding(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
-                .focused($isFocused)
-                .background(Color(.pGray2))
-                .tint(Color(.pPrimary))
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color(.pPrimary), lineWidth: isFocused ? 1 : 0)
-                )
-                .padding(.horizontal, 8)
-                .padding(.vertical, 8)
-
-            HStack {
-                Spacer()
-                Button {
-                    if isFocused {
-                        viewModel.clearSearchText()
-                        isFocused = false
-                    }
-                } label: {
-                    Image(systemName: isFocused ? "x.circle.fill" : "magnifyingglass")
-                        .foregroundStyle(Color(.pGray1))
-                        .padding(.trailing, 20)
-                }
-            }
-        }
-        .onChange(of: isFocused) { viewModel.simpleHaptic() }
-    }
-}
-
 private struct ListView: View {
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     let viewModel: PlakeListViewModel
@@ -226,6 +190,7 @@ private struct PlakeListCell: View {
 
     var body: some View {
         Button {
+            viewModel.simpleHaptic()
             coord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
         } label: {
             VStack(alignment: .leading, spacing: 0) {
@@ -293,18 +258,16 @@ private struct NewPlakeButton: View {
                 Spacer()
                 Button {
                     coordinator.push(route: .searchWritingView)
+                    viewModel.simpleHaptic()
                 } label: {
-                    Circle()
-                        .fill(Color(.sButton))
-                        .frame(width: 48, height: 48)
+                    Image(systemName: "square.and.pencil")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(Color(.sMain))
+                        .padding(10)
+                        .background(Color(.sButton))
+                        .clipShape(Circle())
                         .overlay(
-                            Circle()
-                                .stroke(Color(.sMain), lineWidth: 2)
-                        )
-                        .overlay(
-                            Image(systemName: "square.and.pencil")
-                                .font(.system(size: 24))
-                                .foregroundStyle(Color(.sMain))
+                            Circle().stroke(Color(.sMain), lineWidth: 2)
                         )
                 }
                 .padding(EdgeInsets(top: 16, leading: 30, bottom: 16, trailing: 30))

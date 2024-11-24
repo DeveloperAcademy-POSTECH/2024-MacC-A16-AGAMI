@@ -20,4 +20,8 @@ final class CollectionPlaceViewModel {
         dateFormatter.dateFormat = "MM월 dd일"
         return dateFormatter.string(from: date)
     }
+
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
 }

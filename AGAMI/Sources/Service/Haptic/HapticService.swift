@@ -22,6 +22,14 @@ final class HapticService {
         )
     ]
 
+    private let keyboardHapticEvent = [
+        CHHapticEvent(
+            eventType: .hapticTransient,
+            parameters: [CHHapticEventParameter(parameterID: .hapticIntensity, value: 0.3)],
+            relativeTime: 0
+        )
+    ]
+
     private let longHapticEvent = [
         CHHapticEvent(
             eventType: .hapticTransient,
@@ -67,6 +75,16 @@ final class HapticService {
               let player = try? hapticEngine?.makePlayer(with: pattern)
         else { return }
 
+        try? hapticEngine?.start()
+        try? player.start(atTime: CHHapticTimeImmediate)
+    }
+
+    func playKeyboardHaptic() {
+        guard isSupported,
+              let pattern = try? CHHapticPattern(events: keyboardHapticEvent, parameters: []),
+              let player = try? hapticEngine?.makePlayer(with: pattern)
+        else { return }
+        
         try? hapticEngine?.start()
         try? player.start(atTime: CHHapticTimeImmediate)
     }

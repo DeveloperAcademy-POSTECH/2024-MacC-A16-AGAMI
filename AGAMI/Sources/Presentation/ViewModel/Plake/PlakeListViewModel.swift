@@ -16,32 +16,19 @@ final class PlakeListViewModel {
     private let musicService = MusicService()
 
     var isFetching: Bool = false
-    var isSearching: Bool {
-        !searchText.isEmpty
-    }
+
     var isShowingNewPlake: Bool {
-        playlists.isEmpty && !isFetching && !isSearching
+        playlists.isEmpty && !isFetching
     }
 
     var playlists: [PlaylistModel] = []
-    private var unfilteredPlaylists: [PlaylistModel] = []
     var isUploading: Bool = false
-    var isSearchResultEmpty: Bool = false
-    var searchText: String = "" {
-        didSet {
-            filterPlaylists()
-        }
-    }
 
     var itemsCount: Int { playlists.count }
     var songsCount: Int { playlists.reduce(0) { $0 + $1.songs.count } }
 
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
-    
-    var hasNoResultsForSearch: Bool {
-        !searchText.isEmpty && isSearchResultEmpty
-    }
     
     func fetchPlaylists() {
         isFetching = true
@@ -62,31 +49,13 @@ final class PlakeListViewModel {
         }
     }
 
-    func clearSearchText() {
-        searchText = ""
-        isSearchResultEmpty = false
-    }
-
     private func sortPlaylistsByDate(_ playlistModels: [PlaylistModel]) -> [PlaylistModel] {
         playlistModels.sorted { $0.generationTime > $1.generationTime }
     }
 
     @MainActor
     private func updatePlaylists(_ playlistModels: [PlaylistModel]) {
-        unfilteredPlaylists = playlistModels
-        filterPlaylists()
-    }
-
-    private func filterPlaylists() {
-        if searchText.isEmpty {
-            playlists = unfilteredPlaylists
-            isSearchResultEmpty = false
-        } else {
-            playlists = unfilteredPlaylists.filter { playlist in
-                playlist.playlistName.lowercased().contains(searchText.lowercased())
-            }
-            isSearchResultEmpty = playlists.isEmpty
-        }
+        playlists = playlistModels
     }
 
     func deletePhoto(userID: String, photoURL: String) async {

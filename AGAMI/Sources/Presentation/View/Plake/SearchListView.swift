@@ -1,44 +1,95 @@
 //
-//  CollectionPlaceView.swift
+//  SearchListView.swift
 //  AGAMI
 //
-//  Created by yegang on 10/14/24.
+//  Created by 박현수 on 11/24/24.
 //
 
 import SwiftUI
 import Kingfisher
 
-struct CollectionPlaceView: View {
-    @State var viewModel: CollectionPlaceViewModel
+struct SearchListView: View {
+    @State var viewModel: SearchListViewModel
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(PlakeCoordinator.self) private var plakeCoord
-    @Environment(MapCoordinator.self) private var mapCoord
 
-    init(viewModel: CollectionPlaceViewModel) {
+    init(viewModel: SearchListViewModel) {
         _viewModel = State(wrappedValue: viewModel)
     }
-    
+
     var body: some View {
-        GeometryReader { proxy in
-            ListView(viewModel: viewModel, size: proxy.size)
-        }
-        .safeAreaPadding(.horizontal, 16)
-        .navigationTitle("기록 지도")
-        .navigationBarBackButtonHidden()
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("닫기") {
-                    plakeCoord.dismissSheet()
+        VStack(spacing: 0) {
+            SearchBar(viewModel: viewModel)
+            if viewModel.hasNoResult {
+                HasNoResultPlaceholder()
+            } else {
+                GeometryReader { proxy in
+                    ListView(viewModel: viewModel, size: proxy.size)
                 }
-                .foregroundStyle(Color(.sButton))
+                .safeAreaPadding([.top, .horizontal], 16)
             }
         }
+        .background(Color(.sMain))
+        .onTapGesture(perform: hideKeyboard)
+        .onAppearAndActiveCheckUserValued(scenePhase)
+        .navigationBarBackButtonHidden()
+    }
+}
+
+private struct SearchBar: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    @Bindable var viewModel: SearchListViewModel
+    @FocusState var isFocused: Bool
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 16) {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text("\(Image(systemName: "magnifyingglass")) ")
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(Color(.sTitleText))
+
+                TextField(
+                    "",
+                    text: $viewModel.searchText,
+                    prompt: Text("검색").foregroundStyle(Color(.sTitleText))
+                )
+                .font(.system(size: 17, weight: .regular))
+                .focused($isFocused)
+                .foregroundStyle(Color(.sTitleText))
+
+                Button {
+                    viewModel.clearSearchText()
+                    isFocused = false
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(Color(.sButton))
+                }
+            }
+            .padding(7)
+            .background(Color(.sSearchbar))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            Button {
+                coordinator.pop()
+                viewModel.simpleHaptic()
+            } label: {
+                Text("취소")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(Color(.sTitleText))
+            }
+        }
+        .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 16))
+        .background(Color(.sWhite))
+        .onAppear { isFocused = true }
+        .onChange(of: isFocused) { _, newValue in
+            if newValue { viewModel.simpleHaptic() }
+        }
+
+        Divider().frame(height: 0.5).background(Color(.sLine))
     }
 }
 
 private struct ListView: View {
-    let viewModel: CollectionPlaceViewModel
+    let viewModel: SearchListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
 
@@ -46,7 +97,7 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 ForEach(viewModel.playlists, id: \.playlistID) { playlist in
-                    PlakeListCell(viewModel: viewModel, playlist: playlist, size: size)
+                    ListCell(viewModel: viewModel, playlist: playlist, size: size)
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in
                     content
@@ -60,9 +111,9 @@ private struct ListView: View {
     }
 }
 
-private struct PlakeListCell: View {
-    @Environment(PlakeCoordinator.self) private var plakeCoord
-    let viewModel: CollectionPlaceViewModel
+private struct ListCell: View {
+    @Environment(PlakeCoordinator.self) private var coord
+    let viewModel: SearchListViewModel
     let playlist: PlaylistModel
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
@@ -70,10 +121,7 @@ private struct PlakeListCell: View {
     var body: some View {
         Button {
             viewModel.simpleHaptic()
-            plakeCoord.dismissSheet()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                plakeCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
-            }
+            coord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
         } label: {
             VStack(alignment: .leading, spacing: 0) {
                 KFImage(URL(string: playlist.photoURL))
@@ -125,6 +173,21 @@ private struct PlakeListCell: View {
             .background(Color(.sWhite))
             .clipShape(RoundedRectangle(cornerRadius: 4))
             .shadow(color: Color(.sBlack).opacity(0.15), radius: 3, x: 0, y: 1)
+        }
+    }
+}
+
+private struct HasNoResultPlaceholder: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            Spacer()
+            Text("결과 없음")
+                .font(.notoSansKR(weight: .semiBold600, size: 24))
+                .foregroundStyle(Color(.sTitleText))
+            Text("검색어를 확인해보세요.")
+                .font(.notoSansKR(weight: .regular400, size: 17))
+                .foregroundStyle(Color(.sSubHead))
+            Spacer()
         }
     }
 }

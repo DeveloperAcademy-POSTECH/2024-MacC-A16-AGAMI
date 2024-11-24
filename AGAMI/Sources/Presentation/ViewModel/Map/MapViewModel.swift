@@ -58,10 +58,6 @@ final class MapViewModel {
 }
 
 extension MapViewModel: LocationServiceDelegate {
-    func locationService(_ service: LocationService, didGetReverseGeocode location: String) {
-        
-    }
-    
     func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
         isLoaded = true
     }

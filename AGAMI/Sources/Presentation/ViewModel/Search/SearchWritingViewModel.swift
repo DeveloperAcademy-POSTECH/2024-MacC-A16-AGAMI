@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreLocation
 import PhotosUI
+import MusicKit
 
 @Observable
 final class SearchWritingViewModel {
@@ -51,6 +52,11 @@ final class SearchWritingViewModel {
     
     // 타이틀
     let maximumTitleLength: Int = 15
+    
+    var showSongDetailView: Bool = false
+    var selectedSong: SongModel?
+    var detailSong: DetailSong?
+    var isDetailViewLoading: Bool = false
     
     init() {
         playlist = persistenceService.fetchPlaylist()
@@ -172,6 +178,43 @@ final class SearchWritingViewModel {
     
     func simpleHaptic() {
         HapticService.shared.playSimpleHaptic()
+    }
+    
+    func fetchDetailSong() async {
+        do {
+            isDetailViewLoading = true
+            defer { isDetailViewLoading = false }
+
+            let status = await MusicAuthorization.request()
+            guard status == .authorized else {
+                return
+            }
+            
+            let request = MusicCatalogResourceRequest<Song>(matching: \.id,
+                                                            equalTo: MusicItemID(selectedSong?.songID ?? ""))
+            let response = try await request.response()
+            guard let song = response.items.first else {
+                return
+            }
+            
+            var detailSong = DetailSong()
+            detailSong.songTItle = selectedSong?.title
+            detailSong.artist = selectedSong?.artist
+            detailSong.albumCoverURL = selectedSong?.albumCoverURL
+            detailSong.albumTitle = song.albumTitle
+            detailSong.genres = song.genreNames
+            detailSong.releaseDate = song.releaseDate?.formatDate()
+            
+            self.detailSong = detailSong
+        } catch {
+            print(error)
+        }
+    }
+    
+    func dismissSongDetailView() {
+        selectedSong = nil
+        detailSong = nil
+        showSongDetailView.toggle()
     }
 }
 

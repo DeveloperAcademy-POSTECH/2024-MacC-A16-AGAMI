@@ -78,7 +78,7 @@ final class SearchAddSongViewModel {
                 self.shazamStatus = .searching
                 self.shazamService.startRecognition()
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                     if self.shazamStatus == .searching {
                         self.shazamStatus = .moreSearching
                     }

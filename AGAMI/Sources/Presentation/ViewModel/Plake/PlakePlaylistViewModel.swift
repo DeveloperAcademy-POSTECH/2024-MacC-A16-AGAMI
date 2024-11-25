@@ -19,7 +19,8 @@ struct PlaylistPresentationState {
     var isShowingPicker: Bool = false
     var isUpdating: Bool = false
     var isLoading: Bool = false
-    var isDetailViewLoading = false
+    var isShowingSongDetailView: Bool = false
+    var isDetailViewLoading: Bool = false
     var isShowingExportingAppleMusicFailedAlert: Bool = false
     var isShowingExportingSpotifyFailedAlert: Bool = false
     var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
@@ -31,12 +32,9 @@ final class PlakePlaylistViewModel: Hashable {
     
     var playlist: PlaylistModel
     var selectedSong: SongModel?
+    var detailSong: DetailSong?
     var currentItem: SHMediaItem?
     var shazamStatus: ShazamStatus = .idle
-    var genreNamesInDetailView: [String] = []
-    var releaseDateInDetailView: String?
-    var albumNameInDetailView: String?
-    var errorMessagInDetailView: String?
 
     private var initialPlaylist: PlaylistModel
 
@@ -384,31 +382,32 @@ final class PlakePlaylistViewModel: Hashable {
 
             let status = await MusicAuthorization.request()
             guard status == .authorized else {
-                errorMessagInDetailView = "Apple Music 사용 권한이 필요합니다."
                 return
             }
-            
-            let request = MusicCatalogResourceRequest<Song>(matching: \.id, equalTo: MusicItemID(selectedSong?.songID ?? ""))
+            let request = MusicCatalogResourceRequest<Song>(matching: \.id,
+                                                            equalTo: MusicItemID(selectedSong?.songID ?? ""))
             let response = try await request.response()
             guard let song = response.items.first else {
-                errorMessagInDetailView = "노래를 찾을 수 없습니다."
                 return
             }
+            var detailSong = DetailSong()
+            detailSong.songTItle = selectedSong?.title
+            detailSong.artist = selectedSong?.artist
+            detailSong.albumCoverURL = selectedSong?.albumCoverURL
+            detailSong.albumTitle = song.albumTitle
+            detailSong.genres = song.genreNames
+            detailSong.releaseDate = song.releaseDate?.formatDate()
             
-            genreNamesInDetailView = song.genreNames
-            releaseDateInDetailView = formatDate(song.releaseDate)
-            albumNameInDetailView = song.albumTitle
+            self.detailSong = detailSong
         } catch {
-            errorMessagInDetailView = error.localizedDescription
+            print(error)
         }
     }
     
-    private func formatDate(_ date: Date?) -> String {
-        guard let date = date else { return "N/A" }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.locale = Locale(identifier: "ko_KR")
-        return formatter.string(from: date)
+    func dismissSongDetailView() {
+        selectedSong = nil
+        detailSong = nil
+        presentationState.isShowingSongDetailView.toggle()
     }
 }
 

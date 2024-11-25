@@ -34,8 +34,11 @@ struct PlakePlaylistView: View {
             if viewModel.presentationState.isLoading {
                 ProgressView()
             }
-            if viewModel.selectedSong != nil {
-                SongDetailView(viewModel: viewModel)
+            if viewModel.presentationState.isShowingSongDetailView {
+                SongDetailView(detailSong: viewModel.detailSong,
+                               isLoading: viewModel.presentationState.isDetailViewLoading,
+                               dismiss: { viewModel.dismissSongDetailView() })
+                .task { await viewModel.fetchAdditionalDetails() }
             }
         }
         .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
@@ -96,24 +99,24 @@ private struct ListView: View {
                     ImageView(viewModel: viewModel)
                         .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
                         .listRowSeparator(.hidden)
-
+                    
                     TitleAndDescriptionView(viewModel: viewModel)
                         .listRowBackground(viewModel.presentationState.isEditing ? Color(.sWhite) : Color(.sMain))
                         .listRowSeparator(.hidden)
-
+                    
                     PlaylistView(viewModel: viewModel)
                         .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
-
+                    
                     Spacer().frame(height: 60)
                         .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
                         .listRowSeparator(.hidden, edges: .bottom)
-
+                    
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
             }
             .listStyle(.plain)
             .scrollIndicators(.hidden)
-
+            
             if viewModel.presentationState.isEditing {
                 BottomConfigurationBar(viewModel: viewModel)
             }
@@ -148,7 +151,7 @@ private struct ListRow: View {
                     .kerning(-0.3)
                     .foregroundStyle(viewModel.presentationState.isEditing ? Color(.sMain) : Color(.pBlack))
                     .lineLimit(1)
-
+                
                 Text(song.artist)
                     .font(.notoSansKR(weight: .regular400, size: 14))
                     .foregroundStyle(Color(.pGray1))
@@ -165,6 +168,7 @@ private struct ListRow: View {
                 Spacer().frame(width: 16)
             }
         }
+        .background(Color(.sListBack))
     }
 }
 
@@ -190,7 +194,7 @@ private struct ImageView: View {
                             coordinator.push(route: .imageViewerView(urlString: viewModel.playlist.photoURL))
                         }
                     )
-
+                
                 if viewModel.presentationState.isEditing {
                     DeletePhotoButton(viewModel: viewModel)
                 }
@@ -203,7 +207,7 @@ private struct ImageView: View {
 
 private struct TitleAndDescriptionView: View {
     @Bindable var viewModel: PlakePlaylistViewModel
-
+    
     var body: some View {
         switch viewModel.presentationState.isEditing {
         case true:
@@ -224,11 +228,11 @@ private struct TitleAndDescriptionView: View {
                         .font(.notoSansKR(weight: .regular400, size: 13))
                         .foregroundStyle(Color(.sTextCaption))
                 }
-
+                
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
-
+                
                 TextField("", text: $viewModel.playlist.playlistDescription, axis: .vertical)
                     .font(.notoSansKR(weight: .regular400, size: 15))
                     .foregroundStyle(Color(.sBodyText))
@@ -243,19 +247,19 @@ private struct TitleAndDescriptionView: View {
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(Color(.pBlack))
                     .padding(EdgeInsets(top: 22, leading: 0, bottom: 0, trailing: 0))
-
+                
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
-
+                
                 HStack(spacing: 11) {
                     Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
                         .font(.notoSansKR(weight: .regular400, size: 15))
                         .foregroundStyle(Color(.sSubHead))
                         .lineLimit(1)
-
+                    
                     Divider().frame(width: 0.5).background(Color(.sLine))
-
+                    
                     Text(viewModel.playlist.streetAddress)
                         .font(.notoSansKR(weight: .regular400, size: 15))
                         .foregroundStyle(Color(.sSubHead))
@@ -263,17 +267,17 @@ private struct TitleAndDescriptionView: View {
                     Spacer()
                 }
                 .fixedSize(horizontal: false, vertical: true)
-
+                
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
-
+                
                 Text(viewModel.playlist.playlistDescription.forceCharWrapping)
                     .font(.notoSansKR(weight: .regular400, size: 15))
                     .foregroundStyle(Color(.sBodyText))
                     .lineSpacing(3)
                     .lineLimit(nil)
-
+                
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.top, 12)
@@ -284,7 +288,7 @@ private struct TitleAndDescriptionView: View {
 
 private struct PlaylistView: View {
     let viewModel: PlakePlaylistViewModel
-
+    
     var body: some View {
         HStack(spacing: 8) {
             Text("수집한 음악")
@@ -296,11 +300,12 @@ private struct PlaylistView: View {
         }
         .padding(.vertical, 14)
         .listRowSeparator(.hidden)
-
+        
         ForEach(viewModel.playlist.songs, id: \.songID) { song in
             ListRow(viewModel: viewModel, song: song)
                 .highPriorityGesture(
                     TapGesture().onEnded {
+                        viewModel.presentationState.isShowingSongDetailView.toggle()
                         viewModel.selectedSong = song
                     }
                 )
@@ -338,7 +343,7 @@ private struct DeletePhotoButton: View {
 private struct BottomConfigurationBar: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
-
+    
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
@@ -358,7 +363,7 @@ private struct BottomConfigurationBar: View {
             }
             .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 20)
-
+            
             Spacer()
         }
         .background(Color(.sWhite))
@@ -368,7 +373,7 @@ private struct BottomConfigurationBar: View {
 
 private struct AddPhotoButton: View {
     let viewModel: PlakePlaylistViewModel
-
+    
     var body: some View {
         Spacer()
         Image(systemName: "photo")
@@ -383,7 +388,7 @@ private struct AddPhotoButton: View {
 
 private struct AddMusicButton: View {
     let viewModel: PlakePlaylistViewModel
-
+    
     var body: some View {
         Spacer()
         Image(systemName: "music.note")
@@ -415,7 +420,7 @@ private struct PhotoConfirmationDialogActions: View {
 private struct TopBarLeadingItems: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
-
+    
     var body: some View {
         Button {
             viewModel.simpleHaptic()
@@ -508,7 +513,7 @@ private struct MenuContents: View {
         } label: {
             Label("Apple Music로 듣기", systemImage: "music.note.list")
         }
-
+        
         Button {
             viewModel.simpleHaptic()
             viewModel.exportPlaylistToSpotify { result in
@@ -522,7 +527,7 @@ private struct MenuContents: View {
         } label: {
             Label("Spotify로 듣기", systemImage: "music.note.list")
         }
-
+        
         Button {
             viewModel.simpleHaptic()
             Task {
@@ -590,118 +595,6 @@ private struct ExportingFailedAlertActions: View {
             if let url = URL(string: viewModel.exportAppleMusicURLString) {
                 openURL(url)
             }
-        }
-    }
-}
-
-private struct SongDetailView: View {
-    let viewModel: PlakePlaylistViewModel
-    
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.5)
-                .onTapGesture {
-                    viewModel.selectedSong = nil
-                }
-            VStack(spacing: 0) {
-                HStack(spacing: 0) {
-                    Spacer()
-                    Image(systemName: "xmark.circle")
-                        .font(.system(size: 21, weight: .light))
-                        .padding(EdgeInsets(top: 14, leading: 0, bottom: 0, trailing: 11))
-                        .onTapGesture {
-                            viewModel.selectedSong = nil
-                        }
-                }
-                .padding(.vertical, 0)
-                .padding(.horizontal, 0)
-
-                if viewModel.presentationState.isDetailViewLoading {
-                    ProgressView("Loading...")
-                } else {
-                    if let url = URL(string: viewModel.selectedSong?.albumCoverURL ?? "") {
-                    AsyncImage(url: url) { image in
-                            image.resizable()
-                        } placeholder: {
-                            ProgressView()
-                        }
-                        .frame(width: 155, height: 155)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                    } else {
-                        Image(systemName: "music.note")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 155, height: 155)
-                            .background(Color.gray)
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .padding(.top, 33)
-                    }
-                    
-                    Text(viewModel.selectedSong?.title ?? "")
-                        .font(.notoSansKR(weight: .bold700, size: 24))
-                        .padding(.horizontal, 18)
-                        .padding(.top, 18)
-                    
-                    HorizontalDivider()
-                        .padding(.top, 18)
-                    
-                    DetailInformationRow(title: "아티스트", value: viewModel.selectedSong?.artist)
-                    DetailInformationRow(title: "앨범", value: viewModel.albumNameInDetailView)
-                    DetailInformationRow(title: "장르", value: viewModel.genreNamesInDetailView.joined(separator: ", "))
-                    DetailInformationRow(title: "발매일", value: viewModel.releaseDateInDetailView)
-                }
-            }
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            .padding(.horizontal, 10)
-        }
-        .ignoresSafeArea()
-        .navigationBarHidden(true)
-        .task {
-            await viewModel.fetchAdditionalDetails()
-        }
-    }
-}
-
-private struct HorizontalDivider: View {
-    var body: some View {
-        Divider()
-            .foregroundStyle(Color(.sLine))
-            .padding(.horizontal, 18)
-            .padding(.vertical, 7)
-    }
-}
-
-private struct DetailInformationRow: View {
-    let title: String
-    let value: String?
-    
-    var body: some View {
-        if let value = value {
-            HStack(alignment: .top, spacing: 0) {
-                Text(title)
-                    .font(.notoSansKR(weight: .medium500, size: 15))
-                    .foregroundStyle(Color(.sSubHead))
-                    .frame(width: 56, alignment: .leading)
-                    .padding(.horizontal, 0)
-                    .padding(.vertical, 0)
-                
-                Text(value)
-                    .font(.notoSansKR(weight: .regular400, size: 17))
-                    .foregroundStyle(Color(.sTitleText))
-                    .multilineTextAlignment(.leading)
-                    .padding(0)
-                    .overlay(alignment: .leading) {
-                        Divider()
-                            .offset(x: -11)
-                    }
-                    .padding(.leading, 29)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 18)
-            .padding(.vertical, 0)
-            
-            HorizontalDivider()
         }
     }
 }

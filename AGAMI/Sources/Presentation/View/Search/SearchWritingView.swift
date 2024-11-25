@@ -44,6 +44,13 @@ struct SearchWritingView: View {
                 SearchAddButton(viewModel: viewModel)
             }
             
+            if viewModel.showSongDetailView {
+                SongDetailView(detailSong: viewModel.detailSong,
+                               isLoading: viewModel.isDetailViewLoading,
+                               dismiss: { viewModel.dismissSongDetailView() })
+                    .task { await viewModel.fetchDetailSong() }
+            }
+            
         }
         .task { await viewModel.fetchCurrentLocation() }
         .ignoresSafeArea(edges: .bottom)
@@ -51,6 +58,7 @@ struct SearchWritingView: View {
         .onTapGesture(perform: hideKeyboard)
         .scrollDisabled(viewModel.isPhotoLoading)
         .navigationBarBackButtonHidden(true)
+        .disablePopGesture()
         .photosPicker(isPresented: $viewModel.showPhotoPicker,
                       selection: $viewModel.selectedItem,
                       matching: .images)
@@ -270,6 +278,12 @@ private struct SearchSongList: View {
     var body: some View {
         ForEach(viewModel.diggingList, id: \.songID) { song in
             PlaylistRow(song: song, isHighlighted: true)
+                .highPriorityGesture(
+                    TapGesture().onEnded {
+                        viewModel.showSongDetailView.toggle()
+                        viewModel.selectedSong = song
+                    }
+                )
         }
         .padding(.horizontal, 20)
     }

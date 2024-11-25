@@ -271,4 +271,22 @@ final class FirebaseService {
             }
         }
     }
+    
+    func deleteUserInformationDocument(userID: String, completion: @escaping () -> Void) async throws {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            firestore
+                .collection("UserInformation")
+                .document(userID)
+                .delete { error in
+                    if let error = error {
+                        dump("Failed to delete UserInformation document: \(error.localizedDescription)")
+                        continuation.resume(throwing: error)
+                    } else {
+                        dump("UserInformation document successfully deleted!")
+                        continuation.resume(returning: ())
+                        completion()
+                    }
+                }
+        }
+    }
 }

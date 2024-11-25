@@ -136,11 +136,10 @@ final class FirebaseAuthService {
         }
     }
 
-    func deleteAccount(changeProgress: @escaping () -> Void) async -> Bool {
-        guard let user = user else { return false }
-        guard let lastSignInDate = user.metadata.lastSignInDate else { return false }
+    func deleteAccount(changeProgress: @escaping () -> Void) async {
+        guard let user = user else { return }
+        guard let lastSignInDate = user.metadata.lastSignInDate else { return }
         let needsReAuth = !lastSignInDate.isWithinPast(minutes: 5)
-        
         let needsTokenRevocation = user.providerData.contains { $0.providerID == "apple.com" }
         
         do {
@@ -151,12 +150,12 @@ final class FirebaseAuthService {
                 changeProgress()
                 
                 guard let appleIDToken = appleIDCredential.identityToken else {
-                    dump("Unable to fetdch identify token.")
-                    return false
+                    dump("Unable to fetch identity token.")
+                    return
                 }
                 guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                    dump("Unable to serialise token string from data: \(appleIDToken.debugDescription)")
-                    return false
+                    dump("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
+                    return
                 }
                 
                 let nonce = randomNonceString()
@@ -168,40 +167,45 @@ final class FirebaseAuthService {
                     try await user.reauthenticate(with: credential)
                 }
                 if needsTokenRevocation {
-                    guard let authorizationCode = appleIDCredential.authorizationCode else { return false }
-                    guard let authCodeString = String(data: authorizationCode, encoding: .utf8) else { return false }
+                    guard let authorizationCode = appleIDCredential.authorizationCode else { return }
+                    guard let authCodeString = String(data: authorizationCode, encoding: .utf8) else { return }
                     
                     try await Auth.auth().revokeToken(withAuthorizationCode: authCodeString)
                 }
             }
             
             try await user.delete()
-            return true
         } catch {
-            dump(error)
-            return false
+            dump("계정 삭제 중 오류 발생: \(error)")
         }
     }
     
     static func fetchIsUserValued(userID: String) async throws -> Bool {
-           let documentRef = Firestore
-                                .firestore()
-                                .collection("UserInformation")
-                                .document(userID)
-           
-           do {
-               let documentSnapshot = try await documentRef.getDocument()
-               guard let isUserValued = documentSnapshot.get("isUserValued") as? Bool else {
-                   dump("isUserValued 필드를 찾을 수 없습니다.")
-                   return false
-               }
-               dump("isUserValued 받아옴: \(isUserValued)")
-               return isUserValued
-           } catch {
-               dump("Error fetching isUserValued: \(error.localizedDescription)")
-               return false
-           }
-       }
+        let documentRef = Firestore
+            .firestore()
+            .collection("UserInformation")
+            .document(userID)
+        
+        do {
+            let documentSnapshot = try await documentRef.getDocument()
+            
+            guard documentSnapshot.exists else {
+                dump("UserInformation 문서가 존재하지 않습니다.")
+                return false
+            }
+            
+            guard let isUserValued = documentSnapshot.get("isUserValued") as? Bool else {
+                dump("isUserValued 필드를 찾을 수 없습니다.")
+                return false
+            }
+            
+            dump("isUserValued 받아옴: \(isUserValued)")
+            return isUserValued
+        } catch {
+            dump("Error fetching isUserValued: \(error.localizedDescription)")
+            return false
+        }
+    }
 }
 
 final class SignInWithApple: NSObject, ASAuthorizationControllerDelegate {

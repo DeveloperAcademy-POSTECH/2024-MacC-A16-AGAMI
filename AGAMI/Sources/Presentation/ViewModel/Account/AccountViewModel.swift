@@ -69,20 +69,16 @@ extension AccountViewModel {
         }
         
         Task {
-            try await deleteFirebaseData()
-            dump("아 여기까진 불러왔는데")
-            
-            let success = await firebaseAuthService.deleteAccount {
-                self.deleteAccountProcess = .inProgress
-                dump("불러오기는 함")
-            }
-            
-            if success {
-                try await firebaseService.saveIsUserValued(userID: uid, isUserValued: false)
-                deleteAccountProcess = .finished
-                dump("viewModel 계정 삭제 성공")
-            } else {
-                dump("viewModel 계정 삭제 실패")
+            do {
+                try await deleteFirebaseData()
+                try await firebaseService.deleteUserInformationDocument(userID: uid) {
+                    self.deleteAccountProcess = .finished
+                }
+                await firebaseAuthService.deleteAccount {
+                    self.deleteAccountProcess = .inProgress
+                }
+            } catch {
+                dump("계정 삭제 중 오류 발생: \(error.localizedDescription)")
             }
         }
     }

@@ -13,27 +13,31 @@ struct SignInView: View {
     
     var body: some View {
         ZStack {
-            Image(.signInBackground)
-                .resizable()
-                .edgesIgnoringSafeArea(.all)
+            Color(.sMain)
+                .ignoresSafeArea()
             
-            VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack(spacing: 0) {
+                    Image(.signInLogo)
+                        .resizable()
+                        .frame(width: 73, height: 88)
+                        .padding(EdgeInsets(top: 135, leading: 21, bottom: 0, trailing: 0))
+                    
+                    Spacer()
+                }
+                
+                Text("소록")
+                    .font(.sCoreDream(weight: .dream8, size: 36))
+                    .foregroundStyle(Color(.sTitleText))
+                    .padding(EdgeInsets(top: 45, leading: 24, bottom: 0, trailing: 0))
+                
+                Text(": 기억하고 싶은 모든 순간의 음악을 담다")
+                    .font(.notoSansKR(weight: .medium500, size: 18))
+                    .foregroundStyle(Color(.sSubHead))
+                    .padding(EdgeInsets(top: 14, leading: 24, bottom: 0, trailing: 0))
+                
                 Spacer()
                 
-                Image(.signInLogo)
-                    .resizable()
-                    .scaledToFit()
-                    .padding(EdgeInsets(top: 0, leading: 88, bottom: 24, trailing: 88))
-                
-                Text("순간을 놓치지 않는 즐거움,\n나만의 플라키브 생성하기")
-                    .font(.pretendard(weight: .semiBold600, size: 18))
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .kerning(-0.3)
-                    .foregroundStyle(Color(.pBlack))
-
-                Spacer()
-
                 SignInWithAppleButton(.continue) { request in
                     viewModel.signInRequest(request: request)
                 } onCompletion: { result in
@@ -45,10 +49,11 @@ struct SignInView: View {
                     }
                 }
                 .frame(height: 54)
-                .padding(EdgeInsets(top: 0, leading: 16, bottom: 120, trailing: 16))
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .padding(EdgeInsets(top: 0, leading: 16, bottom: 86, trailing: 16))
             }
+            .ignoresSafeArea(edges: .bottom)
         }
-        .ignoresSafeArea(edges: .bottom)
     }
 }
 

@@ -175,6 +175,12 @@ final class PlakePlaylistViewModel: Hashable {
             if granted {
                 self.shazamStatus = .searching
                 self.shazamService.startRecognition()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                    if self.shazamStatus == .searching {
+                        self.shazamStatus = .moreSearching
+                    }
+                }
             } else {
                 self.shazamStatus = .idle
             }
@@ -188,7 +194,7 @@ final class PlakePlaylistViewModel: Hashable {
     func searchButtonTapped() {
         currentItem = nil
 
-        if shazamStatus == .searching {
+        if shazamStatus == .searching || shazamStatus == .moreSearching {
             stopRecognition()
             shazamStatus = .idle
         } else {

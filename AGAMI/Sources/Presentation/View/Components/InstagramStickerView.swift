@@ -149,7 +149,7 @@ private struct WithMultipleSongs: View {
 
             Spacer()
 
-            Text("\(title ?? "") 외 2곡")
+            Text("\(title ?? "") 외 \(playlist.songs.count - 1)곡")
                 .font(.pretendard(weight: .medium500, size: 24))
                 .foregroundStyle(Color(.pGray1))
                 .padding(.bottom, 6)

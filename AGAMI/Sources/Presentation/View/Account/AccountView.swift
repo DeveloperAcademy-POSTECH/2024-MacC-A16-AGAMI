@@ -208,7 +208,3 @@ private struct DeleteAccountAlertActions: View {
         }
     }
 }
-
-#Preview {
-    AccountView()
-}

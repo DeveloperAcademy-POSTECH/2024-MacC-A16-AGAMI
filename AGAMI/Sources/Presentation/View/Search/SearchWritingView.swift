@@ -45,6 +45,7 @@ struct SearchWritingView: View {
             }
             
         }
+        .task { await viewModel.fetchCurrentLocation() }
         .ignoresSafeArea(edges: .bottom)
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture(perform: hideKeyboard)
@@ -282,6 +283,7 @@ private struct ToolbarLeadingItem: View {
         Button {
             viewModel.simpleHaptic()
             if viewModel.diggingList.isEmpty {
+                viewModel.clearDiggingList()
                 coordinator.pop()
             } else {
                 viewModel.showBackButtonAlert = true
@@ -311,9 +313,13 @@ private struct ToolabraTrailingItem: View {
                 }
             }
         } label: {
-            Text("저장")
-                .font(.pretendard(weight: .medium500, size: 17))
-                .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
+            if viewModel.isSaving {
+                ProgressView()
+            } else {
+                Text("저장")
+                    .font(.pretendard(weight: .medium500, size: 17))
+                    .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
+            }
         }
         .disabled(!viewModel.saveButtonEnabled)
     }

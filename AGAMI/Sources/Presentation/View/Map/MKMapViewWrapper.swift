@@ -236,6 +236,7 @@ struct BubbleView: View {
                             .frame(width: 60, height: 60)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                     }
+                    .scaledToFill()
                     .frame(width: 60, height: 60)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
             }
@@ -268,6 +269,7 @@ struct ClusterBubbleView: View {
                             .frame(width: 60, height: 60)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                     }
+                    .scaledToFill()
                     .frame(width: 60, height: 60)
                     .clipShape(RoundedRectangle(cornerRadius: 4))
 

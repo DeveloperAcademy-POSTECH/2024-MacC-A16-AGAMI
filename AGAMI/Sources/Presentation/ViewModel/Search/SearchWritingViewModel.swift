@@ -76,7 +76,10 @@ final class SearchWritingViewModel {
     }
     
     func getCurrentLocation() {
-        guard let currentLocation = locationService.getCurrentLocation() else { return }
+        guard let currentLocation = locationService.getCurrentLocation() else {
+            dump(#function)
+            return
+        }
         playlist.latitude = currentLocation.coordinate.latitude
         playlist.longitude = currentLocation.coordinate.longitude
         persistenceService.updatePlaylist()

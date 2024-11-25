@@ -80,11 +80,11 @@ struct CameraView: View {
             viewModel.capturePhoto()
         } label: {
             Circle()
-                .foregroundColor(.white)
+                .foregroundColor(Color(.sMain))
                 .frame(width: 85, height: 85, alignment: .center)
                 .overlay(
                     Circle()
-                        .stroke(Color.black.opacity(0.8), lineWidth: 3)
+                        .stroke(Color(.sBlack), lineWidth: 3)
                         .frame(width: 72.5, height: 72.5, alignment: .center)
                 )
         }
@@ -95,12 +95,12 @@ struct CameraView: View {
             viewModel.resetPhoto()
         } label: {
             Circle()
-                .foregroundColor(Color.gray.opacity(0.2))
+                .foregroundColor(Color(.sMainTab))
                 .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: "multiply")
                         .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(.white))
+                        .foregroundColor(Color(.sWhite)))
         }
     }
     
@@ -129,13 +129,13 @@ struct CameraView: View {
             viewModel.switchFlash()
         } label: {
             Circle()
-                .foregroundColor(.gray.opacity(0.2))
+                .foregroundColor(Color(.sMainTab))
                 .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: viewModel.isFlashOn ? "bolt.fill" : "bolt.slash.fill")
-                        .font(.system(size: 26, weight: .medium))
+                        .font(.system(size: 26, weight: .regular))
                 )
-                .accentColor(viewModel.isFlashOn ? .yellow : .white)
+                .accentColor(viewModel.isFlashOn ? Color(.sFlash) : Color(.sWhite))
         }
     }
     
@@ -144,12 +144,12 @@ struct CameraView: View {
             viewModel.changeCamera()
         } label: {
             Circle()
-                .foregroundColor(.gray.opacity(0.2))
+                .foregroundColor(Color(.sMainTab))
                 .frame(width: 56, height: 56, alignment: .center)
                 .overlay(
                     Image(systemName: "camera.rotate.fill")
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(.white))
+                        .font(.system(size: 24, weight: .regular))
+                        .foregroundColor(Color(.sWhite)))
         }
     }
 }

@@ -77,9 +77,7 @@ struct PlakePlaylistView: View {
             selection: $viewModel.selectedItem,
             matching: .images
         )
-        .onOpenURL { url in
-            viewModel.handleURL(url)
-        }
+        .onOpenURL { viewModel.handleURL($0) }
         .onChange(of: scenePhase) { _, newScene in
             if newScene == .active && viewModel.presentationState.didOpenSpotifyURL {
                 viewModel.resetSpotifyURLState()
@@ -133,9 +131,7 @@ private struct ListRow: View {
                 KFImage(URL(string: song.albumCoverURL))
                     .resizable()
                     .cancelOnDisappear(true)
-                    .placeholder {
-                        ProgressView()
-                    }
+                    .placeholder { ProgressView() }
                     .frame(width: 60, height: 60)
                     .padding(.trailing, 12)
             } else {
@@ -183,8 +179,8 @@ private struct ImageView: View {
                 .resizable()
                 .cancelOnDisappear(true)
                 .placeholder {
-                    Image(.coverImageThumbnail)
-                        .resizable()
+                    Rectangle()
+                        .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
                 }
                 .scaledToFill()
                 .clipShape(RoundedRectangle(cornerRadius: 4))
@@ -307,12 +303,8 @@ private struct PlaylistView: View {
         }
         .conditionalModifier(viewModel.presentationState.isEditing) { view in
             view
-                .onDelete { indexSet in
-                    viewModel.deleteMusic(at: indexSet)
-                }
-                .onMove { indices, newOffset in
-                    viewModel.moveMusic(from: indices, to: newOffset)
-                }
+                .onDelete(perform: viewModel.deleteSong)
+                .onMove(perform: viewModel.moveSong)
         }
         .listRowInsets(EdgeInsets(top: 2, leading: 20, bottom: 2, trailing: 20))
     }
@@ -327,7 +319,7 @@ private struct DeletePhotoButton: View {
                 Spacer()
                 Image(systemName: "xmark.circle")
                     .foregroundStyle(Color(.sMain))
-                    .padding(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+                    .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 8))
                     .highPriorityGesture(
                         TapGesture().onEnded {
                             viewModel.presentationState.isShowingDeletePhotoAlert = true
@@ -340,6 +332,7 @@ private struct DeletePhotoButton: View {
 }
 
 private struct BottomConfigurationBar: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
 
     var body: some View {
@@ -353,6 +346,11 @@ private struct BottomConfigurationBar: View {
                     )
                 Divider().frame(width: 0.5).foregroundStyle(Color(.sLine))
                 AddMusicButton(viewModel: viewModel)
+                    .highPriorityGesture(
+                        TapGesture().onEnded {
+                            coordinator.presentSheet(.plakeAddSongView(viewModel: viewModel))
+                        }
+                    )
             }
             .fixedSize(horizontal: false, vertical: true)
             .padding(.top, 20)
@@ -590,7 +588,7 @@ private struct ExportingFailedAlertActions: View {
     }
 }
 
-struct SongDetailView: View {
+private struct SongDetailView: View {
     let viewModel: PlakePlaylistViewModel
     
     var body: some View {

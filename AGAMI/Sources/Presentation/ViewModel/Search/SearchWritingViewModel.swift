@@ -39,6 +39,7 @@ final class SearchWritingViewModel {
     }
     var showPhotoConfirmDialog: Bool = false
     var showDeleteImageAlert: Bool = false
+    var showBackButtonAlert: Bool = false
     var isPhotoLoading: Bool = false
     
     // 커버 이미지 - 앨범에서 가져오기

@@ -231,8 +231,8 @@ struct BubbleView: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Image(.coverImageThumbnail)
-                            .resizable()
+                        Rectangle()
+                            .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
                             .frame(width: 60, height: 60)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                     }
@@ -263,8 +263,8 @@ struct ClusterBubbleView: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Image(.coverImageThumbnail)
-                            .resizable()
+                        Rectangle()
+                            .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
                             .frame(width: 60, height: 60)
                             .clipShape(RoundedRectangle(cornerRadius: 4))
                     }

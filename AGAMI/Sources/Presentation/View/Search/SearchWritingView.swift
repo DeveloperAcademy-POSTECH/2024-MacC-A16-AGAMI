@@ -69,6 +69,11 @@ struct SearchWritingView: View {
         .confirmationDialog("", isPresented: $viewModel.showPhotoConfirmDialog) {
             PhotoConfirmationDialogActions(viewModel: viewModel)
         }
+        .alert("기록 그만두기", isPresented: $viewModel.showBackButtonAlert) {
+            BackButtonAlertActions(viewModel: viewModel)
+        } message: {
+            Text("만들던 기록은 사라집니다.")
+        }
         .alert(isPresented: $viewModel.showDeleteImageAlert) {
             Alert(
                 title: Text("사진 삭제하기")
@@ -276,7 +281,11 @@ private struct ToolbarLeadingItem: View {
     var body: some View {
         Button {
             viewModel.simpleHaptic()
-            coordinator.pop()
+            if viewModel.diggingList.isEmpty {
+                coordinator.pop()
+            } else {
+                viewModel.showBackButtonAlert = true
+            }
         } label: {
             Image(systemName: "chevron.backward")
                 .font(.system(size: 16, weight: .regular))
@@ -293,10 +302,10 @@ private struct ToolabraTrailingItem: View {
         Button {
             Task {
                 viewModel.simpleHaptic()
-                coordinator.popToRoot()
-                
+
                 if await viewModel.savedPlaylist() {
                     viewModel.clearDiggingList()
+                    coordinator.popToRoot()
                 } else {
                     dump("Failed to save playlist. Please try again.")
                 }
@@ -307,6 +316,19 @@ private struct ToolabraTrailingItem: View {
                 .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
         }
         .disabled(!viewModel.saveButtonEnabled)
+    }
+}
+
+private struct BackButtonAlertActions: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: SearchWritingViewModel
+
+    var body: some View {
+        Button("취소", role: .cancel) { }
+        Button("확인", role: .destructive) {
+            viewModel.clearDiggingList()
+            coordinator.pop()
+        }
     }
 }
 

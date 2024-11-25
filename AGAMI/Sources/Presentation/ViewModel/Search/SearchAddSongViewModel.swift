@@ -147,7 +147,6 @@ final class SearchAddSongViewModel {
 extension SearchAddSongViewModel: ShazamServiceDelegate {
     func shazamService(_ service: ShazamService, didFind match: SHMatch) {
         guard let mediaItem = match.mediaItems.first else { return }
-        stopRecognition()
         currentItem = mediaItem
         shazamStatus = .idle
         
@@ -160,12 +159,10 @@ extension SearchAddSongViewModel: ShazamServiceDelegate {
     func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
         HapticService.shared.playLongHaptic()
         shazamStatus = .failed
-        stopRecognition()
     }
     
     func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
         HapticService.shared.playLongHaptic()
         shazamStatus = .failed
-        stopRecognition()
     }
 }

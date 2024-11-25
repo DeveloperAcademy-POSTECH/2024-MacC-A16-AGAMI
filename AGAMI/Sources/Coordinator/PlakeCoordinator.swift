@@ -12,8 +12,6 @@ enum PlakeRoute: Hashable {
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
     case searchListView(viewModel: SearchListViewModel)
-    case addPlakingView(viewModel: AddPlakingViewModel)
-    case addPlakingShazamView(viewModel: AddPlakingViewModel)
     
     case searchWritingView
     case cameraView(viewModelContainer: CoordinatorViewModelContainer)
@@ -32,9 +30,6 @@ enum PlakeRoute: Hashable {
         case .cameraView: return "cameraView"
 
         case .placeListView: return "placeListView"
-            
-        case .addPlakingView: return "addPlakingView"
-        case .addPlakingShazamView: return "addPlakingShazamView"
 
         case .imageViewerView: return "imageViewerView"
         }
@@ -51,12 +46,14 @@ enum PlakeRoute: Hashable {
 
 enum PlakeSheet: Hashable, Identifiable {
     case searchAddSongView(viewModel: SearchAddSongViewModel)
+    case plakeAddSongView(viewModel: PlakePlaylistViewModel)
 	case accountView
     case mapView(viewModel: MapViewModel)
 
     var id: String {
         switch self {
         case .searchAddSongView: return "searchAddSongView"
+        case .plakeAddSongView: return "plakeAddSongView"
         case .accountView: return "accountView"
         case .mapView: return "mapView"
         }
@@ -93,10 +90,6 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             CameraView(viewModelContainer: viewModelContainer)
         case let .placeListView(viewModel):
             CollectionPlaceView(viewModel: viewModel)
-        case let .addPlakingView(viewModel):
-            AddPlakingView(viewModel: viewModel)
-        case let .addPlakingShazamView(viewModel):
-            AddPlakingShazamView(viewModel: viewModel)
         case let .imageViewerView(urlString):
             ImageViewerView(urlString: urlString)
         }
@@ -107,6 +100,9 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
         switch sheet {
         case let .searchAddSongView(viewModel):
             SearchAddSongView(viewModel: viewModel)
+                .interactiveDismissDisabled()
+        case let .plakeAddSongView(viewModel):
+            PlakeAddSongView(viewModel: viewModel)
                 .interactiveDismissDisabled()
         case .accountView:
             AccountView()

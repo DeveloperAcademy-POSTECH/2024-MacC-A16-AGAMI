@@ -93,18 +93,21 @@ final class ShazamService: NSObject {
 extension ShazamService: SHSessionDelegate {
     func session(_ session: SHSession, didFind match: SHMatch) {
         Task { @MainActor in
+            stopRecognition()
             self.delegate?.shazamService(self, didFind: match)
         }
     }
 
     func session(_ session: SHSession, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
         Task { @MainActor in
+            stopRecognition()
             self.delegate?.shazamService(self, didNotFindMatchFor: signature, error: error)
         }
     }
 
     func session(_ session: SHSession, didFailWithError error: Error) {
         Task { @MainActor in
+            stopRecognition()
             self.delegate?.shazamService(self, didFailWithError: error)
         }
     }

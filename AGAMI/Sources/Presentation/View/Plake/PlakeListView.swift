@@ -60,9 +60,13 @@ private struct TopBarView: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            Text("앱 로고")
-                .font(.notoSansKR(weight: .bold700, size: 28))
-                .foregroundStyle(Color(.sTitleText))
+            HStack(spacing: 5) {
+                Image(.sologListIcon)
+                Text("소록")
+                    .font(.sCoreDream(weight: .dream6, size: 27))
+                    .foregroundStyle(Color(.sTitleText))
+                    .kerning(-0.22)
+            }
 
             Spacer()
 

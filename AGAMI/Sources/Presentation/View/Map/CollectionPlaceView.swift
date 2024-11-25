@@ -80,8 +80,7 @@ private struct PlakeListCell: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Rectangle()
-                            .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
+                        Image(.sologPlaceholder)
                     }
                     .scaledToFill()
                     .frame(height: imageHeight)

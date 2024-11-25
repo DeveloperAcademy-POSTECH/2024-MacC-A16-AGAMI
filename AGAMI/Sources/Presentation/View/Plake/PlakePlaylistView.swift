@@ -106,7 +106,7 @@ private struct ListView: View {
 
                     Spacer().frame(height: 60)
                         .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
-                        .listRowSeparator(.hidden)
+                        .listRowSeparator(.hidden, edges: .bottom)
 
                 }
                 .listRowInsets(EdgeInsets(top: 0, leading: 20, bottom: 0, trailing: 20))
@@ -175,23 +175,25 @@ private struct ImageView: View {
     
     var body: some View {
         ZStack {
-            KFImage(URL(string: viewModel.playlist.photoURL))
-                .resizable()
-                .cancelOnDisappear(true)
-                .placeholder {
-                    Rectangle()
-                        .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
-                }
-                .scaledToFill()
-                .clipShape(RoundedRectangle(cornerRadius: 4))
-                .highPriorityGesture(
-                    TapGesture().onEnded {
-                        coordinator.push(route: .imageViewerView(urlString: viewModel.playlist.photoURL))
+            if !viewModel.playlist.photoURL.isEmpty {
+                KFImage(URL(string: viewModel.playlist.photoURL))
+                    .resizable()
+                    .cancelOnDisappear(true)
+                    .placeholder {
+                        Image(.sologPlaceholder)
+                            .resizable()
                     }
-                )
+                    .scaledToFill()
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .highPriorityGesture(
+                        TapGesture().onEnded {
+                            coordinator.push(route: .imageViewerView(urlString: viewModel.playlist.photoURL))
+                        }
+                    )
 
-            if viewModel.presentationState.isEditing {
-                DeletePhotoButton(viewModel: viewModel)
+                if viewModel.presentationState.isEditing {
+                    DeletePhotoButton(viewModel: viewModel)
+                }
             }
         }
         .padding(.top, 4)

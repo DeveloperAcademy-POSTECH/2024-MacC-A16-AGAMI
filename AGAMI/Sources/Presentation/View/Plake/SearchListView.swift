@@ -128,8 +128,8 @@ private struct ListCell: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Rectangle()
-                            .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
+                        Image(.sologPlaceholder)
+                            .resizable()
                     }
                     .scaledToFill()
                     .frame(height: imageHeight)

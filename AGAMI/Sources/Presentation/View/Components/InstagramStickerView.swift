@@ -39,9 +39,10 @@ private struct StickerImage: View {
                     .aspectRatio(1, contentMode: .fit)
                     .padding(.horizontal, 36)
             } else {
-                Rectangle()
-                    .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
-                    .aspectRatio(1, contentMode: .fit)
+                Image(.sologPlaceholder)
+                    .resizable()
+                    .aspectRatio(1, contentMode: .fill)
+                    .clipped()
                     .padding(.horizontal, 36)
             }
         }

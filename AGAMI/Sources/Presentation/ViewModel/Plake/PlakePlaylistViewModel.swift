@@ -248,9 +248,9 @@ final class PlakePlaylistViewModel: Hashable {
 
         await deletePhoto(userID: userID)
 
-        guard let url = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image) else { return
-        }
-        await MainActor.run { playlist.photoURL = url }
+        guard let url = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
+        else { return }
+        playlist.photoURL = url
     }
     
     func uploadPhotoFromCamera() async {
@@ -323,12 +323,16 @@ final class PlakePlaylistViewModel: Hashable {
     }
 
     func loadBackgroundImage(urlString: String, targetSize: CGSize) async throws -> UIImage? {
-        guard let image = try? await loadImage(urlString: urlString),
-              let resized = image.resizedAndCropped(to: targetSize),
-              let blurred = resized.applyBlur()
-        else { return nil }
+        if let image = try? await loadImage(urlString: urlString),
+           let resized = image.resizedAndCropped(to: targetSize),
+           let blurred = resized.applyBlur() {
+            return blurred
+        }
 
-        return blurred
+        guard let defaultBackImage = UIImage(named: "InstagramBackground") else {
+            return nil
+        }
+        return defaultBackImage
     }
 
     func getInstagramStoryURL() async -> URL? {

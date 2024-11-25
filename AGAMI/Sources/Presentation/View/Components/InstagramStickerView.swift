@@ -59,7 +59,7 @@ private struct WithOneSong: View {
 
         VStack(alignment: .leading, spacing: 0) {
             StickerImage(uiImage: images.first)
-                .padding(.top, 70)
+                .padding(.top, 60)
 
             Spacer()
 
@@ -68,12 +68,12 @@ private struct WithOneSong: View {
                 .foregroundStyle(Color(.pGray1))
                 .padding(.bottom, 6)
 
-            Text("\(address ?? "")에서\n수집한 플레이크입니다.")
+            Text("'\(address ?? "")'에서\n수집한 기록입니다.")
                 .font(.pretendard(weight: .bold700, size: 32))
                 .foregroundStyle(Color(.pWhite))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
-                .padding(.bottom, 32)
+                .padding(.bottom, 48)
         }
         .instagramStickerStyle()
     }
@@ -110,12 +110,12 @@ private struct WithTwoSongs: View {
                 .foregroundStyle(Color(.pGray1))
                 .padding(.bottom, 6)
 
-            Text("\(address ?? "")에서\n수집한 플레이크입니다.")
+            Text("'\(address ?? "")'에서\n수집한 기록입니다.")
                 .font(.pretendard(weight: .bold700, size: 32))
                 .foregroundStyle(Color(.pWhite))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
-                .padding(.bottom, 32)
+                .padding(.bottom, 48)
         }
         .instagramStickerStyle()
     }
@@ -154,12 +154,12 @@ private struct WithMultipleSongs: View {
                 .foregroundStyle(Color(.pGray1))
                 .padding(.bottom, 6)
 
-            Text("\(address ?? "")에서\n수집한 플레이크입니다.")
+            Text("'\(address ?? "")'에서\n수집한 기록입니다.")
                 .font(.pretendard(weight: .bold700, size: 32))
                 .foregroundStyle(Color(.pWhite))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
-                .padding(.bottom, 32)
+                .padding(.bottom, 48)
         }
         .instagramStickerStyle()
     }

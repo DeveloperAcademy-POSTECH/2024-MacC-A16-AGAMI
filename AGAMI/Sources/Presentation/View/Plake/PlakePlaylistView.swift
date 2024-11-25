@@ -327,6 +327,9 @@ private struct DeletePhotoButton: View {
             HStack {
                 Spacer()
                 Image(systemName: "xmark.circle")
+                    .resizable()
+                    .frame(width: 24, height: 24)
+                    .fontWeight(.light)
                     .foregroundStyle(Color(.sMain))
                     .padding(EdgeInsets(top: 8, leading: 16, bottom: 16, trailing: 8))
                     .highPriorityGesture(

@@ -8,8 +8,8 @@
 import Foundation
 import SwiftUI
 import PhotosUI
-import ColorThiefSwift
 import MusicKit
+import ShazamKit
 
 struct PlaylistPresentationState {
     var isEditing: Bool = false
@@ -31,12 +31,16 @@ final class PlakePlaylistViewModel: Hashable {
     
     var playlist: PlaylistModel
     var selectedSong: SongModel?
+    var currentItem: SHMediaItem?
+    var shazamStatus: ShazamStatus = .idle
     var genreNamesInDetailView: [String] = []
     var releaseDateInDetailView: String?
     var albumNameInDetailView: String?
     var errorMessagInDetailView: String?
 
     private var initialPlaylist: PlaylistModel
+
+    private let shazamService: ShazamService = ShazamService()
     private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
     
@@ -56,10 +60,15 @@ final class PlakePlaylistViewModel: Hashable {
     var showDeleteButton: Bool {
         !playlist.photoURL.isEmpty && presentationState.isEditing
     }
-    
+
+    var currentSongId: String? {
+        currentItem?.appleMusicID
+    }
+
     init(playlist: PlaylistModel) {
         self.playlist = playlist
         self.initialPlaylist = playlist
+        shazamService.delegate = self
     }
     
     static func == (lhs: PlakePlaylistViewModel, rhs: PlakePlaylistViewModel) -> Bool {
@@ -137,14 +146,58 @@ final class PlakePlaylistViewModel: Hashable {
         return URL(string: musicService.getCurrentPlaylistUrl() ?? "")
     }
     
-    func deleteMusic(at indexSet: IndexSet) {
+    func deleteSong(at indexSet: IndexSet) {
         playlist.songs.remove(atOffsets: indexSet)
     }
     
-    func moveMusic(from source: IndexSet, to destination: Int) {
+    func moveSong(from source: IndexSet, to destination: Int) {
         playlist.songs.move(fromOffsets: source, toOffset: destination)
     }
-    
+
+    private func checkMicrophonePermission(completion: @escaping (Bool) -> Void) {
+        switch AVAudioApplication.shared.recordPermission {
+        case .denied:
+            completion(false)
+        case .granted:
+            completion(true)
+        case .undetermined:
+            AVAudioApplication.requestRecordPermission { granted in
+                DispatchQueue.main.async {
+                    completion(granted)
+                }
+            }
+        @unknown default:
+            completion(false)
+        }
+    }
+
+    func startRecognition() {
+        checkMicrophonePermission { [weak self] granted in
+            guard let self = self else { return }
+            if granted {
+                self.shazamStatus = .searching
+                self.shazamService.startRecognition()
+            } else {
+                self.shazamStatus = .idle
+            }
+        }
+    }
+
+    func stopRecognition() {
+        shazamService.stopRecognition()
+    }
+
+    func searchButtonTapped() {
+        currentItem = nil
+
+        if shazamStatus == .searching {
+            stopRecognition()
+            shazamStatus = .idle
+        } else {
+            startRecognition()
+        }
+    }
+
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy년 MM월 dd일"
@@ -356,5 +409,28 @@ final class PlakePlaylistViewModel: Hashable {
         formatter.dateStyle = .medium
         formatter.locale = Locale(identifier: "ko_KR")
         return formatter.string(from: date)
+    }
+}
+
+extension PlakePlaylistViewModel: ShazamServiceDelegate {
+    func shazamService(_ service: ShazamService, didFind match: SHMatch) {
+        guard let mediaItem = match.mediaItems.first else { return }
+        currentItem = mediaItem
+        shazamStatus = .idle
+
+        if let item = currentItem {
+            HapticService.shared.playLongHaptic()
+            playlist.songs.append(ModelAdapter.fromSHtoFirestoreSong(item))
+        }
+    }
+
+    func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
+        HapticService.shared.playLongHaptic()
+        shazamStatus = .failed
+    }
+
+    func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
+        HapticService.shared.playLongHaptic()
+        shazamStatus = .failed
     }
 }

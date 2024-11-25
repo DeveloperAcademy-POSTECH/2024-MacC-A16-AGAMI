@@ -19,10 +19,10 @@ struct PlaylistRow: View {
                 KFImage(URL(string: song.albumCoverURL))
                     .resizable()
                     .cancelOnDisappear(true)
-                    .placeholder({
+                    .placeholder {
                         ProgressView()
                             .frame(width: 54, height: 54)
-                    })
+                    }
                     .frame(width: 54, height: 54)
                     .padding(.trailing, 20)
                     .padding(.vertical, 3)

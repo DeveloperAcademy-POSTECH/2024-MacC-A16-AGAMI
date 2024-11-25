@@ -85,6 +85,7 @@ private struct ContentView: View {
                         } else {
                             dump("잘못된 URL입니다.")
                         }
+                        openURL(viewModel.termsOfServiceURL)
                     } label: {
                         ButtonLabel(
                             title: "이용 약관",

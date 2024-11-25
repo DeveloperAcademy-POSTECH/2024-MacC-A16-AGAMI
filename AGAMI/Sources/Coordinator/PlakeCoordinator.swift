@@ -1,5 +1,5 @@
 //
-//  ArchiveCoordinator.swift
+//  PlakeCoordinator.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/15/24.
@@ -49,6 +49,7 @@ enum PlakeSheet: Hashable, Identifiable {
     case plakeAddSongView(viewModel: PlakePlaylistViewModel)
 	case accountView
     case mapView(viewModel: MapViewModel)
+    case playlistMapView(playlist: PlaylistModel)
 
     var id: String {
         switch self {
@@ -56,6 +57,7 @@ enum PlakeSheet: Hashable, Identifiable {
         case .plakeAddSongView: return "plakeAddSongView"
         case .accountView: return "accountView"
         case .mapView: return "mapView"
+        case .playlistMapView: return "playlistMapView"
         }
     }
     
@@ -108,6 +110,9 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             AccountView()
         case let .mapView(viewModel):
             MapView(viewModel: viewModel)
+                .interactiveDismissDisabled()
+        case let .playlistMapView(playlist):
+            PlaylistMapView(playlist: playlist)
                 .interactiveDismissDisabled()
         }
     }

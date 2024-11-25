@@ -425,6 +425,7 @@ private struct TopBarLeadingItems: View {
 }
 
 private struct TopBarTrailingItems: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
     
     var body: some View {
@@ -467,7 +468,8 @@ private struct TopBarTrailingItems: View {
                         .foregroundStyle(Color(.sButton))
                 }
                 Button {
-
+                    viewModel.simpleHaptic()
+                    coordinator.presentSheet(.playlistMapView(playlist: viewModel.playlist))
                 } label: {
                     Image(systemName: "location.circle")
                         .font(.system(size: 16, weight: .regular))

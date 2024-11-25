@@ -20,11 +20,11 @@ final class LocationService: NSObject {
     var locality: String?
     var region: String?
     var placeHolderAddress: String?
-    
+
     static let shared = LocationService()
-    
+
     weak var delegate: LocationServiceDelegate?
-    
+
     private var locationContinuation: CheckedContinuation<CLLocation, Error>?
 
     private override init() {
@@ -33,10 +33,10 @@ final class LocationService: NSObject {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
     }
-    
+
     func requestLocationAuthorization() {
         let status = locationManager.authorizationStatus
-        
+
         switch status {
         case .notDetermined:
             locationManager.requestWhenInUseAuthorization()
@@ -46,40 +46,40 @@ final class LocationService: NSObject {
             return
         }
     }
-    
+
     func requestCurrentLocation() async throws -> CLLocation {
         return try await withCheckedThrowingContinuation { continuation in
             self.locationManager.requestLocation()
             self.locationContinuation = continuation
         }
     }
-    
+
     func getCurrentLocation() -> CLLocation? {
         currentLocation
     }
-    
+
     func coordinateToStreetAddress(completion: @escaping (String?) -> Void) {
         guard let currentLocation else { return }
-        
+
         let geocoder = CLGeocoder()
         let locale = Locale(identifier: "ko_KR")
-        
+
         geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: { [weak self] (placemarks, _) in
             if let self = self {
                 if let address: [CLPlacemark] = placemarks {
                     var currentAddress: String = ""
-                                        
+
                     if let name: String = address.last?.name {
                         currentAddress += name
                         placeHolderAddress = name
                         region = name
                     }
-                    
+
                     if let area: String = address.last?.locality {
                         currentAddress += (", \(area)")
                         locality = area
                     }
-                    
+
                     self.streetAddress = currentAddress
                     completion(currentAddress)
                 }
@@ -88,36 +88,36 @@ final class LocationService: NSObject {
     }
 
     func coordinateToStreetAddress() async -> String? {
-          guard let currentLocation else { return nil }
-          return await withCheckedContinuation { continuation in
-              let geocoder = CLGeocoder()
-              let locale = Locale(identifier: "ko_KR")
+        guard let currentLocation else { return nil }
+        return await withCheckedContinuation { continuation in
+            let geocoder = CLGeocoder()
+            let locale = Locale(identifier: "ko_KR")
 
-              geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale) { [weak self] (placemarks, _) in
-                  guard let self = self else { return }
-                  if let address = placemarks?.last {
-                      var currentAddress = ""
+            geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale) { [weak self] (placemarks, _) in
+                guard let self = self else { return }
+                if let address = placemarks?.last {
+                    var currentAddress = ""
 
-                      if let name = address.name {
-                          currentAddress += name
-                          self.placeHolderAddress = name
-                          self.region = name
-                      }
+                    if let name = address.name {
+                        currentAddress += name
+                        self.placeHolderAddress = name
+                        self.region = name
+                    }
 
-                      if let area = address.locality {
-                          currentAddress += ", \(area)"
-                          self.locality = area
-                      }
+                    if let area = address.locality {
+                        currentAddress += ", \(area)"
+                        self.locality = area
+                    }
 
-                      self.streetAddress = currentAddress
-                      continuation.resume(returning: currentAddress)
-                  } else {
-                      continuation.resume(returning: nil)
-                  }
-              }
-          }
-      }
-  }
+                    self.streetAddress = currentAddress
+                    continuation.resume(returning: currentAddress)
+                } else {
+                    continuation.resume(returning: nil)
+                }
+            }
+        }
+    }
+}
 
 extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -129,16 +129,16 @@ extension LocationService: CLLocationManagerDelegate {
 
         self.delegate?.locationService(self, didUpdate: locations)
     }
-    
+
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         locationContinuation?.resume(throwing: error)
         locationContinuation = nil
         dump("위치 정보 가져오기 실패: \(error.localizedDescription)")
     }
-    
+
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         authorizationStatus = manager.authorizationStatus
-        
+
         switch manager.authorizationStatus {
         case .authorizedAlways, .authorizedWhenInUse:
             dump("위치 서비스 권한이 허용되었습니다.")

@@ -16,42 +16,41 @@ struct DeleteAccountView: View {
             Color(.pLightGray)
                 .ignoresSafeArea()
             
-            VStack(alignment: .center, spacing: 25) {
-                ZStack(alignment: .center) {
-                    Circle()
-                        .fill(Color(.sTitleText))
-                        .frame(width: 90, height: 90)
-                    
-                    Circle()
-                        .fill(Color(.pWhite))
-                        .frame(width: 82, height: 82)
-                    
-                    Image(systemName: "checkmark.circle.fill")
-                        .resizable()
-                        .frame(width: 76, height: 76)
-                        .foregroundStyle(Color(.sTitleText))
-                }
+            VStack(alignment: .center, spacing: 44) {
+                Image(.deleteViewIcon)
+                    .resizable()
+                    .frame(maxWidth: 72, maxHeight: 28)
                 
                 switch viewModel.deleteAccountProcess {
                 case .inProgress:
-                    Text("회원 탈퇴중입니다...")
-                        .font(.notoSansKR(weight: .semiBold600, size: 22))
-                        .foregroundStyle(Color(.sTitleText))
+                    // 로띠 넣고 spacing이랑 폰트, 색상 수정 해야 됨
+                    VStack(alignment: .center, spacing: 0) {
+                        Text("회원 탈퇴중입니다...")
+                            .font(.notoSansKR(weight: .semiBold600, size: 24))
+                            .foregroundStyle(Color(.sMain))
+                    }
                 default:
-                    Text("회원 탈퇴 완료!")
-                        .font(.notoSansKR(weight: .semiBold600, size: 22))
-                        .foregroundStyle(Color(.sTitleText))
-                        .onAppear {
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                                UserDefaults.standard.removeObject(forKey: "isSignedIn")
-                                coordinator.dismissSheet()
-                                coordinator.popToRoot()
-                            }
+                    VStack(alignment: .center, spacing: 14) {
+                        Text("회원 탈퇴")
+                            .font(.notoSansKR(weight: .semiBold600, size: 24))
+                            .foregroundStyle(Color(.sMain))
+                            .kerning(-0.43)
+                        
+                        Text("탈퇴가 완료되었습니다.")
+                            .font(.notoSansKR(weight: .regular400, size: 17))
+                            .foregroundStyle(Color(.sSubHead))
+                            .kerning(-0.43)
+                    }
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                            UserDefaults.standard.removeObject(forKey: "isSignedIn")
+                            coordinator.dismissSheet()
+                            coordinator.popToRoot()
                         }
+                    }
                 }
             }
         }
-        .navigationTitle("")
         .disablePopGesture()
     }
 }

@@ -26,7 +26,7 @@ struct AccountView: View {
         .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
             SignOutAlertActions(viewModel: viewModel)
         } message: {
-            Text("로그아웃을 진행하시겠어요?\n다시 돌아오실 때를 기다릴게요!")
+            Text("로그아웃을 진행하시겠어요?\n이전에 기록한 데이터는 유지됩니다.")
                 .font(.notoSansKR(weight: .regular400, size: 14))
                 .foregroundStyle(Color(.sBodyText))
         }
@@ -42,7 +42,7 @@ struct AccountView: View {
 
 private struct HeaderView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
-
+    
     var body: some View {
         ZStack(alignment: .center) {
             Text("계정 관리")
@@ -79,40 +79,22 @@ private struct ContentView: View {
             VStack(spacing: 32) {
                 VStack(spacing: 14) {
                     Button {
-                        // 이용 약관 알럿
-                        if let url = URL(string: "https://posacademy.notion.site/Plake-1302b843d5af81969d94daddfac63fde?pvs=4") {
-                            openURL(url)
-                        } else {
-                            dump("잘못된 URL입니다.")
-                        }
                         openURL(viewModel.termsOfServiceURL)
                     } label: {
-                        ButtonLabel(
-                            title: "이용 약관",
-                            fontType: .notoSansKR(weight: .medium500, size: 17),
-                            fontColor: Color(.sButton),
-                            backgroundColor: Color(.sWhite))
+                        ButtonLabel(type: .termsOfService)
                     }
                     
                     Button {
                         viewModel.isShowingDeleteAccountAlert.toggle()
                     } label: {
-                        ButtonLabel(
-                            title: "회원 탈퇴",
-                            fontType: .notoSansKR(weight: .medium500, size: 17),
-                            fontColor: Color(.sButton),
-                            backgroundColor: Color(.sWhite))
+                        ButtonLabel(type: .deleteAccount)
                     }
                 }
                 
                 Button {
                     viewModel.isShowingSignOutAlert.toggle()
                 } label: {
-                    ButtonLabel(
-                        title: "로그아웃",
-                        fontType: .notoSansKR(weight: .semiBold600, size: 17),
-                        fontColor: Color(.sWhite),
-                        backgroundColor: Color(.sTitleText))
+                    ButtonLabel(type: .signOut)
                 }
                 
                 Spacer()
@@ -123,22 +105,57 @@ private struct ContentView: View {
 }
 
 private struct ButtonLabel: View {
-    let title: String
-    let fontType: Font
-    let fontColor: Color
-    let backgroundColor: Color
+    enum AccountButtonType {
+        case termsOfService
+        case signOut
+        case deleteAccount
+        
+        var title: String {
+            switch self {
+            case .termsOfService: return "이용약관"
+            case .signOut: return "로그아웃"
+            case .deleteAccount: return "회원탈퇴"
+            }
+        }
+        
+        var fontType: Font {
+            switch self {
+            case .termsOfService: return .notoSansKR(weight: .medium500, size: 17)
+            case .signOut: return .notoSansKR(weight: .semiBold600, size: 17)
+            case .deleteAccount: return .notoSansKR(weight: .medium500, size: 17)
+            }
+        }
+        
+        var fontColor: Color {
+            switch self {
+            case .termsOfService: return Color(.sButton)
+            case .signOut: return Color(.sWhite)
+            case .deleteAccount: return Color(.sButton)
+            }
+        }
+        
+        var backgroundColor: Color {
+            switch self {
+            case .termsOfService: return Color(.sWhite)
+            case .signOut: return Color(.sTitleText)
+            case .deleteAccount: return Color(.sWhite)
+            }
+        }
+    }
+    
+    let type: AccountButtonType
     
     var body: some View {
         HStack(spacing: 0) {
-            Text(title)
-                .font(fontType)
-                .foregroundStyle(fontColor)
+            Text(type.title)
+                .font(type.fontType)
+                .foregroundStyle(type.fontColor)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: 4)
-                .fill(backgroundColor)
+                .fill(type.backgroundColor)
         )
     }
 }
@@ -150,13 +167,13 @@ private struct SignOutAlertActions: View {
     var body: some View {
         Button(role: .cancel) {
             viewModel.cancelSignOutAlert()
-
+            
         } label: {
             Text("취소")
                 .font(.notoSansKR(weight: .regular400, size: 16))
                 .foregroundStyle(Color(.sSubHead))
         }
-
+        
         Button(role: .destructive) {
             viewModel.confirmSignOut()
             coordinator.dismissSheet()
@@ -172,7 +189,7 @@ private struct SignOutAlertActions: View {
 private struct DeleteAccountAlertActions: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
-
+    
     var body: some View {
         Button(role: .cancel) {
             viewModel.cancelDeleteAccountAlert()

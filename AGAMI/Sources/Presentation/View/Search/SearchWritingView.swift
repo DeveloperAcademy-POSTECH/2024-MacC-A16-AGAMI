@@ -61,10 +61,10 @@ struct SearchWritingView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                ToolbarLeadingItem(viewModel: viewModel)
+                TopBarLeadingItems(viewModel: viewModel)
             }
             ToolbarItem(placement: .topBarTrailing) {
-                ToolabraTrailingItem(viewModel: viewModel)
+                TopbarTrailingItems(viewModel: viewModel)
             }
         }
         .confirmationDialog("", isPresented: $viewModel.showPhotoConfirmDialog) {
@@ -275,7 +275,7 @@ private struct SearchSongList: View {
     }
 }
 
-private struct ToolbarLeadingItem: View {
+private struct TopBarLeadingItems: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     var viewModel: SearchWritingViewModel
     
@@ -296,7 +296,7 @@ private struct ToolbarLeadingItem: View {
     }
 }
 
-private struct ToolabraTrailingItem: View {
+private struct TopbarTrailingItems: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     var viewModel: SearchWritingViewModel
     
@@ -304,22 +304,18 @@ private struct ToolabraTrailingItem: View {
         Button {
             Task {
                 viewModel.simpleHaptic()
+                coordinator.popToRoot()
 
                 if await viewModel.savedPlaylist() {
                     viewModel.clearDiggingList()
-                    coordinator.popToRoot()
                 } else {
                     dump("Failed to save playlist. Please try again.")
                 }
             }
         } label: {
-            if viewModel.isSaving {
-                ProgressView()
-            } else {
-                Text("저장")
-                    .font(.pretendard(weight: .medium500, size: 17))
-                    .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
-            }
+            Text("저장")
+                .font(.pretendard(weight: .medium500, size: 17))
+                .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
         }
         .disabled(!viewModel.saveButtonEnabled)
     }

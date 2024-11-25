@@ -419,8 +419,11 @@ extension PlakePlaylistViewModel: ShazamServiceDelegate {
         shazamStatus = .idle
 
         if let item = currentItem {
-            HapticService.shared.playLongHaptic()
-            playlist.songs.append(ModelAdapter.fromSHtoFirestoreSong(item))
+            let song = ModelAdapter.fromSHtoFirestoreSong(item)
+            if playlist.songs.contains(where: { $0.songID == song.songID }) {
+                HapticService.shared.playLongHaptic()
+                playlist.songs.append(song)
+            }
         }
     }
 

@@ -19,6 +19,7 @@ struct SearchListView: View {
     var body: some View {
         VStack(spacing: 0) {
             SearchBar(viewModel: viewModel)
+            Divider().frame(height: 0.33).background(Color(.sLine))
             if viewModel.hasNoResult {
                 HasNoResultPlaceholder()
             } else {
@@ -32,7 +33,7 @@ struct SearchListView: View {
         .navigationBarBackButtonHidden()
         .onTapGesture(perform: hideKeyboard)
         .onAppear {
-            withAnimation(.easeIn(duration: 0.2)) {
+            withAnimation(.easeIn(duration: 0.3)) {
                 viewModel.isSearchBarPresented = true
             }
         }
@@ -47,6 +48,7 @@ private struct SearchBar: View {
 
     var body: some View {
         if viewModel.isSearchBarPresented {
+
             HStack(alignment: .center, spacing: 16) {
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
                     Text("\(Image(systemName: "magnifyingglass")) ")
@@ -85,12 +87,11 @@ private struct SearchBar: View {
             }
             .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 16))
             .background(Color(.sWhite))
-            .onAppear { isFocused = true }
+            .task { isFocused = true }
             .onChange(of: isFocused) { _, newValue in
                 if newValue { viewModel.simpleHaptic() }
             }
-
-            Divider().frame(height: 0.5).background(Color(.sLine))
+            .transition(.move(edge: .top))
         }
     }
 }

@@ -77,6 +77,12 @@ final class SearchAddSongViewModel {
             if granted {
                 self.shazamStatus = .searching
                 self.shazamService.startRecognition()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    if self.shazamStatus == .searching {
+                        self.shazamStatus = .moreSearching
+                    }
+                }
             } else {
                 self.shazamStatus = .idle
             }
@@ -90,7 +96,7 @@ final class SearchAddSongViewModel {
     func searchButtonTapped() {
         currentItem = nil
         
-        if shazamStatus == .searching {
+        if shazamStatus == .searching || shazamStatus == .moreSearching {
             stopRecognition()
             shazamStatus = .idle
         } else {

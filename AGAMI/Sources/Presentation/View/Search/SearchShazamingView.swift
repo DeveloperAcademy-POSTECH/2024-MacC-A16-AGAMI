@@ -14,12 +14,6 @@ struct SearchShazamingView: View {
     
     var body: some View {
         ZStack {
-            RadialGradient(colors: viewModel.shazamStatus.backgroundColor,
-                           center: .center,
-                           startRadius: 0,
-                           endRadius: 530)
-            .ignoresSafeArea()
-            
             ZStack {
                 if viewModel.shazamStatus == .searching {
                     CustomLottieView(.search, speed: 1.3)

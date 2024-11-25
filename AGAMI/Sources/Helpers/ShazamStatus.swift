@@ -19,7 +19,7 @@ enum ShazamStatus {
         case .idle, .found: return "음악 수집하기"
         case .searching: return "음악을 수집하는 중 ..."
         case .moreSearching: return "음악 수집을 계속 시도하는 중 ..."
-        case .failed: return "결과 없음"
+        case .failed: return "다시 음악 수집하기"
         }
     }
     
@@ -31,11 +31,18 @@ enum ShazamStatus {
         case .failed: return "일치하는 콘텐츠를 찾을 수 없습니다."
         }
     }
-
-    var backgroundColor: [Color] {
+    
+    var titleColor: Color {
         switch self {
-        case .idle, .searching, .found, .moreSearching: return GradientColors.pink
-        case .failed: return GradientColors.gray
+        case .idle, .found, .failed: return Color(.sTitleText)
+        case .searching, .moreSearching: return Color(.sMain)
+        }
+    }
+
+    var backgroundColor: Color {
+        switch self {
+        case .idle, .found, .failed: return Color(.sMain)
+        case .searching, .moreSearching: return Color(.sButton)
         }
     }
 }

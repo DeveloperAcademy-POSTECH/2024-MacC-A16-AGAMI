@@ -151,7 +151,7 @@ private struct SearchTitleTextField: View {
                 .padding(.bottom, 6)
             
             HStack(spacing: 0) {
-                TextField("타이틀 입력", text: $viewModel.playlist.playlistName)
+                TextField("오늘의 소록", text: $viewModel.playlist.playlistName)
                     .font(.sCoreDream(weight: .dream5, size: 24))
                     .foregroundStyle(Color(.sTitleText))
                     .tint(Color(.sTitleText))

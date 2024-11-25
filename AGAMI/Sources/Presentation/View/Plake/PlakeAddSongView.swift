@@ -47,23 +47,34 @@ private struct SongStatusView: View {
     var body: some View {
         VStack {
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color(.sShazam))
+                .fill(viewModel.shazamStatus.backgroundColor)
                 .padding(.horizontal, 16)
                 .frame(height: 82)
-                .overlay {
-                    HStack(spacing: 0) {
-                        if viewModel.shazamStatus == .idle {
-                            Image(systemName: "plus")
-                                .font(.system(size: 10, weight: .semibold))
-                            Image(systemName: "music.note")
-                                .font(.system(size: 17, weight: .light))
-                                .padding(.leading, -4)
+                .overlay(alignment: viewModel.shazamStatus == .idle ? .center : .bottom) {
+                    VStack(spacing: 0) {
+                        if viewModel.shazamStatus == .searching || viewModel.shazamStatus == .moreSearching {
+                            CustomLottieView(.search, speed: 0.8)
+                                .frame(height: 40)
+                                
+                        } else if viewModel.shazamStatus == .failed {
+                            Image(.shazamFailed)
+                                .padding(.bottom, 13)
                         }
-                        Text(viewModel.shazamStatus.title ?? "")
-                            .font(.notoSansKR(weight: .medium500, size: 17))
-                            .padding(.leading, 6)
+                        HStack(spacing: 0) {
+                            if viewModel.shazamStatus == .idle || viewModel.shazamStatus == .failed {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 10, weight: .semibold))
+                                Image(systemName: "music.note")
+                                    .font(.system(size: 17, weight: .light))
+                                    .padding(.leading, -4)
+                            }
+                            Text(viewModel.shazamStatus.title ?? "")
+                                .font(.notoSansKR(weight: .medium500, size: 17))
+                                .padding(.leading, 6)
+                        }
+                        .foregroundStyle(viewModel.shazamStatus.titleColor)
+                        .padding(.bottom, viewModel.shazamStatus == .searching || viewModel.shazamStatus == .moreSearching || viewModel.shazamStatus == .failed ? 18 : 0)
                     }
-                    .foregroundStyle(Color(.sTitleText))
                 }
                 .onTapGesture {
                     viewModel.simpleHaptic()

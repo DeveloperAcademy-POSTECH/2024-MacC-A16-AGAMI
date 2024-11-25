@@ -29,9 +29,14 @@ struct SearchListView: View {
             }
         }
         .background(Color(.sMain))
-        .onTapGesture(perform: hideKeyboard)
-        .onAppearAndActiveCheckUserValued(scenePhase)
         .navigationBarBackButtonHidden()
+        .onTapGesture(perform: hideKeyboard)
+        .onAppear {
+            withAnimation(.easeIn(duration: 0.2)) {
+                viewModel.isSearchBarPresented = true
+            }
+        }
+        .onAppearAndActiveCheckUserValued(scenePhase)
     }
 }
 
@@ -41,50 +46,52 @@ private struct SearchBar: View {
     @FocusState var isFocused: Bool
 
     var body: some View {
-        HStack(alignment: .center, spacing: 16) {
-            HStack(alignment: .firstTextBaseline, spacing: 0) {
-                Text("\(Image(systemName: "magnifyingglass")) ")
+        if viewModel.isSearchBarPresented {
+            HStack(alignment: .center, spacing: 16) {
+                HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    Text("\(Image(systemName: "magnifyingglass")) ")
+                        .font(.system(size: 17, weight: .regular))
+                        .foregroundStyle(Color(.sTitleText))
+
+                    TextField(
+                        "",
+                        text: $viewModel.searchText,
+                        prompt: Text("검색").foregroundStyle(Color(.sTitleText))
+                    )
                     .font(.system(size: 17, weight: .regular))
+                    .focused($isFocused)
                     .foregroundStyle(Color(.sTitleText))
 
-                TextField(
-                    "",
-                    text: $viewModel.searchText,
-                    prompt: Text("검색").foregroundStyle(Color(.sTitleText))
-                )
-                .font(.system(size: 17, weight: .regular))
-                .focused($isFocused)
-                .foregroundStyle(Color(.sTitleText))
+                    Button {
+                        viewModel.clearSearchText()
+                        isFocused = false
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(Color(.sButton))
+                    }
+                }
+                .padding(7)
+                .background(Color(.sSearchbar))
+                .clipShape(RoundedRectangle(cornerRadius: 10))
 
                 Button {
-                    viewModel.clearSearchText()
-                    isFocused = false
+                    coordinator.pop()
+                    viewModel.simpleHaptic()
                 } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(Color(.sButton))
+                    Text("취소")
+                        .font(.system(size: 16, weight: .regular))
+                        .foregroundStyle(Color(.sTitleText))
                 }
             }
-            .padding(7)
-            .background(Color(.sSearchbar))
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-
-            Button {
-                coordinator.pop()
-                viewModel.simpleHaptic()
-            } label: {
-                Text("취소")
-                    .font(.system(size: 16, weight: .regular))
-                    .foregroundStyle(Color(.sTitleText))
+            .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 16))
+            .background(Color(.sWhite))
+            .onAppear { isFocused = true }
+            .onChange(of: isFocused) { _, newValue in
+                if newValue { viewModel.simpleHaptic() }
             }
-        }
-        .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 16))
-        .background(Color(.sWhite))
-        .onAppear { isFocused = true }
-        .onChange(of: isFocused) { _, newValue in
-            if newValue { viewModel.simpleHaptic() }
-        }
 
-        Divider().frame(height: 0.5).background(Color(.sLine))
+            Divider().frame(height: 0.5).background(Color(.sLine))
+        }
     }
 }
 

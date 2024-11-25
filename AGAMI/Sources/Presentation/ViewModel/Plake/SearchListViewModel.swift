@@ -20,6 +20,8 @@ final class SearchListViewModel {
     }
     private var unfilteredPlaylists: [PlaylistModel]
 
+    var isSearchBarPresented: Bool = false
+
     var searchText: String = "" {
         didSet {
             keyboardHaptic()

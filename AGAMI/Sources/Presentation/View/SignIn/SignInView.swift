@@ -21,20 +21,20 @@ struct SignInView: View {
                     Image(.signInLogo)
                         .resizable()
                         .frame(width: 73, height: 88)
-                        .padding(EdgeInsets(top: 135, leading: 21, bottom: 0, trailing: 0))
+                        .padding(EdgeInsets(top: 135, leading: 11, bottom: 0, trailing: 0))
                     
                     Spacer()
                 }
                 
                 Text("소록")
-                    .font(.sCoreDream(weight: .dream8, size: 36))
+                    .font(.sCoreDream(weight: .dream6, size: 36))
                     .foregroundStyle(Color(.sTitleText))
-                    .padding(EdgeInsets(top: 45, leading: 24, bottom: 0, trailing: 0))
+                    .padding(EdgeInsets(top: 45, leading: 16, bottom: 0, trailing: 0))
                 
                 Text(": 기억하고 싶은 모든 순간의 음악을 담다")
                     .font(.notoSansKR(weight: .medium500, size: 18))
                     .foregroundStyle(Color(.sSubHead))
-                    .padding(EdgeInsets(top: 14, leading: 24, bottom: 0, trailing: 0))
+                    .padding(EdgeInsets(top: 14, leading: 16, bottom: 0, trailing: 0))
                 
                 Spacer()
                 

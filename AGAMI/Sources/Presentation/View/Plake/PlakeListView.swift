@@ -75,16 +75,8 @@ private struct TopBarView: View {
                 viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "magnifyingglass.circle")
-                    .font(.system(size: 26))
-                    .foregroundStyle(Color(.sButton))
-            }
-
-            Button {
-                coordinator.presentSheet(.accountView)
-                viewModel.simpleHaptic()
-            } label: {
-                Image(systemName: "person.circle")
-                    .font(.system(size: 26))
+                    .font(.system(size: 26)
+                        .weight(.light))
                     .foregroundStyle(Color(.sButton))
             }
 
@@ -95,10 +87,20 @@ private struct TopBarView: View {
                 viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "map.circle")
-                    .font(.system(size: 26))
+                    .font(.system(size: 26)
+                        .weight(.light))
                     .foregroundStyle(Color(.sButton))
             }
 
+            Button {
+                coordinator.presentSheet(.accountView)
+                viewModel.simpleHaptic()
+            } label: {
+                Image(systemName: "person.circle")
+                    .font(.system(size: 26)
+                        .weight(.light))
+                    .foregroundStyle(Color(.sButton))
+            }
         }
         .padding(.top, 28)
     }

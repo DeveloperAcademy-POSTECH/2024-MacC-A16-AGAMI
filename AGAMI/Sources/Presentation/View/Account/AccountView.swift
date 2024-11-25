@@ -12,14 +12,14 @@ struct AccountView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(PlakeCoordinator.self) private var coordinator
     
-    var body: some View {
-        VStack(spacing: 0) {
-            if case .none = viewModel.deleteAccountProcess {
-                HeaderView()
-                ContentView(viewModel: viewModel)
-            } else {
-                DeleteAccountView(viewModel: viewModel)
-            }
+    init() {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor.white
+            appearance.titleTextAttributes = [.foregroundColor: UIColor.black]
+            appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.black]
+            UINavigationBar.appearance().standardAppearance = appearance
+            UINavigationBar.appearance().scrollEdgeAppearance = appearance
         }
         .ignoresSafeArea(edges: .bottom)
         .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
@@ -43,26 +43,44 @@ private struct HeaderView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     
     var body: some View {
-        ZStack(alignment: .center) {
-            Text("계정 관리")
-                .font(.notoSansKR(weight: .semiBold600, size: 20))
-                .foregroundStyle(Color(.sTitleText))
-            
-            HStack(spacing: 0) {
-                Button {
-                    coordinator.dismissSheet()
-                } label: {
-                    Text("닫기")
-                        .font(.notoSansKR(weight: .regular400, size: 17))
-                        .foregroundStyle(Color(.sButton))
+        NavigationStack {
+            VStack(spacing: 0) {
+                if case .none = viewModel.deleteAccountProcess {
+                    ContentView(viewModel: viewModel)
+                } else {
+                    DeleteAccountView(viewModel: viewModel)
                 }
-                
-                Spacer()
             }
-            .padding(.leading, 16)
+            .navigationTitle("계정관리")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        coordinator.dismissSheet()
+                    } label: {
+                        Text("닫기")
+                            .foregroundStyle(Color(.sButton))
+                    }
+                }
+            }
+            .interactiveDismissDisabled(!viewModel.isAbleClosed)
+            .ignoresSafeArea(edges: .bottom)
+            .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
+                SignOutAlertActions(viewModel: viewModel)
+            } message: {
+                Text("로그아웃을 진행하시겠어요?\n이전에 기록한 데이터는 유지됩니다.")
+                    .font(.notoSansKR(weight: .regular400, size: 14))
+                    .foregroundStyle(Color(.sBodyText))
+            }
+            .alert("회원 탈퇴", isPresented: $viewModel.isShowingDeleteAccountAlert) {
+                DeleteAccountAlertActions(viewModel: viewModel)
+            } message: {
+                Text("회원 탈퇴 시 모든 기록이 삭제되고\n복구할 수 없습니다.")
+                    .font(.notoSansKR(weight: .regular400, size: 14))
+                    .foregroundStyle(Color(.sBodyText))
+            }
         }
-        .padding(EdgeInsets(top: 15, leading: 0, bottom: 17, trailing: 0))
-        .background(Color(.sWhiteBack))
     }
 }
 

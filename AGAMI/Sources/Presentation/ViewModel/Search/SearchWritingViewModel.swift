@@ -25,7 +25,7 @@ final class SearchWritingViewModel {
     }
     
     var saveButtonEnabled: Bool {
-        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.playlistName.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty && !isPhotoLoading
+        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty && !isPhotoLoading
     }
     
     // 커버 이미지
@@ -102,6 +102,9 @@ final class SearchWritingViewModel {
         isSaving = true
         defer { isSaving = false }
         
+        if playlist.playlistName.isEmpty {
+            playlist.playlistName = "오늘의 소록"
+        }
         guard let uploadedPhotoURL = await savePhotoToFirebase(userID: FirebaseAuthService.currentUID ?? "")
         else { return false }
         playlist.photoURL = uploadedPhotoURL

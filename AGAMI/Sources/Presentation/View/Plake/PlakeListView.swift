@@ -198,8 +198,8 @@ private struct PlakeListCell: View {
                     .resizable()
                     .cancelOnDisappear(true)
                     .placeholder {
-                        Rectangle()
-                            .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
+                        Image(.sologPlaceholder)
+                            .resizable()
                     }
                     .scaledToFill()
                     .frame(height: imageHeight)
@@ -286,8 +286,9 @@ private struct ArchiveListUpLoadingCell: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Rectangle()
-                .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
+            Image(.sologPlaceholder)
+                .resizable()
+                .scaledToFill()
                 .frame(height: imageHeight)
                 .padding(.vertical, 15)
 
@@ -334,8 +335,10 @@ private struct MakeNewPlakeCell: View {
             coordinator.push(route: .searchWritingView)
         } label: {
             VStack(alignment: .leading, spacing: 0) {
-                Rectangle()
-                    .fill(Color(.sMain).shadow(.inner(color: Color(.sBlack).opacity(0.2), radius: 2)))
+                Image(.sologPlaceholder)
+                    .resizable()
+                    .scaledToFill()
+                    .clipped()
                     .frame(height: imageHeight)
                     .padding(.vertical, 15)
 

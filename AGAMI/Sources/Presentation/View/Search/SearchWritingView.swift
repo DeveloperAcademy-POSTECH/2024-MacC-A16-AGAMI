@@ -297,6 +297,7 @@ private struct TopBarLeadingItems: View {
 }
 
 private struct TopbarTrailingItems: View {
+    @Environment(ListCellPlaceholderModel.self) private var placeholderData
     @Environment(PlakeCoordinator.self) private var coordinator
     var viewModel: SearchWritingViewModel
     
@@ -304,9 +305,15 @@ private struct TopbarTrailingItems: View {
         Button {
             Task {
                 viewModel.simpleHaptic()
+                placeholderData.setListCellPlaceholderModel(
+                    userTitle: viewModel.playlist.playlistName,
+                    streetAddress: viewModel.playlist.streetAddress,
+                    generationTime: Date()
+                )
                 coordinator.popToRoot()
 
                 if await viewModel.savedPlaylist() {
+                    placeholderData.resetListCellPlaceholderModel()
                     viewModel.clearDiggingList()
                 } else {
                     dump("Failed to save playlist. Please try again.")

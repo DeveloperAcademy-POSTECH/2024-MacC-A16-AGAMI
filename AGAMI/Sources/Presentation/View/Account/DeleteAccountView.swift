@@ -19,11 +19,11 @@ struct DeleteAccountView: View {
             VStack(alignment: .center, spacing: 44) {
                 Image(.deleteViewIcon)
                     .resizable()
-                    .frame(maxWidth: 72, maxHeight: 28)
+                    .frame(maxWidth: 72, maxHeight: 78)
                 
                 switch viewModel.deleteAccountProcess {
                 case .inProgress:
-                    // 로띠 넣고 spacing이랑 폰트, 색상 수정 해야 됨
+                    //TODO: - 로띠 넣고 spacing이랑 폰트, 색상 수정 해야 됨
                     VStack(alignment: .center, spacing: 0) {
                         Text("회원 탈퇴중입니다...")
                             .font(.notoSansKR(weight: .semiBold600, size: 24))

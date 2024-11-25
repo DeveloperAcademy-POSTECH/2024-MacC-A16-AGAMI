@@ -11,7 +11,7 @@ import ShazamKit
 @Observable
 final class SearchAddSongViewModel {
     private let firebaseService = FirebaseService()
-    private let shazamService = ShazamService()
+    private let shazamService = ShazamService.shared
     let persistenceService = PersistenceService.shared
 
     var currentItem: SHMediaItem?

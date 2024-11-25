@@ -38,7 +38,7 @@ final class PlakePlaylistViewModel: Hashable {
 
     private var initialPlaylist: PlaylistModel
 
-    private let shazamService: ShazamService = ShazamService()
+    private let shazamService = ShazamService.shared
     private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
     
@@ -422,12 +422,12 @@ extension PlakePlaylistViewModel: ShazamServiceDelegate {
         guard let mediaItem = match.mediaItems.first else { return }
         currentItem = mediaItem
         shazamStatus = .idle
-
         if let item = currentItem {
             let song = ModelAdapter.fromSHtoFirestoreSong(item)
-            if playlist.songs.contains(where: { $0.songID == song.songID }) {
+            if !playlist.songs.contains(where: { $0.songID == song.songID }) {
                 HapticService.shared.playLongHaptic()
-                playlist.songs.append(song)
+                playlist.songs.insert(song, at: 0)
+                print(playlist.songs)
             }
         }
     }

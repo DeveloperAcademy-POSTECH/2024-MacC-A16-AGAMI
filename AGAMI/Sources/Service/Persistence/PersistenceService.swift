@@ -96,10 +96,13 @@ final class PersistenceService {
         guard let playlist = _playlist else { return }
 
         let song = ModelAdapter.fromSHtoSwiftDataSong(mediaItem)
-        let index = playlist.songs.count
+        let index = 0
         song.orderIndex = index
         if playlist.swiftDataSongs.contains(where: { $0.songID == song.songID }) {
             return
+        }
+        playlist.swiftDataSongs.forEach { song in
+            song.orderIndex? += 1
         }
         playlist.swiftDataSongs.append(song)
         updatePlaylist()

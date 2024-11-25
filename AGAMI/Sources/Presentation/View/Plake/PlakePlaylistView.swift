@@ -34,7 +34,7 @@ struct PlakePlaylistView: View {
             if viewModel.presentationState.isLoading {
                 ProgressView()
             }
-            if let song = viewModel.selectedSong {
+            if viewModel.selectedSong != nil {
                 SongDetailView(viewModel: viewModel)
             }
         }
@@ -299,9 +299,11 @@ private struct PlaylistView: View {
 
         ForEach(viewModel.playlist.songs, id: \.songID) { song in
             ListRow(viewModel: viewModel, song: song)
-                .onTapGesture {
-                    viewModel.selectedSong = song
-                }
+                .highPriorityGesture(
+                    TapGesture().onEnded {
+                        viewModel.selectedSong = song
+                    }
+                )
         }
         .conditionalModifier(viewModel.presentationState.isEditing) { view in
             view

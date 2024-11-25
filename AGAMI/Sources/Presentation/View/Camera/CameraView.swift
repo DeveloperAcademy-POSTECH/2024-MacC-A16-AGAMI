@@ -52,29 +52,26 @@ struct CameraView: View {
                             captureButton
                             changeCameraButton
                         } else {
-//                            resetPhotoButton
-                            usedPhotoButton
-//                            savePhotoButton
+                            ZStack {
+                                usedPhotoButton
+                                
+                                HStack(spacing: 0) {
+                                    resetPhotoButton
+                                    Spacer()
+                                }
+                            }
                         }
                     }
                     .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
                 }
             }
-            .navigationBarTitleDisplayMode(.inline)
             .navigationBarBackButtonHidden()
             .toolbar {
-                if !viewModel.isPhotoCaptured {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button {
-                            coordinator.pop()
-                        } label: {
-                            Image(systemName: "chevron.backward")
-                                .font(.pretendard(weight: .regular400, size: 16))
-                                .foregroundStyle(Color(.sMain))
-                        }
-                    }
+                ToolbarItem(placement: .topBarLeading) {
+                    ToolbarLeadingItem(viewModel: viewModel)
                 }
             }
+            .disablePopGesture()
         }
     }
     
@@ -110,7 +107,7 @@ struct CameraView: View {
     private var usedPhotoButton: some View {
         Button {
             guard let croppedImage = viewModel.photoUIImage?.cropToFiveByFour() else { return }
-
+            
             switch viewModelContainer {
             case let .searchWriting(viewModel):
                 viewModel.savePhotoUIImage(photoUIImage: croppedImage)
@@ -142,22 +139,6 @@ struct CameraView: View {
         }
     }
     
-//    private var savePhotoButton: some View {
-//        Button {
-//            viewModel.savePhoto()
-//        } label: {
-//            Circle()
-//                .foregroundColor(Color.gray.opacity(0.2))
-//                .frame(width: 56, height: 56, alignment: .center)
-//                .overlay(
-//                    Image(systemName: "square.and.arrow.down.fill")
-//                        .font(.system(size: 24, weight: .medium))
-//                        .foregroundColor(.white)
-//                        .padding(.bottom, 4)
-//                )
-//        }
-//    }
-    
     private var changeCameraButton: some View {
         Button {
             viewModel.changeCamera()
@@ -169,6 +150,24 @@ struct CameraView: View {
                     Image(systemName: "camera.rotate.fill")
                         .font(.system(size: 24, weight: .medium))
                         .foregroundColor(.white))
+        }
+    }
+}
+
+private struct ToolbarLeadingItem: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    var viewModel: CameraViewModel
+    
+    var body: some View {
+        Button {
+            coordinator.pop()
+        } label: {
+            if !viewModel.isPhotoCaptured {
+                Image(systemName: "chevron.backward")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(Color(.sMain))
+                    .frame(width: 15, height: 22)
+            }
         }
     }
 }

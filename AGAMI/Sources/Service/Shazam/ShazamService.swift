@@ -20,6 +20,8 @@ final class ShazamService: NSObject {
     private let session = SHSession()
     private let audioEngine = AVAudioEngine()
     private var timer: Timer?
+    
+    static let shared: ShazamService = .init()
 
     override init() {
         super.init()

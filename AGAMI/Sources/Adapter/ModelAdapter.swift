@@ -20,7 +20,7 @@ struct ModelAdapter {
 
     static func toFirestorePlaylist(from playlistModel: PlaylistModel) -> FirestorePlaylistModel {
         var firestorePlaylist = FirestorePlaylistModel(from: playlistModel)
-        firestorePlaylist.songs.sort { $0.orderIndex ?? 0 > $1.orderIndex ?? 0 }
+        firestorePlaylist.songs.sort { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
         return firestorePlaylist
     }
 

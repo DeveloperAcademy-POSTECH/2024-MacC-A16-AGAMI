@@ -136,7 +136,10 @@ final class FirebaseAuthService {
         }
     }
 
-    func deleteAccount(changeProgress: @escaping () -> Void) async {
+    func deleteAccount(
+        changeProcessInProgress: @escaping () async throws -> Void,
+        changeProcessFinished: @escaping () -> Void
+    ) async throws {
         guard let user = user else { return }
         guard let lastSignInDate = user.metadata.lastSignInDate else { return }
         let needsReAuth = !lastSignInDate.isWithinPast(minutes: 5)
@@ -147,8 +150,8 @@ final class FirebaseAuthService {
                 let signInWithApple = await SignInWithApple()
                 let appleIDCredential = try await signInWithApple()
                 
-                changeProgress()
-                
+                try await changeProcessInProgress()
+
                 guard let appleIDToken = appleIDCredential.identityToken else {
                     dump("Unable to fetch identity token.")
                     return
@@ -162,7 +165,6 @@ final class FirebaseAuthService {
                 let credential = OAuthProvider.credential(withProviderID: "apple.com",
                                                           idToken: idTokenString,
                                                           rawNonce: nonce)
-                
                 if needsReAuth {
                     try await user.reauthenticate(with: credential)
                 }
@@ -173,10 +175,23 @@ final class FirebaseAuthService {
                     try await Auth.auth().revokeToken(withAuthorizationCode: authCodeString)
                 }
             }
-            
-            try await user.delete()
+
+            changeProcessFinished()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                dump("dispatch queue")
+                Task {
+                    do {
+                        try await FirebaseService().deleteUserInformationDocument(userID: user.uid) {
+                            dump("Firestore document deleted successfully.")
+                        }
+                        try await user.delete()
+                        dump("Firebase user account deleted successfully.")
+                    }
+                }
+            }
         } catch {
-            dump("계정 삭제 중 오류 발생: \(error)")
+            dump("계정 삭제 중 오류 발생 in firebaseauthservice: \(error)")
+            throw error
         }
     }
     
@@ -209,7 +224,6 @@ final class FirebaseAuthService {
 }
 
 final class SignInWithApple: NSObject, ASAuthorizationControllerDelegate {
-
   private var continuation: CheckedContinuation<ASAuthorizationAppleIDCredential, Error>?
 
   func callAsFunction() async throws -> ASAuthorizationAppleIDCredential {

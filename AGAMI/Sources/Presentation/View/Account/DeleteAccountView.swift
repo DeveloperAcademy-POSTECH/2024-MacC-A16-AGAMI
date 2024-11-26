@@ -22,6 +22,8 @@ struct DeleteAccountView: View {
                     .frame(maxWidth: 72, maxHeight: 78)
                 
                 switch viewModel.deleteAccountProcess {
+                case .none:
+                    EmptyView()
                 case .inProgress:
                     //TODO: - 로띠 넣고 spacing이랑 폰트, 색상 수정 해야 됨
                     VStack(alignment: .center, spacing: 0) {

@@ -13,7 +13,7 @@ struct DeleteAccountView: View {
     
     var body: some View {
         ZStack {
-            Color(.pLightGray)
+            Color(.sTitleText)
                 .ignoresSafeArea()
             
             VStack(alignment: .center, spacing: 44) {

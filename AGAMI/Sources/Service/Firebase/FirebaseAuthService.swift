@@ -137,7 +137,7 @@ final class FirebaseAuthService {
     }
 
     func deleteAccount(
-        changeProcessInProgress: @escaping () async throws -> Void,
+        changeProcessInProgress: () async throws -> Void,
         changeProcessFinished: @escaping () -> Void
     ) async throws {
         guard let user = user else { return }

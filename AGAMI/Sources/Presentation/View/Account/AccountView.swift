@@ -21,7 +21,6 @@ struct AccountView: View {
                 DeleteAccountView(viewModel: viewModel)
             }
         }
-        .interactiveDismissDisabled(!viewModel.isAbleClosed)
         .ignoresSafeArea(edges: .bottom)
         .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
             SignOutAlertActions(viewModel: viewModel)
@@ -79,7 +78,11 @@ private struct ContentView: View {
             VStack(spacing: 32) {
                 VStack(spacing: 14) {
                     Button {
-                        openURL(viewModel.termsOfServiceURL)
+                        if let url = viewModel.termsOfServiceURL {
+                            openURL(url)
+                        } else {
+                            dump("잘못된 URL입니다.")
+                        }
                     } label: {
                         ButtonLabel(type: .termsOfService)
                     }

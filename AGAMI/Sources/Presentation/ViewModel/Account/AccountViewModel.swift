@@ -63,7 +63,7 @@ extension AccountViewModel {
     }
     
     func deleteAccount() {
-        guard FirebaseAuthService.currentUID != nil else {
+        guard let uid = FirebaseAuthService.currentUID else {
             dump("viewModel UID를 가져오는 데 실패했습니다.")
             return
         }

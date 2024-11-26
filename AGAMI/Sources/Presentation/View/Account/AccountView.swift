@@ -108,44 +108,6 @@ private struct ContentView: View {
 }
 
 private struct ButtonLabel: View {
-    enum AccountButtonType {
-        case termsOfService
-        case signOut
-        case deleteAccount
-        
-        var title: String {
-            switch self {
-            case .termsOfService: return "이용약관"
-            case .signOut: return "로그아웃"
-            case .deleteAccount: return "회원탈퇴"
-            }
-        }
-        
-        var fontType: Font {
-            switch self {
-            case .termsOfService: return .notoSansKR(weight: .medium500, size: 17)
-            case .signOut: return .notoSansKR(weight: .semiBold600, size: 17)
-            case .deleteAccount: return .notoSansKR(weight: .medium500, size: 17)
-            }
-        }
-        
-        var fontColor: Color {
-            switch self {
-            case .termsOfService: return Color(.sButton)
-            case .signOut: return Color(.sWhite)
-            case .deleteAccount: return Color(.sButton)
-            }
-        }
-        
-        var backgroundColor: Color {
-            switch self {
-            case .termsOfService: return Color(.sWhite)
-            case .signOut: return Color(.sTitleText)
-            case .deleteAccount: return Color(.sWhite)
-            }
-        }
-    }
-    
     let type: AccountButtonType
     
     var body: some View {
@@ -208,6 +170,44 @@ private struct DeleteAccountAlertActions: View {
             Text("탈퇴하기")
                 .font(.notoSansKR(weight: .semiBold600, size: 16))
                 .foregroundStyle(Color(.sRed))
+        }
+    }
+}
+
+enum AccountButtonType {
+    case termsOfService
+    case signOut
+    case deleteAccount
+    
+    var title: String {
+        switch self {
+        case .termsOfService: return "이용약관"
+        case .signOut: return "로그아웃"
+        case .deleteAccount: return "회원탈퇴"
+        }
+    }
+    
+    var fontType: Font {
+        switch self {
+        case .termsOfService: return .notoSansKR(weight: .medium500, size: 17)
+        case .signOut: return .notoSansKR(weight: .semiBold600, size: 17)
+        case .deleteAccount: return .notoSansKR(weight: .medium500, size: 17)
+        }
+    }
+    
+    var fontColor: Color {
+        switch self {
+        case .termsOfService: return Color(.sButton)
+        case .signOut: return Color(.sWhite)
+        case .deleteAccount: return Color(.sButton)
+        }
+    }
+    
+    var backgroundColor: Color {
+        switch self {
+        case .termsOfService: return Color(.sWhite)
+        case .signOut: return Color(.sTitleText)
+        case .deleteAccount: return Color(.sWhite)
         }
     }
 }

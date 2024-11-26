@@ -27,10 +27,13 @@ struct MapView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
-                        Button("닫기") {
+                        Button {
                             plakeCoord.dismissSheet()
+                        } label: {
+                            Text("닫기")
+                                .font(.notoSansKR(weight: .regular400, size: 17))
+                                .foregroundStyle(Color(.sButton))
                         }
-                        .foregroundStyle(Color(.sButton))
                     }
                 }
                 .navigationDestination(for: MapRoute.self) { route in

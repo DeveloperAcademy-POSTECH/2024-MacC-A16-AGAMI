@@ -35,18 +35,18 @@ final class PlakePlaylistViewModel: Hashable {
     var detailSong: DetailSong?
     var currentItem: SHMediaItem?
     var shazamStatus: ShazamStatus = .idle
-
+    
     private var initialPlaylist: PlaylistModel
-
+    
     private let shazamService = ShazamService.shared
     private let firebaseService: FirebaseService = FirebaseService()
     private let musicService: MusicService = MusicService()
     
     var exportingState: ExportingState = .none
     var presentationState: PlaylistPresentationState = .init()
-
+    
     let exportAppleMusicURLString: String = "itms-apps://itunes.apple.com/app/apple-music/id1108187390"
-
+    
     var selectedItem: PhotosPickerItem? {
         didSet { Task { await handleAndUploadPhotoFromAlbum() } }
     }
@@ -58,11 +58,11 @@ final class PlakePlaylistViewModel: Hashable {
     var showDeleteButton: Bool {
         !playlist.photoURL.isEmpty && presentationState.isEditing
     }
-
+    
     var currentSongId: String? {
         currentItem?.appleMusicID
     }
-
+    
     init(playlist: PlaylistModel) {
         self.playlist = playlist
         self.initialPlaylist = playlist
@@ -76,16 +76,16 @@ final class PlakePlaylistViewModel: Hashable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
-
+    
     func exportPlaylistToAppleMusic() async -> URL? {
         guard await musicService.checkAppleMusicSubscriptionStatus() else {
             self.presentationState.isShowingExportingAppleMusicFailedAlert = true
             return nil
         }
-
+        
         exportingState = .isAppleMusicExporting
         defer { exportingState = .none }
-
+        
         do {
             musicService.clearSongs()
             try await addSongsToAppleMusic()
@@ -96,14 +96,14 @@ final class PlakePlaylistViewModel: Hashable {
             return nil
         }
     }
-
+    
     private func addSongsToAppleMusic() async throws {
         for song in playlist.songs {
             let appleMusicSong = try await musicService.searchSongById(songId: song.songID)
             musicService.addSongToSongs(song: appleMusicSong)
         }
     }
-
+    
     func exportPlaylistToSpotify(completion: @escaping (Result<URL, Error>) -> Void) {
         exportingState = .isSpotifyExporting
         let musicList = playlist.songs.map { ($0.title, $0.artist) }
@@ -113,7 +113,7 @@ final class PlakePlaylistViewModel: Hashable {
                                           description: playlist.playlistDescription) { [weak self] playlistUri in
             guard let self = self else { return }
             self.exportingState = .none
-
+            
             if let playlistUri = playlistUri, let playlistURL = URL(string: playlistUri.replacingOccurrences(of: "spotify:playlist:", with: "spotify://playlist/")) {
                 completion(.success(playlistURL))
             } else {
@@ -121,13 +121,13 @@ final class PlakePlaylistViewModel: Hashable {
             }
         }
     }
-
+    
     func deletePlaylist() async {
         guard let userID = FirebaseAuthService.currentUID else { return }
         await deletePhoto(userID: userID)
         try? await firebaseService.deletePlaylist(userID: userID, playlistID: playlist.playlistID)
     }
-
+    
     func deletePhoto(userID: String) async {
         if !playlist.photoURL.isEmpty {
             let pastURL = playlist.photoURL
@@ -135,11 +135,11 @@ final class PlakePlaylistViewModel: Hashable {
             deletePhotoURL()
         }
     }
-
+    
     func deletePhotoURL() {
         playlist.photoURL.removeAll()
     }
-
+    
     func getCurrentPlaylistURL() -> URL? {
         return URL(string: musicService.getCurrentPlaylistUrl() ?? "")
     }
@@ -151,7 +151,7 @@ final class PlakePlaylistViewModel: Hashable {
     func moveSong(from source: IndexSet, to destination: Int) {
         playlist.songs.move(fromOffsets: source, toOffset: destination)
     }
-
+    
     private func checkMicrophonePermission(completion: @escaping (Bool) -> Void) {
         switch AVAudioApplication.shared.recordPermission {
         case .denied:
@@ -168,7 +168,7 @@ final class PlakePlaylistViewModel: Hashable {
             completion(false)
         }
     }
-
+    
     func startRecognition() {
         checkMicrophonePermission { [weak self] granted in
             guard let self = self else { return }
@@ -186,14 +186,14 @@ final class PlakePlaylistViewModel: Hashable {
             }
         }
     }
-
+    
     func stopRecognition() {
         shazamService.stopRecognition()
     }
-
+    
     func searchButtonTapped() {
         currentItem = nil
-
+        
         if shazamStatus == .searching || shazamStatus == .moreSearching {
             stopRecognition()
             shazamStatus = .idle
@@ -201,7 +201,7 @@ final class PlakePlaylistViewModel: Hashable {
             startRecognition()
         }
     }
-
+    
     func formatDateToString(_ date: Date) -> String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy년 MM월 dd일"
@@ -211,11 +211,11 @@ final class PlakePlaylistViewModel: Hashable {
     func applyChangesToFirestore() async {
         presentationState.isUpdating = true
         defer { presentationState.isUpdating = false }
-
+        
         guard let userID = FirebaseAuthService.currentUID,
               let firestoreModel = playlist as? FirestorePlaylistModel
         else { return }
-
+        
         do {
             try await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
             refreshPlaylist()
@@ -239,15 +239,15 @@ final class PlakePlaylistViewModel: Hashable {
     func handleAndUploadPhotoFromAlbum() async {
         presentationState.isLoading = true
         defer { presentationState.isLoading = false }
-
+        
         guard let item = selectedItem,
               let data = try? await item.loadTransferable(type: Data.self),
               let rawImage = UIImage(data: data),
               let image = rawImage.cropToFiveByFour(),
               let userID = FirebaseAuthService.currentUID else { return }
-
+        
         await deletePhoto(userID: userID)
-
+        
         guard let url = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
         else { return }
         playlist.photoURL = url
@@ -261,7 +261,7 @@ final class PlakePlaylistViewModel: Hashable {
               let image = photoFromCamera,
               let url = try? await firebaseService.uploadImageToFirebase(userID: userID, image: image)
         else { return }
-
+        
         await MainActor.run { playlist.photoURL = url }
     }
     
@@ -273,13 +273,13 @@ final class PlakePlaylistViewModel: Hashable {
               let (data, _) = try? await URLSession.shared.data(from: url),
               let image = UIImage(data: data)
         else { return }
-
+        
         let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
         guard status == .authorized || status == .limited else {
             dump("사진 앨범 접근 권한이 없습니다.")
             return
         }
-
+        
         await MainActor.run {
             PHPhotoLibrary.shared().performChanges {
                 PHAssetChangeRequest.creationRequestForAsset(from: image)
@@ -310,7 +310,7 @@ final class PlakePlaylistViewModel: Hashable {
     func resetPlaylist() {
         playlist = initialPlaylist
     }
-
+    
     func loadImage(urlString: String) async throws -> UIImage {
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
@@ -321,33 +321,31 @@ final class PlakePlaylistViewModel: Hashable {
         }
         return image
     }
-
+    
     func loadBackgroundImage(urlString: String, targetSize: CGSize) async throws -> UIImage? {
         if let image = try? await loadImage(urlString: urlString),
            let resized = image.resizedAndCropped(to: targetSize),
            let blurred = resized.applyBlur() {
             return blurred
+        } else {
+            let defaultBackImage = UIImage(resource: .instagramBackGround)
+            return defaultBackImage
         }
-
-        guard let defaultBackImage = UIImage(named: "InstagramBackground") else {
-            return nil
-        }
-        return defaultBackImage
     }
-
+    
     func getInstagramStoryURL() async -> URL? {
         guard let instaAppID = Bundle.main.object(forInfoDictionaryKey: "INSTA_APP_ID") as? String,
               let instagramURL = URL(string: "instagram-stories://share?source_application=\(instaAppID)")
         else { return nil }
-
+        
         let songImages = await getSongImages()
-
+        
         let backgroundImage = try? await loadBackgroundImage(
             urlString: playlist.photoURL,
             targetSize: .init(width: 1080, height: 1920)
         )
         let stickerImage = InstagramStickerView(playlist: playlist, images: songImages)
-
+        
         let pasteboardItems: [String: Any]
         if let stickerImageData = await stickerImage.asUIImage(size: .init(width: 480, height: 800)) {
             if let backgroundImageData = backgroundImage?.jpegData(compressionQuality: 0.5) {
@@ -359,9 +357,9 @@ final class PlakePlaylistViewModel: Hashable {
                 pasteboardItems = [ "com.instagram.sharedSticker.stickerImage": stickerImageData ]
             }
         } else { pasteboardItems = [:] }
-
+        
         UIPasteboard.general.setItems([pasteboardItems], options: [:])
-
+        
         if await UIApplication.shared.canOpenURL(instagramURL) {
             return instagramURL
         } else if let appStoreURL = URL(string: "https://apps.apple.com/app/instagram/id389801252") {
@@ -369,7 +367,7 @@ final class PlakePlaylistViewModel: Hashable {
         }
         return nil
     }
-
+    
     private func getSongImages() async -> [UIImage] {
         let suffix = playlist.songs.suffix(3)
         var songImages: [UIImage] = []
@@ -380,7 +378,7 @@ final class PlakePlaylistViewModel: Hashable {
         }
         return songImages
     }
-
+    
     func simpleHaptic() {
         HapticService.shared.playSimpleHaptic()
     }
@@ -389,7 +387,7 @@ final class PlakePlaylistViewModel: Hashable {
         do {
             presentationState.isDetailViewLoading = true
             defer { presentationState.isDetailViewLoading = false }
-
+            
             let status = await MusicAuthorization.request()
             guard status == .authorized else {
                 return
@@ -435,12 +433,12 @@ extension PlakePlaylistViewModel: ShazamServiceDelegate {
             }
         }
     }
-
+    
     func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
         HapticService.shared.playLongHaptic()
         shazamStatus = .failed
     }
-
+    
     func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
         HapticService.shared.playLongHaptic()
         shazamStatus = .failed

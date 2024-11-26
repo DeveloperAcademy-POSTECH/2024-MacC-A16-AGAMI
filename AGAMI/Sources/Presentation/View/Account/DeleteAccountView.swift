@@ -33,6 +33,8 @@ struct DeleteAccountView: View {
                 }
                 
                 switch viewModel.deleteAccountProcess {
+                case .none:
+                    EmptyView()
                 case .inProgress:
                     Text("회원 탈퇴중입니다...")
                         .font(.notoSansKR(weight: .semiBold600, size: 22))

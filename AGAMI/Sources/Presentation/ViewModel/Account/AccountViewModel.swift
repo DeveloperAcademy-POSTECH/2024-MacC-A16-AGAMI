@@ -63,22 +63,22 @@ extension AccountViewModel {
     }
     
     func deleteAccount() {
-        guard let uid = FirebaseAuthService.currentUID else {
+        guard FirebaseAuthService.currentUID != nil else {
             dump("viewModel UID를 가져오는 데 실패했습니다.")
             return
         }
         
         Task {
             do {
-                try await deleteFirebaseData()
-                try await firebaseService.deleteUserInformationDocument(userID: uid) {
+                try await firebaseAuthService.deleteAccount {
+                    self.deleteAccountProcess = .inProgress
+                    try await self.deleteFirebaseData()
+                } changeProcessFinished: {
                     self.deleteAccountProcess = .finished
                 }
-                await firebaseAuthService.deleteAccount {
-                    self.deleteAccountProcess = .inProgress
-                }
             } catch {
-                dump("계정 삭제 중 오류 발생: \(error.localizedDescription)")
+                dump("계정 삭제 중 오류 발생 in accountviewmdoel: \(error.localizedDescription)")
+                self.deleteAccountProcess = .none
             }
         }
     }

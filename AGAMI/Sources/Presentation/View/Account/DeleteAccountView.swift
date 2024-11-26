@@ -25,7 +25,7 @@ struct DeleteAccountView: View {
                 case .inProgress:
                     //TODO: - 로띠 넣고 spacing이랑 폰트, 색상 수정 해야 됨
                     VStack(alignment: .center, spacing: 0) {
-                        Text("회원 탈퇴중입니다...")
+                        Text("회원 탈퇴중...")
                             .font(.notoSansKR(weight: .semiBold600, size: 24))
                             .foregroundStyle(Color(.sMain))
                     }

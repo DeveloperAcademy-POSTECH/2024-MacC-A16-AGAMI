@@ -38,6 +38,8 @@ struct PlakeListView: View {
             }
 
             if viewModel.isFetching { ProgressView() }
+
+            SearchView(viewModel: viewModel)
         }
         .background(Color(.sMain))
         .toolbarBackground(.visible, for: .tabBar)
@@ -71,7 +73,8 @@ private struct TopBarView: View {
             Spacer()
 
             Button {
-                coordinator.push(route: .searchListView(viewModel: .init(playlists: viewModel.playlists)))
+                viewModel.isSearching.toggle()
+                withAnimation(.easeIn(duration: 0.2)) { viewModel.isSearchBarPresented = true }
                 viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "magnifyingglass.circle")
@@ -410,6 +413,138 @@ private struct ContextMenuItems: View {
             viewModel.deletePlaylist(playlistID: playlist.playlistID, photoURL: playlist.photoURL)
         } label: {
             Label("삭제", systemImage: "trash")
+        }
+    }
+}
+
+private struct SearchView: View {
+    let viewModel: PlakeListViewModel
+    @FocusState private var isFocused
+    var body: some View {
+        ZStack(alignment: .top) {
+            if viewModel.isSearching {
+                SearchResultView(viewModel: viewModel)
+            }
+
+            if viewModel.isSearchBarPresented {
+                SearchBar(viewModel: viewModel, isFocused: $isFocused)
+                    .transition(.move(edge: .top))
+            }
+        }
+    }
+}
+
+private struct SearchBar: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    @Bindable var viewModel: PlakeListViewModel
+    var isFocused: FocusState<Bool>.Binding
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 16) {
+            HStack(alignment: .firstTextBaseline, spacing: 0) {
+                Text("\(Image(systemName: "magnifyingglass")) ")
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(Color(.sTitleText))
+
+                TextField(
+                    "",
+                    text: $viewModel.searchText,
+                    prompt: Text("검색").foregroundStyle(Color(.sTitleText))
+                )
+                .font(.system(size: 17, weight: .regular))
+                .focused(isFocused)
+                .foregroundStyle(Color(.sTitleText))
+
+                Button {
+                    viewModel.clearSearchText()
+                    isFocused.wrappedValue = false
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(Color(.sButton))
+                }
+            }
+            .padding(7)
+            .background(Color(.sSearchbar))
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            Button {
+                withAnimation(.easeIn(duration: 0.2)) { viewModel.isSearchBarPresented = false }
+                isFocused.wrappedValue = false
+                viewModel.isSearching.toggle()
+                viewModel.simpleHaptic()
+            } label: {
+                Text("취소")
+                    .font(.system(size: 16, weight: .regular))
+                    .foregroundStyle(Color(.sTitleText))
+            }
+        }
+        .padding(EdgeInsets(top: 15, leading: 16, bottom: 15, trailing: 16))
+        .background(Color(.sWhite))
+        .task { isFocused.wrappedValue = true }
+        .onChange(of: isFocused.wrappedValue) { _, newValue in
+            if newValue { viewModel.simpleHaptic() }
+        }
+        .transition(.move(edge: .top))
+    }
+}
+
+private struct SearchResultView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    let viewModel: PlakeListViewModel
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Spacer().frame(height: 64.5)
+            if viewModel.hasNoResult {
+                HasNoResultPlaceholder()
+            } else {
+                GeometryReader { proxy in
+                    SearchResultListView(viewModel: viewModel, size: proxy.size)
+                }
+                .safeAreaPadding([.top, .horizontal], 16)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color(.sMain))
+        .onTapGesture(perform: hideKeyboard)
+    }
+}
+
+private struct SearchResultListView: View {
+    let viewModel: PlakeListViewModel
+    let size: CGSize
+    private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
+
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            LazyVStack(spacing: verticalSpacingValue) {
+                ForEach(viewModel.playlists, id: \.playlistID) { playlist in
+                    PlakeListCell(viewModel: viewModel, playlist: playlist, size: size)
+                }
+                .scrollTransition(.animated, axis: .vertical) { content, phase in
+                    content
+                        .scaleEffect(phase.isIdentity ? 1 : 0.8)
+                        .opacity(phase.isIdentity ? 1 : 0.5)
+                }
+            }
+            .scrollTargetLayout()
+        }
+        .scrollDismissesKeyboard(.immediately)
+        .scrollTargetBehavior(.viewAligned(limitBehavior: getAlwaysByOneIfAvailableElseAlways()))
+    }
+}
+
+private struct HasNoResultPlaceholder: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            Spacer()
+            Text("결과 없음")
+                .font(.notoSansKR(weight: .semiBold600, size: 24))
+                .foregroundStyle(Color(.sTitleText))
+            Text("검색어를 확인해보세요.")
+                .font(.notoSansKR(weight: .regular400, size: 17))
+                .foregroundStyle(Color(.sSubHead))
+            Spacer()
         }
     }
 }

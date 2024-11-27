@@ -59,21 +59,6 @@ final class MusicService {
         return playlist?.url?.absoluteString
     }
     
-    func searchSongByTitle(songTitle: String) async throws -> Song {
-        try await requestAuthorization()
-        
-        var searchRequest = MusicCatalogSearchRequest(term: songTitle, types: [Song.self])
-        searchRequest.limit = 1
-        
-        let searchResponse = try await searchRequest.response()
-        
-        guard let song = searchResponse.songs.first else {
-            throw MusicServiceError.songNotFound
-        }
-        
-        return song
-    }
-    
     func searchSongById(songId: String) async throws -> Song {
         try await requestAuthorization()
         

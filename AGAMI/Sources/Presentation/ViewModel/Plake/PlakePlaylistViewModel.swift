@@ -140,10 +140,6 @@ final class PlakePlaylistViewModel: Hashable {
         playlist.photoURL.removeAll()
     }
     
-    func getCurrentPlaylistURL() -> URL? {
-        return URL(string: musicService.getCurrentPlaylistUrl() ?? "")
-    }
-    
     func deleteSong(at indexSet: IndexSet) {
         playlist.songs.remove(atOffsets: indexSet)
     }
@@ -264,29 +260,7 @@ final class PlakePlaylistViewModel: Hashable {
         
         await MainActor.run { playlist.photoURL = url }
     }
-    
-    func downloadPhotoAndSaveToAlbum() async {
-        presentationState.isLoading = true
-        defer { presentationState.isLoading = false }
-        
-        guard let url = URL(string: playlist.photoURL),
-              let (data, _) = try? await URLSession.shared.data(from: url),
-              let image = UIImage(data: data)
-        else { return }
-        
-        let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
-        guard status == .authorized || status == .limited else {
-            dump("사진 앨범 접근 권한이 없습니다.")
-            return
-        }
-        
-        await MainActor.run {
-            PHPhotoLibrary.shared().performChanges {
-                PHAssetChangeRequest.creationRequestForAsset(from: image)
-            }
-        }
-    }
-    
+
     func refreshPlaylist() {
         Task {
             guard let userID = FirebaseAuthService.currentUID,

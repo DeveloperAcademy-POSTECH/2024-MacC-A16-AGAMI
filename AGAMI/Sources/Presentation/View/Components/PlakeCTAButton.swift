@@ -22,7 +22,7 @@ struct PlakeCTAButton: View {
                     
                     Text(type.buttonTitle)
                 }
-                .font(.pretendard(weight: .medium500, size: 20))
+                .font(.notoSansKR(weight: .medium500, size: 20))
                 .kerning(-0.41)
                 .foregroundStyle(type.buttonTItleColor)
             }

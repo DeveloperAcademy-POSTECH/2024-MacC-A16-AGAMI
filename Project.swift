@@ -1,15 +1,6 @@
 import ProjectDescription
 
 let fonts = [
-    "Pretendard-Thin.otf",
-    "Pretendard-ExtraLight.otf",
-    "Pretendard-Light.otf",
-    "Pretendard-Regular.otf",
-    "Pretendard-Medium.otf",
-    "Pretendard-SemiBold.otf",
-    "Pretendard-Bold.otf",
-    "Pretendard-ExtraBold.otf",
-    "Pretendard-Black.otf",
     "SCDream1.otf",
     "SCDream2.otf",
     "SCDream3.otf",

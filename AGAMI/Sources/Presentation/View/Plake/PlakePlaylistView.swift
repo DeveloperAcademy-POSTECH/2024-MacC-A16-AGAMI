@@ -146,7 +146,7 @@ private struct ListRow: View {
             
             VStack(alignment: .leading) {
                 Text(song.title)
-                    .font(.notoSansKR(weight: .semiBold600, size: 18))
+                    .font(.notoSansKR(weight: .semiBold600, size: 16))
                     .kerning(-0.3)
                     .foregroundStyle(viewModel.presentationState.isEditing ? Color(.sMain) : Color(.pBlack))
                     .lineLimit(1)
@@ -167,7 +167,7 @@ private struct ListRow: View {
                 Spacer().frame(width: 16)
             }
         }
-        .background(Color(.sListBack))
+        .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
     }
 }
 

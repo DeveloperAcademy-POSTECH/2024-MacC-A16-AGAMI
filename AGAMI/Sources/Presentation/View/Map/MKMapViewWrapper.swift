@@ -281,7 +281,7 @@ struct ClusterBubbleView: View {
                     HStack {
                         Spacer()
                         Text("\(count)")
-                            .font(.pretendard(weight: .semiBold600, size: 16))
+                            .font(.notoSansKR(weight: .semiBold600, size: 16))
                             .foregroundStyle(Color(.sWhite))
                             .padding(8)
                             .background(Color(.sTitleText))

@@ -51,14 +51,14 @@ struct SearchShazamingView: View {
                 
                 if let title = viewModel.shazamStatus.title {
                     Text(title)
-                        .font(.pretendard(weight: .semiBold600, size: 24))
+                        .font(.notoSansKR(weight: .semiBold600, size: 24))
                         .foregroundStyle(Color(.pPrimary))
                         .padding(.bottom, viewModel.shazamStatus.subTitle != nil ? 14 : 0)
                 }
                 
                 if let subTitle = viewModel.shazamStatus.subTitle {
                     Text(subTitle)
-                        .font(.pretendard(weight: .medium500, size: 20))
+                        .font(.notoSansKR(weight: .medium500, size: 20))
                         .foregroundStyle(Color(.pPrimary))
                 }
                 

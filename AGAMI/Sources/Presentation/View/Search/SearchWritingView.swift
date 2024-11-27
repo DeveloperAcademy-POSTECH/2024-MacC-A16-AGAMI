@@ -334,7 +334,7 @@ private struct TopbarTrailingItems: View {
             }
         } label: {
             Text("저장")
-                .font(.pretendard(weight: .medium500, size: 17))
+                .font(.notoSansKR(weight: .medium500, size: 17))
                 .foregroundStyle(viewModel.saveButtonEnabled ? Color(.sButton) : Color(.sButtonDisabled))
         }
         .disabled(!viewModel.saveButtonEnabled)

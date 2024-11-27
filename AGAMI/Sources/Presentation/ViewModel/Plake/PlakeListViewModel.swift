@@ -15,6 +15,7 @@ final class PlakeListViewModel {
     private let musicService = MusicService()
 
     var isFetching: Bool = false
+    var isSearching: Bool = false
 
     var isShowingNewPlake: Bool {
         playlists.isEmpty && !isFetching

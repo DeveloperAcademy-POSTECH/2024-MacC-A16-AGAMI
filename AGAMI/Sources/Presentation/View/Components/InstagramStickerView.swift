@@ -65,12 +65,12 @@ private struct WithOneSong: View {
 
             Text("\(title ?? "")")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(Color(.pGray1))
+                .foregroundStyle(Color(.sLine))
                 .padding(.bottom, 6)
 
             Text("'\(address ?? "")'에서\n수집한 기록입니다.")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundStyle(Color(.pWhite))
+                .foregroundStyle(Color(.sWhite))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
                 .padding(.bottom, 48)
@@ -107,12 +107,12 @@ private struct WithTwoSongs: View {
 
             Text("\(title ?? "") 외 1곡")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(Color(.pGray1))
+                .foregroundStyle(Color(.sLine))
                 .padding(.bottom, 6)
 
             Text("'\(address ?? "")'에서\n수집한 기록입니다.")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundStyle(Color(.pWhite))
+                .foregroundStyle(Color(.sWhite))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
                 .padding(.bottom, 48)
@@ -151,12 +151,12 @@ private struct WithMultipleSongs: View {
 
             Text("\(title ?? "") 외 \(playlist.songs.count - 1)곡")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(Color(.pGray1))
+                .foregroundStyle(Color(.sLine))
                 .padding(.bottom, 6)
 
             Text("'\(address ?? "")'에서\n수집한 기록입니다.")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundStyle(Color(.pWhite))
+                .foregroundStyle(Color(.sWhite))
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
                 .padding(.bottom, 48)

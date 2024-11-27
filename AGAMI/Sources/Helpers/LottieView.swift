@@ -32,17 +32,14 @@ struct CustomLottieView: View {
 
 enum LottieAnimationType: String {
     case search
-    case applemusicExporting
-    case spotifyExporting
+    case export
 
     var filename: String {
         switch self {
         case .search:
             "shazamLottie"
-        case .applemusicExporting:
-            "applemusicLottie"
-        case .spotifyExporting:
-            "spotifyLottie"
+        case .export:
+            "exportLottie"
         }
     }
 }

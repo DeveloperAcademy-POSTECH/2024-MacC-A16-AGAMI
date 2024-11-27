@@ -13,10 +13,12 @@ struct AppleMusicLottieView: View {
         ZStack {
             Color(.sWhite)
             VStack(spacing: 37) {
-                CustomLottieView(.applemusicExporting)
-                    .frame(width: 200, height: 200)
-                Text("수집한 플레이크를\nApple Music으로 내보내는 중...")
-                    .font(.notoSansKR(weight: .semiBold600, size: 24))
+                ZStack {
+                    CustomLottieView(.export)
+                    Image(.exportAppleMusic)
+                }
+                Text("수집한 음악을\nApple Music으로 내보내는 중...")
+                    .font(.notoSansKR(weight: .semiBold600, size: 22))
                     .foregroundStyle(Color(.sTitleText))
                     .multilineTextAlignment(.center)
             }
@@ -26,5 +28,5 @@ struct AppleMusicLottieView: View {
 }
 
 #Preview {
-    SpotifyLottieView()
+    AppleMusicLottieView()
 }

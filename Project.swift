@@ -74,7 +74,7 @@ let project = Project(
                             "CLIENT_SECRET": .string("$(CLIENT_SECRET)"),
                             "REDIRECT_URL": .string("$(REDIRECT_URL)"),
                             "INSTA_APP_ID": .string("$(INSTA_APP_ID)"),
-                            "CFBundleDisplayName": "Plake",
+                            "CFBundleDisplayName": "소록",
                             "CFBundleShortVersionString": "1.1.0",
                             "CFBundleVersion": "2"
                         ]

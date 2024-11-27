@@ -11,13 +11,13 @@ import Lottie
 struct AppleMusicLottieView: View {
     var body: some View {
         ZStack {
-            Color(.pWhite)
+            Color(.sWhite)
             VStack(spacing: 37) {
                 CustomLottieView(.applemusicExporting)
                     .frame(width: 200, height: 200)
                 Text("수집한 플레이크를\nApple Music으로 내보내는 중...")
                     .font(.notoSansKR(weight: .semiBold600, size: 24))
-                    .foregroundStyle(Color(.pPrimary))
+                    .foregroundStyle(Color(.sTitleText))
                     .multilineTextAlignment(.center)
             }
         }

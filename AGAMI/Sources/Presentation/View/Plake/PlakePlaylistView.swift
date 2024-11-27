@@ -95,9 +95,11 @@ private struct ListView: View {
         VStack(spacing: 0) {
             List {
                 Group {
-                    ImageView(viewModel: viewModel)
-                        .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
-                        .listRowSeparator(.hidden)
+                    if !viewModel.playlist.photoURL.isEmpty {
+                        ImageView(viewModel: viewModel)
+                            .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
+                            .listRowSeparator(.hidden)
+                    }
                     
                     TitleAndDescriptionView(viewModel: viewModel)
                         .listRowBackground(viewModel.presentationState.isEditing ? Color(.sWhite) : Color(.sMain))
@@ -148,12 +150,12 @@ private struct ListRow: View {
                 Text(song.title)
                     .font(.notoSansKR(weight: .semiBold600, size: 16))
                     .kerning(-0.3)
-                    .foregroundStyle(viewModel.presentationState.isEditing ? Color(.sMain) : Color(.pBlack))
+                    .foregroundStyle(viewModel.presentationState.isEditing ? Color(.sMain) : Color(.sTitleText))
                     .lineLimit(1)
                 
                 Text(song.artist)
                     .font(.notoSansKR(weight: .regular400, size: 14))
-                    .foregroundStyle(Color(.pGray1))
+                    .foregroundStyle(Color(.sBodyText))
                     .kerning(-0.3)
                     .lineLimit(1)
             }
@@ -214,7 +216,7 @@ private struct TitleAndDescriptionView: View {
                     TextField(viewModel.playlist.playlistName, text: $viewModel.playlist.playlistName)
                         .font(.sCoreDream(weight: .dream5, size: 24))
                         .multilineTextAlignment(.leading)
-                        .foregroundStyle(Color(.pBlack))
+                        .foregroundStyle(Color(.sTitleText))
                         .onChange(of: viewModel.playlist.playlistName) { _, newValue in
                             if newValue.count > 15 {
                                 viewModel.playlist.playlistName = String(newValue.prefix(15))
@@ -243,7 +245,7 @@ private struct TitleAndDescriptionView: View {
                 Text(viewModel.playlist.playlistName)
                     .font(.sCoreDream(weight: .dream5, size: 24))
                     .multilineTextAlignment(.leading)
-                    .foregroundStyle(Color(.pBlack))
+                    .foregroundStyle(Color(.sTitleText))
                     .padding(EdgeInsets(top: 22, leading: 0, bottom: 0, trailing: 0))
                 
                 Divider().frame(height: 0.5)
@@ -494,7 +496,7 @@ private struct TopBarTrailingItems: View {
                 }
             }
         }
-        .foregroundStyle(Color(.pPrimary))
+        .foregroundStyle(Color(.sTitleText))
     }
 }
 

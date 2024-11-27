@@ -17,6 +17,7 @@ final class FirebaseAuthService {
     
     var currentNonce: String?
     var user: User?
+    var authProcessState: AuthProcessState = .none
     
     static var currentUID: String? {
         if let uid = Auth.auth().currentUser?.uid {
@@ -135,63 +136,90 @@ final class FirebaseAuthService {
             completion(.failure(signOutError))
         }
     }
-
-    func deleteAccount(
-        changeProcessInProgress: () async throws -> Void,
-        changeProcessFinished: @escaping () -> Void
-    ) async throws {
-        guard let user = user else { return }
-        guard let lastSignInDate = user.metadata.lastSignInDate else { return }
+    
+    func updateAuthProcessState() throws {
+        guard let user = user else {
+            throw AuthServiceError.userNotFound
+        }
+        guard let lastSignInDate = user.metadata.lastSignInDate else {
+            throw AuthServiceError.lastSignInDateNotFound
+        }
+        
         let needsReAuth = !lastSignInDate.isWithinPast(minutes: 5)
         let needsTokenRevocation = user.providerData.contains { $0.providerID == "apple.com" }
         
-        do {
-            if needsReAuth || needsTokenRevocation {
-                let signInWithApple = await SignInWithApple()
-                let appleIDCredential = try await signInWithApple()
-                
-                try await changeProcessInProgress()
+        if needsReAuth && needsTokenRevocation {
+            authProcessState = .needsFullAuthenticationProcess
+        } else if needsReAuth {
+            authProcessState = .needsReAuth
+        } else if needsTokenRevocation {
+            authProcessState = .needsTokenRevocation
+        } else {
+            authProcessState = .none
+        }
+    }
+    
+    func appleAuthentication() async throws -> ASAuthorizationAppleIDCredential {
+        if authProcessState == .none {
+            throw AuthServiceError.userNotFound
+        }
 
-                guard let appleIDToken = appleIDCredential.identityToken else {
-                    dump("Unable to fetch identity token.")
-                    return
-                }
-                guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
-                    dump("Unable to serialize token string from data: \(appleIDToken.debugDescription)")
-                    return
-                }
-                
-                let nonce = randomNonceString()
-                let credential = OAuthProvider.credential(withProviderID: "apple.com",
-                                                          idToken: idTokenString,
-                                                          rawNonce: nonce)
-                if needsReAuth {
-                    try await user.reauthenticate(with: credential)
-                }
-                if needsTokenRevocation {
-                    guard let authorizationCode = appleIDCredential.authorizationCode else { return }
-                    guard let authCodeString = String(data: authorizationCode, encoding: .utf8) else { return }
-                    
-                    try await Auth.auth().revokeToken(withAuthorizationCode: authCodeString)
-                }
+        let signInWithApple = await SignInWithApple()
+        let appleIDCredential = try await signInWithApple()
+        return appleIDCredential
+    }
+    
+    func handleAppleIDAuthentication(appleIDCredential: ASAuthorizationAppleIDCredential) async throws {
+        guard let user = user else {
+            throw AuthServiceError.userNotFound
+        }
+
+        guard let appleIDToken = appleIDCredential.identityToken else {
+            throw AuthServiceError.lastSignInDateNotFound
+        }
+
+        guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
+            throw AuthServiceError.lastSignInDateNotFound
+        }
+
+        let nonce = randomNonceString()
+        let credential = OAuthProvider.credential(withProviderID: "apple.com",
+                                                  idToken: idTokenString,
+                                                  rawNonce: nonce)
+
+        if authProcessState == .needsReAuth || authProcessState == .needsFullAuthenticationProcess {
+            try await user.reauthenticate(with: credential)
+        }
+
+        if authProcessState == .needsTokenRevocation || authProcessState == .needsFullAuthenticationProcess {
+            guard let authorizationCode = appleIDCredential.authorizationCode else {
+                throw AuthServiceError.lastSignInDateNotFound
             }
+            guard let authCodeString = String(data: authorizationCode, encoding: .utf8) else {
+                throw AuthServiceError.lastSignInDateNotFound
+            }
+            
+            try await Auth.auth().revokeToken(withAuthorizationCode: authCodeString)
+        }
 
-            changeProcessFinished()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                dump("dispatch queue")
-                Task {
-                    do {
-                        try await FirebaseService().deleteUserInformationDocument(userID: user.uid) {
-                            dump("Firestore document deleted successfully.")
-                        }
-                        try await user.delete()
-                        dump("Firebase user account deleted successfully.")
+        authProcessState = .none
+    }
+    
+    func deleteUserInfoWithDelay() async throws {
+        guard let user = user else {
+            throw AuthServiceError.userNotFound
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            Task {
+                do {
+                    try await FirebaseService().deleteUserInformationDocument(userID: user.uid) {
+                        dump("Firestore document deleted successfully.")
                     }
+                    try await user.delete()
+                    dump("Firebase user account deleted successfully.")
                 }
             }
-        } catch {
-            dump("계정 삭제 중 오류 발생 in firebaseauthservice: \(error)")
-            throw error
         }
     }
     
@@ -220,6 +248,18 @@ final class FirebaseAuthService {
             dump("Error fetching isUserValued: \(error.localizedDescription)")
             return false
         }
+    }
+    
+    enum AuthProcessState {
+        case needsFullAuthenticationProcess
+        case needsReAuth
+        case needsTokenRevocation
+        case none
+    }
+    
+    enum AuthServiceError: Error {
+        case userNotFound
+        case lastSignInDateNotFound
     }
 }
 

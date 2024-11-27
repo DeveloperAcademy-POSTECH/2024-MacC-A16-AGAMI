@@ -518,7 +518,7 @@ private struct SearchResultListView: View {
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
-                ForEach(viewModel.playlists, id: \.playlistID) { playlist in
+                ForEach(viewModel.filteredplaylists, id: \.playlistID) { playlist in
                     PlakeListCell(viewModel: viewModel, playlist: playlist, size: size)
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in

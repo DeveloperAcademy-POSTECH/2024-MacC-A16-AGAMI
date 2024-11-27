@@ -13,10 +13,12 @@ struct SpotifyLottieView: View {
         ZStack {
             Color(.sWhite)
             VStack(spacing: 37) {
-                CustomLottieView(.spotifyExporting)
-                    .frame(width: 200, height: 200)
+                ZStack {
+                    CustomLottieView(.export)
+                    Image(.exportSpotify)
+                }
                 Text("수집한 플레이크를\nSpotify로 내보내는 중...")
-                    .font(.notoSansKR(weight: .semiBold600, size: 24))
+                    .font(.notoSansKR(weight: .semiBold600, size: 22))
                     .foregroundStyle(Color(.sTitleText))
                     .multilineTextAlignment(.center)
             }

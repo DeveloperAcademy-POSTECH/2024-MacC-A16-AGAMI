@@ -11,8 +11,7 @@ import SwiftUI
 enum PlakeRoute: Hashable {
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
-    case searchListView(viewModel: SearchListViewModel)
-    
+
     case searchWritingView
     case cameraView(viewModelContainer: CoordinatorViewModelContainer)
 
@@ -24,7 +23,6 @@ enum PlakeRoute: Hashable {
         switch self {
         case .listView: return "listView"
         case .playlistView: return "playlistView"
-        case .searchListView: return "searchListView"
 
         case .searchWritingView: return "searchWritingView"
         case .cameraView: return "cameraView"
@@ -84,8 +82,6 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             PlakeListView()
         case let .playlistView(viewModel):
             PlakePlaylistView(viewModel: viewModel)
-        case let .searchListView(viewModel):
-            SearchListView(viewModel: viewModel)
         case .searchWritingView:
             SearchWritingView()
         case let .cameraView(viewModelContainer):

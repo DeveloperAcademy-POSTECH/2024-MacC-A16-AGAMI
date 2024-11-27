@@ -16,12 +16,33 @@ final class PlakeListViewModel {
 
     var isFetching: Bool = false
     var isSearching: Bool = false
+    var isSearchBarPresented: Bool = false
 
     var isShowingNewPlake: Bool {
         playlists.isEmpty && !isFetching
     }
 
+    var searchText: String = "" {
+        didSet {
+            keyboardHaptic()
+        }
+    }
+
     var playlists: [PlaylistModel] = []
+    var filteredplaylists: [PlaylistModel] {
+        if searchText.isEmpty {
+            playlists
+        } else {
+            playlists.filter {
+                $0.playlistName.lowercased().contains(searchText.lowercased())
+            }
+        }
+    }
+
+    var hasNoResult: Bool {
+        !searchText.isEmpty && filteredplaylists.isEmpty
+    }
+
     var isUploading: Bool = false
 
     var itemsCount: Int { playlists.count }
@@ -136,6 +157,13 @@ final class PlakeListViewModel {
         HapticService.shared.playSimpleHaptic()
     }
 
+    func keyboardHaptic() {
+        HapticService.shared.playKeyboardHaptic()
+    }
+
+    func clearSearchText() {
+        searchText.removeAll()
+    }
 // MARK: - FirebaseListner 코드
 //    private let listenerService = FirebaseListenerService()
 

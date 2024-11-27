@@ -10,7 +10,6 @@ import PhotosUI
 
 struct PlakeAddSongView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(PlakeCoordinator.self) private var coordinator
     let viewModel: PlakePlaylistViewModel
     
     var body: some View {

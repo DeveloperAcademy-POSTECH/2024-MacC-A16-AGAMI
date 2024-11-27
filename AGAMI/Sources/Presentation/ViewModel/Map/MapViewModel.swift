@@ -10,8 +10,6 @@ import MapKit
 
 @Observable
 final class MapViewModel {
-    private let firebaseService = FirebaseService()
-    private let authService = FirebaseAuthService()
     private let locationService = LocationService.shared
     
     var currentLocationCoordinate2D: CLLocationCoordinate2D?
@@ -50,10 +48,6 @@ final class MapViewModel {
         if let address = await locationService.coordinateToStreetAddress() {
             currentStreetAddress = address
         }
-    }
-
-    func requestLocationAuthorization() {
-        locationService.requestLocationAuthorization()
     }
 }
 

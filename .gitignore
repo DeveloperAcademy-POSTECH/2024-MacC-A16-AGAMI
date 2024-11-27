@@ -75,3 +75,5 @@ AGAMI/Sources/Service/Spotify/SpotifyAPIKey.swift
 ### Configuration File ###
 *.xcconfig
 
+### Build Log ###
+xcodebuild.log

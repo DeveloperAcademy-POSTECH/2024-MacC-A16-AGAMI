@@ -27,10 +27,6 @@ final class SearchListViewModel {
             keyboardHaptic()
         }
     }
-    
-    var isSearching: Bool {
-        !searchText.isEmpty
-    }
 
     var hasNoResult: Bool {
         playlists.isEmpty && !searchText.isEmpty

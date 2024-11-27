@@ -10,7 +10,6 @@ import PhotosUI
 
 struct SearchAddSongView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(PlakeCoordinator.self) private var coordinator
     @State var viewModel: SearchAddSongViewModel
     
     init(viewModel: SearchAddSongViewModel) {

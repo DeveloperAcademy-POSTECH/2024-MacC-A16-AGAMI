@@ -14,7 +14,6 @@ import PhotosUI
 struct PlakePlaylistView: View {
     @State var viewModel: PlakePlaylistViewModel
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.openURL) private var openURL
     
     init(viewModel: PlakePlaylistViewModel) {
         _viewModel = State(wrappedValue: viewModel)
@@ -175,8 +174,7 @@ private struct ListRow: View {
 private struct ImageView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     @Bindable var viewModel: PlakePlaylistViewModel
-    @FocusState private var isFocused: Bool
-    
+
     var body: some View {
         ZStack {
             if !viewModel.playlist.photoURL.isEmpty {
@@ -195,7 +193,7 @@ private struct ImageView: View {
                         }
                     )
                 
-                if viewModel.presentationState.isEditing {
+                if viewModel.showDeleteButton {
                     DeletePhotoButton(viewModel: viewModel)
                 }
             }
@@ -501,7 +499,6 @@ private struct TopBarTrailingItems: View {
 }
 
 private struct MenuContents: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(\.openURL) private var openURL
     let viewModel: PlakePlaylistViewModel
     
@@ -584,7 +581,6 @@ private struct DeletePlakeAlertActions: View {
 }
 
 private struct ExportingFailedAlertActions: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
     @Environment(\.openURL) private var openURL
     let viewModel: PlakePlaylistViewModel
     

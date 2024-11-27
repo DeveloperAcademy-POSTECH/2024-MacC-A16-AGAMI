@@ -67,10 +67,6 @@ final class SearchWritingViewModel {
         SearchAddSongViewModel(playlist: playlist)
     }
     
-    func loadSavedSongs() {
-        playlist = persistenceService.fetchPlaylist()
-    }
-    
     func fetchCurrentLocation() async {
         do {
             let location = try await locationService.requestCurrentLocation()

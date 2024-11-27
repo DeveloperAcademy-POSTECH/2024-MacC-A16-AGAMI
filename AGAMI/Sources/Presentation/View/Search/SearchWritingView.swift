@@ -179,8 +179,7 @@ private struct SearchTitleTextField: View {
 
 private struct SearchDescriptionTextField: View {
     @Bindable var viewModel: SearchWritingViewModel
-    @FocusState private var isFocused: Bool
-    
+
     var body: some View {
         VStack(spacing: 0) {
             TextField("기록하고 싶었던 순간이나 생각과 감정을 작성해보세요.",

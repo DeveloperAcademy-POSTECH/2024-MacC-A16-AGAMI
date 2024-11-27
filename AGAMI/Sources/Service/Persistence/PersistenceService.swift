@@ -13,8 +13,6 @@ import SwiftData
 final class PersistenceService {
     private let modelContainer: ModelContainer
     private let modelContext: ModelContext
-    
-    private let diggingListOrderKey = "diggingListOrder"
 
     private var _playlist: SwiftDataPlaylistModel?
 
@@ -87,11 +85,6 @@ final class PersistenceService {
         }
     }
     
-    func fetchDiggingList() throws -> [SongModel] {
-        let fetchDescriptor = FetchDescriptor<SwiftDataSongModel>()
-        return try modelContext.fetch(fetchDescriptor)
-    }
-    
     func appendSong(from mediaItem: SHMediaItem) {
         guard let playlist = _playlist else { return }
 
@@ -118,12 +111,6 @@ final class PersistenceService {
         for (index, song) in updatedSongs.enumerated() {
             song.orderIndex = index
         }
-        updatePlaylist()
-    }
-    
-    func deleteAllSongs() {
-        guard let playlist = _playlist else { return }
-        playlist.swiftDataSongs.removeAll()
         updatePlaylist()
     }
 

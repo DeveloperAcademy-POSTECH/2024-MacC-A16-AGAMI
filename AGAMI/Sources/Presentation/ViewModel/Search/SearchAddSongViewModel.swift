@@ -25,23 +25,6 @@ final class SearchAddSongViewModel {
         playlist.songs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
     }
 
-    var cellAddress: String {
-        let components = playlist.streetAddress
-                                 .split(separator: ",")
-                                 .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-
-        guard let last = components.last, let first = components.first
-        else { return "" }
-
-        return "\(last), \(first)"
-    }
-
-    var cellDate: String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy. MM. dd"
-        return dateFormatter.string(from: Date())
-    }
-    
     var currentSongId: String? {
         currentItem?.appleMusicID
     }
@@ -108,23 +91,6 @@ final class SearchAddSongViewModel {
         playlist = persistenceService.fetchPlaylist()
     }
 
-    func savedPlaylist() async -> Bool {
-        isSaving = true
-        defer { isSaving = false }
-
-        // Firebase에 플레이리스트 저장
-        do {
-            try await firebaseService.savePlaylistToFirebase(
-                userID: FirebaseAuthService.currentUID ?? "",
-                playlist: ModelAdapter.toFirestorePlaylist(from: playlist)
-            )
-        } catch {
-            dump("Failed to create playlist: \(error)")
-            return false
-        }
-        return true
-    }
-    
     func deleteSong(indexSet: IndexSet) {
         for index in indexSet {
             let song = diggingList[index]

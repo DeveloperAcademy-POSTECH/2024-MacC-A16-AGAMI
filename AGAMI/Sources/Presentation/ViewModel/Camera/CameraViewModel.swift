@@ -69,20 +69,4 @@ final class CameraViewModel {
     func zoomInitialize() {
         lastScale = 1.0
     }
-    
-    func savePhoto() {
-        guard let image = photoUIImage, let imageData = image.jpegData(compressionQuality: 1.0) else { return }
-        cameraService.savePhoto(imageData)
-    }
-    
-    func savePhotoToFirebase(userID: String) async -> String? {
-        if let image = photoUIImage {
-            do {
-                photoURL = try await firebaseService.uploadImageToFirebase(userID: userID, image: image)
-            } catch {
-                dump("이미지 저장 실패: \(error.localizedDescription)")
-            }
-        }
-        return photoURL
-    }
 }

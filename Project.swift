@@ -93,15 +93,13 @@ let project = Project(
             entitlements: "Entitlements/AGAMI.entitlements",
             scripts: [.swiftLintShell],
             dependencies: [
-                .external(name: "FirebaseAnalytics"),
                 .external(name: "FirebaseAuth"),
                 .external(name: "FirebaseFirestore"),
                 .external(name: "FirebaseStorage"),
                 .external(name: "SpotifyAPI"),
                 .external(name: "KeychainAccess"),
                 .external(name: "Lottie"),
-                .external(name: "Kingfisher"),
-                .external(name: "ColorThiefSwift")
+                .external(name: "Kingfisher")
             ]
         )
     ]

@@ -6,22 +6,26 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct ImageViewerView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     @State private var image: UIImage?
-
+    @State private var isDownloading = false
     let urlString: String
 
     var body: some View {
-        VStack {
-            Spacer()
-            if let image = image {
-                PinchableImageView(image: image)
-            } else {
-                ProgressView()
+        ZStack {
+            VStack {
+                Spacer()
+                if let image = image {
+                    PinchableImageView(image: image)
+                } else {
+                    ProgressView("다운로드 중...")
+                }
+                Spacer()
             }
-            Spacer()
+            if isDownloading { ProgressView("다운로드 중...") }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.sBlack))
@@ -35,6 +39,16 @@ struct ImageViewerView: View {
                         .foregroundStyle(Color(.sMain))
                 }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                if let image = image {
+                    Button {
+                        Task { await savePhotoToAlbum() }
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                            .foregroundStyle(Color(.sMain))
+                    }
+                }
+            }
         }
         .onAppear(perform: loadImage)
     }
@@ -46,6 +60,22 @@ struct ImageViewerView: View {
                   let image = UIImage(data: data)
             else { return }
             await MainActor.run { self.image = image }
+        }
+    }
+
+    private func savePhotoToAlbum() async {
+        isDownloading = true
+        defer { isDownloading = false }
+
+        let status = await PHPhotoLibrary.requestAuthorization(for: .addOnly)
+        guard let image = image,
+              status == .authorized || status == .limited
+        else { return }
+
+        await MainActor.run {
+            PHPhotoLibrary.shared().performChanges {
+                PHAssetChangeRequest.creationRequestForAsset(from: image)
+            }
         }
     }
 }

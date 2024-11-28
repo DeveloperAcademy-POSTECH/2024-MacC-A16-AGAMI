@@ -64,7 +64,7 @@ struct PlakePlaylistView: View {
         } message: {
             Text("삭제한 플레이크는 되돌릴 수 없습니다.")
         }
-        .alert("게정 상태 문제", isPresented: $viewModel.presentationState.isShowingExportingAppleMusicFailedAlert) {
+        .alert("계정 상태 문제", isPresented: $viewModel.presentationState.isShowingExportingAppleMusicFailedAlert) {
             ExportingFailedAlertActions(viewModel: viewModel)
         } message: {
             Text("플레이크를 내보낼 수 없습니다.\n Apple Music의 계정 상태를 확인해주세요.")

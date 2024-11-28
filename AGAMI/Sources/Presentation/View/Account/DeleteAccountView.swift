@@ -27,13 +27,14 @@ struct DeleteAccountView: View {
                         .font(.notoSansKR(weight: .semiBold600, size: 24))
                         .foregroundStyle(Color(.sTitleText))
                 }
+                .ignoresSafeArea(.all)
             default:
                 VStack(alignment: .center, spacing: 44) {
                     Image(.deleteViewIcon)
                         .resizable()
                         .frame(maxWidth: 72, maxHeight: 78)
                     
-                    VStack(alignment: .center, spacing: 14) {
+                    VStack(spacing: 14) {
                         Text("회원 탈퇴")
                             .font(.notoSansKR(weight: .semiBold600, size: 24))
                             .foregroundStyle(Color(.sMain))
@@ -52,8 +53,10 @@ struct DeleteAccountView: View {
                         }
                     }
                 }
+                .ignoresSafeArea(.all)
             }
         }
         .disablePopGesture()
     }
 }
+

@@ -33,6 +33,7 @@ struct CustomLottieView: View {
 enum LottieAnimationType: String {
     case search
     case export
+	case deleting
 
     var filename: String {
         switch self {
@@ -40,6 +41,8 @@ enum LottieAnimationType: String {
             "shazamLottie"
         case .export:
             "exportLottie"
+		case .deleting:
+			"deleteLottie"
         }
     }
 }

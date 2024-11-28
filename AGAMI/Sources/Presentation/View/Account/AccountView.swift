@@ -26,9 +26,11 @@ struct AccountView: View {
                     Button {
                         coordinator.dismissSheet()
                     } label: {
-                        Text("닫기")
-                            .font(.notoSansKR(weight: .regular400, size: 17))
-                            .foregroundStyle(Color(.sButton))
+                        if viewModel.deleteAccountProcess == .none {
+                            Text("닫기")
+                                .font(.notoSansKR(weight: .regular400, size: 17))
+                                .foregroundStyle(Color(.sButton))
+                        }
                     }
                 }
             }

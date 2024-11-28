@@ -25,7 +25,7 @@ final class SearchWritingViewModel {
     }
     
     var saveButtonEnabled: Bool {
-        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.playlistDescription.isEmpty && !playlist.songs.isEmpty && !isPhotoLoading
+        playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.songs.isEmpty && !isPhotoLoading && !playlist.playlistName.isEmpty
     }
     
     // 커버 이미지

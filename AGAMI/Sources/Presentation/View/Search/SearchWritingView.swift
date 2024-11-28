@@ -56,6 +56,7 @@ struct SearchWritingView: View {
         .ignoresSafeArea(edges: .bottom)
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture(perform: hideKeyboard)
+        .scrollDismissesKeyboard(.immediately)
         .scrollDisabled(viewModel.isPhotoLoading)
         .navigationBarBackButtonHidden(true)
         .disablePopGesture()

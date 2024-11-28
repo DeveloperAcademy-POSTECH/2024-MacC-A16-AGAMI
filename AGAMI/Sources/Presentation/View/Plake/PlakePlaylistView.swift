@@ -233,7 +233,7 @@ private struct TitleAndDescriptionView: View {
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
                 
-                TextField("", text: $viewModel.playlist.playlistDescription, axis: .vertical)
+                TextField("기록하고 싶은 내용을 작성해보세요", text: $viewModel.playlist.playlistDescription, axis: .vertical)
                     .font(.notoSansKR(weight: .regular400, size: 15))
                     .foregroundStyle(Color(.sBodyText))
                     .lineSpacing(3)
@@ -251,7 +251,7 @@ private struct TitleAndDescriptionView: View {
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
-                
+
                 HStack(spacing: 11) {
                     Text(viewModel.formatDateToString(viewModel.playlist.generationTime))
                         .font(.notoSansKR(weight: .regular400, size: 15))
@@ -271,16 +271,18 @@ private struct TitleAndDescriptionView: View {
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
-                
-                Text(viewModel.playlist.playlistDescription.forceCharWrapping)
-                    .font(.notoSansKR(weight: .regular400, size: 15))
-                    .foregroundStyle(Color(.sBodyText))
-                    .lineSpacing(3)
-                    .lineLimit(nil)
-                
-                Divider().frame(height: 0.5)
-                    .background(Color(.sLine))
-                    .padding(.top, 12)
+
+                if !viewModel.playlist.playlistDescription.isEmpty {
+                    Text(viewModel.playlist.playlistDescription.forceCharWrapping)
+                        .font(.notoSansKR(weight: .regular400, size: 15))
+                        .foregroundStyle(Color(.sBodyText))
+                        .lineSpacing(3)
+                        .lineLimit(nil)
+
+                    Divider().frame(height: 0.5)
+                        .background(Color(.sLine))
+                        .padding(.top, 12)
+                }
             }
         }
     }

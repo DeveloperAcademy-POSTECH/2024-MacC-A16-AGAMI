@@ -21,6 +21,7 @@ struct MapView: View {
     var body: some View {
         NavigationStack(path: $mapCoord.path) {
             MKMapViewWrapper(viewModel: viewModel)
+                .ignoresSafeArea(edges: .bottom)
                 .onAppearAndActiveCheckUserValued(scenePhase)
                 .onAppear(perform: viewModel.initializeView)
                 .navigationTitle("기록 지도")

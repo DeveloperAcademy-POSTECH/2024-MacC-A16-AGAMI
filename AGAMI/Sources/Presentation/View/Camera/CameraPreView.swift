@@ -9,32 +9,48 @@ import SwiftUI
 import AVFoundation
 
 struct CameraPreview: UIViewRepresentable {
+    let viewModel: CameraViewModel
+
     class VideoPreviewView: UIView {
-        override class var layerClass: AnyClass {
-             AVCaptureVideoPreviewLayer.self
-        }
-        
+        override class var layerClass: AnyClass { AVCaptureVideoPreviewLayer.self }
+
         var videoPreviewLayer: AVCaptureVideoPreviewLayer {
             guard let previewLayer = layer as? AVCaptureVideoPreviewLayer
-            else {
-                fatalError("Expected AVCaptureVideoPreviewLayer but found \(type(of: layer))")
-            }
+            else { fatalError("Expected AVCaptureVideoPreviewLayer but found \(type(of: layer))") }
             return previewLayer
         }
     }
-    
-    let session: AVCaptureSession
-    
+
     func makeUIView(context: Context) -> VideoPreviewView {
         let view = VideoPreviewView()
-        
-        view.backgroundColor = .white // 기본 백그라운드 색 지정
-        view.videoPreviewLayer.videoGravity = .resizeAspectFill // 카메라 프리뷰 ratio 조절(fit, fill)
-        view.videoPreviewLayer.cornerRadius = 4 // 프리뷰 모서리에 CornerRadius를 결정
-        view.videoPreviewLayer.session = session // 카메라 세션 지정(필수)
+        view.backgroundColor = .white
+        view.videoPreviewLayer.videoGravity = .resizeAspectFill
+        view.videoPreviewLayer.cornerRadius = 4
+        view.videoPreviewLayer.session = viewModel.getSession()
+
+        let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(context.coordinator.handleTap(_:)))
+        view.addGestureRecognizer(tapGesture)
 
         return view
     }
-    
+
     func updateUIView(_ uiView: VideoPreviewView, context: Context) { }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(self)
+    }
+
+    class Coordinator: NSObject {
+        let parent: CameraPreview
+
+        init(_ parent: CameraPreview) {
+            self.parent = parent
+        }
+
+        @objc func handleTap(_ sender: UITapGestureRecognizer) {
+            let tapPoint = sender.location(in: sender.view)
+            guard let previewView = sender.view else { return }
+            parent.viewModel.setFocus(at: tapPoint, in: previewView)
+        }
+    }
 }

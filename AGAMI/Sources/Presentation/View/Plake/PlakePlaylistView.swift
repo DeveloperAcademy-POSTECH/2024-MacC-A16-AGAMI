@@ -22,6 +22,7 @@ struct PlakePlaylistView: View {
     var body: some View {
         ZStack {
             ListView(viewModel: viewModel)
+
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
                 AppleMusicLottieView()
@@ -30,9 +31,11 @@ struct PlakePlaylistView: View {
             case .none:
                 EmptyView()
             }
+
             if viewModel.presentationState.isLoading {
                 ProgressView()
             }
+            
             if viewModel.presentationState.isShowingSongDetailView {
                 SongDetailView(detailSong: viewModel.detailSong,
                                isLoading: viewModel.presentationState.isDetailViewLoading,
@@ -191,7 +194,7 @@ private struct ImageView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 4))
                     .highPriorityGesture(
                         TapGesture().onEnded {
-                            coordinator.push(route: .imageViewerView(urlString: viewModel.playlist.photoURL))
+                            coordinator.presentFullScreenCover(.imageViewerView(urlString: viewModel.playlist.photoURL))
                         }
                     )
                 

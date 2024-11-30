@@ -88,4 +88,8 @@ final class CameraViewModel {
     func setFocus(at point: CGPoint, in view: UIView) {
         cameraService.setFocus(at: point, in: view)
     }
+
+    func playSimpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
 }

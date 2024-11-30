@@ -15,40 +15,42 @@ struct ImageViewerView: View {
     let urlString: String
 
     var body: some View {
-        ZStack {
-            VStack {
-                Spacer()
-                if let image = image {
-                    PinchableImageView(image: image)
-                } else {
-                    ProgressView("다운로드 중...")
+        NavigationStack {
+            ZStack {
+                VStack {
+                    Spacer()
+                    if let image = image {
+                        PinchableImageView(image: image)
+                    } else {
+                        ProgressView("다운로드 중...")
+                    }
+                    Spacer()
                 }
-                Spacer()
+                if isDownloading { ProgressView("다운로드 중...") }
             }
-            if isDownloading { ProgressView("다운로드 중...") }
+            .onAppear(perform: loadImage)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(Color(.sBlack))
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        coordinator.dismissFullScreenCover()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundStyle(Color(.sMain))
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        Task { await savePhotoToAlbum() }
+                    } label: {
+                        Image(systemName: "square.and.arrow.down")
+                            .foregroundStyle(Color(.sMain))
+                    }
+                }
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.sBlack))
-        .navigationBarBackButtonHidden()
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    coordinator.pop()
-                } label: {
-                    Image(systemName: "chevron.left")
-                        .foregroundStyle(Color(.sMain))
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    Task { await savePhotoToAlbum() }
-                } label: {
-                    Image(systemName: "square.and.arrow.down")
-                        .foregroundStyle(Color(.sMain))
-                }
-            }
-        }
-        .onAppear(perform: loadImage)
     }
 
     private func loadImage() {

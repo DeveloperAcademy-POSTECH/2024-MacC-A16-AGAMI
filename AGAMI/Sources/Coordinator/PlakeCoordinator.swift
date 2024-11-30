@@ -17,8 +17,6 @@ enum PlakeRoute: Hashable {
 
     case placeListView(viewModel: CollectionPlaceViewModel)
 
-    case imageViewerView(urlString: String)
-
     var id: String {
         switch self {
         case .listView: return "listView"
@@ -28,8 +26,6 @@ enum PlakeRoute: Hashable {
         case .cameraView: return "cameraView"
 
         case .placeListView: return "placeListView"
-
-        case .imageViewerView: return "imageViewerView"
         }
     }
     
@@ -68,10 +64,14 @@ enum PlakeSheet: Hashable, Identifiable {
     }
 }
 
-enum PlakeFullScreenCover: String, Identifiable {
-    var id: String { self.rawValue }
+enum PlakeFullScreenCover: Hashable, Identifiable {
+    var id: String {
+        switch self {
+        case .imageViewerView: return "imageViewerView"
+        }
+    }
     
-    case dummyFullScreenCover
+    case imageViewerView(urlString: String)
 }
 
 final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
@@ -88,8 +88,6 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             CameraView(viewModel: .init(container: viewModelContainer))
         case let .placeListView(viewModel):
             CollectionPlaceView(viewModel: viewModel)
-        case let .imageViewerView(urlString):
-            ImageViewerView(urlString: urlString)
         }
     }
     
@@ -117,8 +115,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
     @ViewBuilder
     func buildFullScreenCover(cover: PlakeFullScreenCover) -> some View {
         switch cover {
-        case .dummyFullScreenCover:
-            EmptyView()
+        case let .imageViewerView(urlString):
+            ImageViewerView(urlString: urlString)
         }
     }
 }

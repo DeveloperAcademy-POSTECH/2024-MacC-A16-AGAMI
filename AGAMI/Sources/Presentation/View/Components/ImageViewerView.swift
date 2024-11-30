@@ -40,13 +40,11 @@ struct ImageViewerView: View {
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
-                if let image = image {
-                    Button {
-                        Task { await savePhotoToAlbum() }
-                    } label: {
-                        Image(systemName: "square.and.arrow.down")
-                            .foregroundStyle(Color(.sMain))
-                    }
+                Button {
+                    Task { await savePhotoToAlbum() }
+                } label: {
+                    Image(systemName: "square.and.arrow.down")
+                        .foregroundStyle(Color(.sMain))
                 }
             }
         }
@@ -140,7 +138,7 @@ private struct PinchableImageView: UIViewRepresentable {
         scrollView.contentInset = UIEdgeInsets(top: verticalInset, left: horizontalInset, bottom: verticalInset, right: horizontalInset)
     }
 
-    class Coordinator: NSObject, UIScrollViewDelegate {
+    final class Coordinator: NSObject, UIScrollViewDelegate {
         var imageView: UIImageView?
         weak var scrollView: UIScrollView?
 

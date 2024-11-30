@@ -6,65 +6,26 @@
 //
 
 import SwiftUI
-import AVFoundation
-import UIKit
 
 struct CameraView: View {
     @Environment(PlakeCoordinator.self) private var coordinator
-    @State private var viewModel = CameraViewModel()
-    let viewModelContainer: CoordinatorViewModelContainer?
-    
+    @State private var viewModel: CameraViewModel
+
+    init(viewModel: CameraViewModel) {
+        _viewModel = .init(wrappedValue: viewModel)
+    }
+
     var body: some View {
         GeometryReader { geometry in
-            ZStack {
-                Color(.sBlack).edgesIgnoringSafeArea(.all)
-                
-                VStack(spacing: 0) {
-                    Spacer()
-                    
-                    if viewModel.isPhotoCaptured, let recentImage = viewModel.photoUIImage {
-                        Image(uiImage: recentImage)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: geometry.size.width, height: geometry.size.width * 4 / 5)
-                            .clipShape(RoundedRectangle(cornerRadius: 4))
-                            .clipped()
-                    } else {
-                        viewModel.cameraPreView
-                            .frame(width: geometry.size.width, height: geometry.size.width * 4 / 5)
-                            .onAppear {
-                                viewModel.configure()
-                            }
-                            .gesture(
-                                MagnificationGesture()
-                                    .onChanged { val in
-                                        viewModel.zoom(factor: val)
-                                    }
-                                    .onEnded { _ in
-                                        viewModel.zoomInitialize()
-                                    }
-                            )
-                    }
-                    
-                    HStack(spacing: 44) {
-                        if !viewModel.isPhotoCaptured {
-                            switchFlashButton
-                            captureButton
-                            changeCameraButton
-                        } else {
-                            ZStack {
-                                usedPhotoButton
-                                
-                                HStack(spacing: 0) {
-                                    resetPhotoButton
-                                    Spacer()
-                                }
-                            }
-                        }
-                    }
-                    .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
-                }
+            VStack(spacing: 0) {
+                Spacer()
+
+                PhotoPreview(viewModel: viewModel, size: geometry.size)
+
+                ConfigureButtons(viewModel: viewModel)
             }
+            .ignoresSafeArea()
+            .background(Color(.sBlack))
             .navigationBarBackButtonHidden()
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -74,8 +35,121 @@ struct CameraView: View {
             .disablePopGesture()
         }
     }
-    
-    private var captureButton: some View {
+}
+
+private struct PhotoPreview: View {
+    let viewModel: CameraViewModel
+    let size: CGSize
+
+    var body: some View {
+        if viewModel.isPhotoCaptured, let recentImage = viewModel.photoUIImage {
+            Image(uiImage: recentImage)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: size.width, height: size.width * 4 / 5)
+                .clipShape(RoundedRectangle(cornerRadius: 4))
+                .clipped()
+        } else {
+            CameraPreview(viewModel: viewModel)
+                .frame(width: size.width, height: size.width * 4 / 5)
+                .onAppear {
+                    viewModel.configure()
+                }
+                .gesture(
+                    MagnificationGesture()
+                        .onChanged { val in
+                            viewModel.zoom(factor: val)
+                        }
+                        .onEnded { _ in
+                            viewModel.initializeZoom()
+                        }
+                )
+        }
+    }
+}
+
+private struct ConfigureButtons: View {
+    let viewModel: CameraViewModel
+
+    var body: some View {
+        HStack(spacing: 44) {
+            if !viewModel.isPhotoCaptured {
+                ToggleFlashButton(viewModel: viewModel)
+                CaptureButton(viewModel: viewModel)
+                ToggleCameraButton(viewModel: viewModel)
+            } else {
+                ZStack {
+                    SavePhotoButton(viewModel: viewModel)
+
+                    HStack(spacing: 0) {
+                        ResetPhotoButton(viewModel: viewModel)
+                        Spacer()
+                    }
+                }
+            }
+        }
+        .padding(EdgeInsets(top: 87, leading: 54, bottom: 113, trailing: 54))
+    }
+}
+
+private struct ResetPhotoButton: View {
+    let viewModel: CameraViewModel
+
+    var body: some View {
+        Button {
+            viewModel.resetPhoto()
+        } label: {
+            Circle()
+                .foregroundColor(Color(.sMainTab))
+                .frame(width: 56, height: 56, alignment: .center)
+                .overlay(
+                    Image(systemName: "multiply")
+                        .font(.system(size: 24, weight: .medium))
+                        .foregroundColor(Color(.sWhite)))
+        }
+    }
+}
+
+private struct ToggleFlashButton: View {
+    let viewModel: CameraViewModel
+    var body: some View {
+        Button {
+            viewModel.toggleFlash()
+        } label: {
+            Circle()
+                .foregroundColor(Color(.sMainTab))
+                .frame(width: 56, height: 56, alignment: .center)
+                .overlay(
+                    Image(systemName: viewModel.isFlashOn ? "bolt.fill" : "bolt.slash.fill")
+                        .font(.system(size: 26, weight: .regular))
+                )
+                .accentColor(viewModel.isFlashOn ? Color(.sFlash) : Color(.sWhite))
+        }
+    }
+}
+
+private struct ToggleCameraButton: View {
+    let viewModel: CameraViewModel
+
+    var body: some View {
+        Button {
+            viewModel.toggleCamera()
+        } label: {
+            Circle()
+                .foregroundColor(Color(.sMainTab))
+                .frame(width: 56, height: 56, alignment: .center)
+                .overlay(
+                    Image(systemName: "camera.rotate.fill")
+                        .font(.system(size: 24, weight: .regular))
+                        .foregroundColor(Color(.sWhite)))
+        }
+    }
+}
+
+private struct CaptureButton: View {
+    let viewModel: CameraViewModel
+
+    var body: some View {
         Button {
             viewModel.capturePhoto()
         } label: {
@@ -89,33 +163,15 @@ struct CameraView: View {
                 )
         }
     }
-    
-    private var resetPhotoButton: some View {
+}
+
+private struct SavePhotoButton: View {
+    @Environment(PlakeCoordinator.self) private var coordinator
+    let viewModel: CameraViewModel
+
+    var body: some View {
         Button {
-            viewModel.resetPhoto()
-        } label: {
-            Circle()
-                .foregroundColor(Color(.sMainTab))
-                .frame(width: 56, height: 56, alignment: .center)
-                .overlay(
-                    Image(systemName: "multiply")
-                        .font(.system(size: 24, weight: .medium))
-                        .foregroundColor(Color(.sWhite)))
-        }
-    }
-    
-    private var usedPhotoButton: some View {
-        Button {
-            guard let croppedImage = viewModel.photoUIImage?.cropToFiveByFour() else { return }
-            
-            switch viewModelContainer {
-            case let .searchWriting(viewModel):
-                viewModel.savePhotoUIImage(photoUIImage: croppedImage)
-            case let .plakePlaylist(viewModel):
-                viewModel.setPhotoFromCamera(photo: croppedImage)
-            case nil:
-                return
-            }
+            viewModel.savePhoto()
             coordinator.pop()
         } label: {
             Image(.cameraButton)
@@ -123,41 +179,12 @@ struct CameraView: View {
                 .frame(width: 85, height: 85, alignment: .center)
         }
     }
-    
-    private var switchFlashButton: some View {
-        Button {
-            viewModel.switchFlash()
-        } label: {
-            Circle()
-                .foregroundColor(Color(.sMainTab))
-                .frame(width: 56, height: 56, alignment: .center)
-                .overlay(
-                    Image(systemName: viewModel.isFlashOn ? "bolt.fill" : "bolt.slash.fill")
-                        .font(.system(size: 26, weight: .regular))
-                )
-                .accentColor(viewModel.isFlashOn ? Color(.sFlash) : Color(.sWhite))
-        }
-    }
-    
-    private var changeCameraButton: some View {
-        Button {
-            viewModel.changeCamera()
-        } label: {
-            Circle()
-                .foregroundColor(Color(.sMainTab))
-                .frame(width: 56, height: 56, alignment: .center)
-                .overlay(
-                    Image(systemName: "camera.rotate.fill")
-                        .font(.system(size: 24, weight: .regular))
-                        .foregroundColor(Color(.sWhite)))
-        }
-    }
 }
 
 private struct ToolbarLeadingItem: View {
     @Environment(PlakeCoordinator.self) private var coordinator
     var viewModel: CameraViewModel
-    
+
     var body: some View {
         Button {
             coordinator.pop()

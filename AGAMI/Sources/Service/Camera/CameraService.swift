@@ -62,7 +62,7 @@ final class CameraService: NSObject {
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] authStatus in
                 if authStatus {
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         self?.setUpCamera()
                     }
                 }
@@ -70,7 +70,7 @@ final class CameraService: NSObject {
         case .restricted:
             AVCaptureDevice.requestAccess(for: .video) { [weak self] authStatus in
                 if authStatus {
-                    DispatchQueue.main.async {
+                    Task { @MainActor in
                         self?.setUpCamera()
                     }
                 }
@@ -95,7 +95,7 @@ final class CameraService: NSObject {
         dump("사진 저장")
     }
     
-    func changeCamera() {
+    func toggleCamera() {
         guard let currentPosition = videoDeviceInput else { return }
         
         let newPosition: AVCaptureDevice.Position = currentPosition.device.position == .front ? .back : .front
@@ -131,6 +131,30 @@ final class CameraService: NSObject {
             device.unlockForConfiguration()
         } catch {
             dump(error.localizedDescription)
+        }
+    }
+
+    func setFocus(at point: CGPoint, in view: UIView) {
+        guard let device = videoDeviceInput?.device else { return }
+
+        let focusPoint = CGPoint(x: point.x / view.bounds.width, y: point.y / view.bounds.height)
+
+        do {
+            try device.lockForConfiguration()
+
+            if device.isFocusPointOfInterestSupported {
+                device.focusPointOfInterest = focusPoint
+                device.focusMode = .autoFocus
+            }
+
+            if device.isExposurePointOfInterestSupported {
+                device.exposurePointOfInterest = focusPoint
+                device.exposureMode = .continuousAutoExposure
+            }
+
+            device.unlockForConfiguration()
+        } catch {
+            print("Failed to set focus: \(error.localizedDescription)")
         }
     }
 }

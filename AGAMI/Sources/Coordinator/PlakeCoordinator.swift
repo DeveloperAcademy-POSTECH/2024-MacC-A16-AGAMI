@@ -85,7 +85,7 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
         case .searchWritingView:
             SearchWritingView()
         case let .cameraView(viewModelContainer):
-            CameraView(viewModelContainer: viewModelContainer)
+            CameraView(viewModel: .init(container: viewModelContainer))
         case let .placeListView(viewModel):
             CollectionPlaceView(viewModel: viewModel)
         case let .imageViewerView(urlString):

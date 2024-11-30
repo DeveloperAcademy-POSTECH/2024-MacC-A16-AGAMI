@@ -18,7 +18,6 @@ final class CameraViewModel {
 
     var viewModelContainer: CoordinatorViewModelContainer?
     var photoUIImage: UIImage?
-    var isPhotoCaptured: Bool = false
     var isFlashOn: Bool = false
     var photoURL: String?
 
@@ -27,7 +26,6 @@ final class CameraViewModel {
         cameraService.onPhotoCaptured = { [weak self] imageData in
             if let image = UIImage(data: imageData) {
                 self?.photoUIImage = image
-                self?.isPhotoCaptured = true
             }
         }
     }
@@ -45,7 +43,6 @@ final class CameraViewModel {
     }
 
     func resetPhoto() {
-        isPhotoCaptured = false
         photoUIImage = nil
         cameraService.session.stopRunning()
         cameraService.setUpCamera()

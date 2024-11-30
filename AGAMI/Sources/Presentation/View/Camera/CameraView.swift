@@ -42,7 +42,7 @@ private struct PhotoPreview: View {
     let size: CGSize
 
     var body: some View {
-        if viewModel.isPhotoCaptured, let recentImage = viewModel.photoUIImage {
+        if let recentImage = viewModel.photoUIImage {
             Image(uiImage: recentImage)
                 .resizable()
                 .aspectRatio(contentMode: .fill)
@@ -73,7 +73,7 @@ private struct ConfigureButtons: View {
 
     var body: some View {
         HStack(spacing: 44) {
-            if !viewModel.isPhotoCaptured {
+            if viewModel.photoUIImage == nil {
                 ToggleFlashButton(viewModel: viewModel)
                 CaptureButton(viewModel: viewModel)
                 ToggleCameraButton(viewModel: viewModel)
@@ -191,7 +191,7 @@ private struct ToolbarLeadingItem: View {
         Button {
             coordinator.pop()
         } label: {
-            if !viewModel.isPhotoCaptured {
+            if viewModel.photoUIImage == nil {
                 Image(systemName: "chevron.backward")
                     .font(.system(size: 16, weight: .regular))
                     .foregroundStyle(Color(.sMain))

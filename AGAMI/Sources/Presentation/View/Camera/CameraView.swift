@@ -152,6 +152,7 @@ private struct CaptureButton: View {
     var body: some View {
         Button {
             viewModel.capturePhoto()
+            viewModel.playSimpleHaptic()
         } label: {
             Circle()
                 .foregroundColor(Color(.sMain))
@@ -172,6 +173,7 @@ private struct SavePhotoButton: View {
     var body: some View {
         Button {
             viewModel.savePhoto()
+            viewModel.playSimpleHaptic()
             coordinator.pop()
         } label: {
             Image(.cameraButton)

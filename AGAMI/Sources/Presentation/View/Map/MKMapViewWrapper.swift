@@ -45,7 +45,7 @@ struct MKMapViewWrapper: UIViewRepresentable {
         Coordinator(self)
     }
 
-    class Coordinator: NSObject, MKMapViewDelegate {
+    final class Coordinator: NSObject, MKMapViewDelegate {
         var parent: MKMapViewWrapper
 
         init(_ parent: MKMapViewWrapper) {

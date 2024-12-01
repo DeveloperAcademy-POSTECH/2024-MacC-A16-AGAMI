@@ -37,15 +37,31 @@ private struct StickerImage: View {
                 Image(uiImage: image)
                     .resizable()
                     .aspectRatio(1, contentMode: .fit)
-                    .padding(.horizontal, 36)
+                    .padding(.horizontal, 32)
             } else {
                 Image(.sologPlaceholder)
                     .resizable()
                     .aspectRatio(1, contentMode: .fill)
                     .clipped()
-                    .padding(.horizontal, 36)
+                    .padding(.horizontal, 32)
             }
         }
+    }
+}
+
+private struct LogoRow: View {
+    var body: some View {
+        HStack(alignment: .center, spacing: 6) {
+            Image(.sologListIcon)
+                .resizable()
+                .frame(width: 40, height: 40)
+            Text("소록")
+                .font(.sCoreDream(weight: .dream5, size: 26))
+                .foregroundStyle(Color(.sMain))
+            Spacer()
+
+        }
+        .padding(EdgeInsets(top: 20, leading: -40, bottom: 24, trailing: -40))
     }
 }
 
@@ -58,17 +74,19 @@ private struct WithOneSong: View {
         let address = playlist.streetAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines)
 
         VStack(alignment: .leading, spacing: 0) {
+            LogoRow()
+
             StickerImage(uiImage: images.first)
-                .padding(.top, 60)
 
             Spacer()
 
             Text("\(title ?? "")")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(Color(.sLine))
+                .foregroundStyle(Color(.sBodyText))
+                .lineLimit(1)
                 .padding(.bottom, 6)
 
-            Text("'\(address ?? "")'에서\n수집한 기록입니다.")
+            Text("'\(address ?? "")'에서\n수집한 노래 기록입니다.")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(Color(.sWhite))
                 .multilineTextAlignment(.leading)
@@ -88,6 +106,8 @@ private struct WithTwoSongs: View {
         let address = playlist.streetAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines)
 
         VStack(alignment: .leading, spacing: 0) {
+            LogoRow()
+
             ZStack {
                 Group {
                     StickerImage(uiImage: images.first)
@@ -97,20 +117,20 @@ private struct WithTwoSongs: View {
                         .rotationEffect(.degrees(8.03))
                         .offset(x: 64, y: 96)
                 }
-                .padding(.horizontal, 32)
+                .padding(.horizontal, 40)
 
             }
             .aspectRatio(1, contentMode: .fit)
-            .padding(.top, 70)
 
             Spacer()
 
             Text("\(title ?? "") 외 1곡")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(Color(.sLine))
+                .foregroundStyle(Color(.sBodyText))
+                .lineLimit(1)
                 .padding(.bottom, 6)
 
-            Text("'\(address ?? "")'에서\n수집한 기록입니다.")
+            Text("'\(address ?? "")'에서\n수집한 노래 기록입니다.")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(Color(.sWhite))
                 .multilineTextAlignment(.leading)
@@ -130,6 +150,8 @@ private struct WithMultipleSongs: View {
         let address = playlist.streetAddress.split(separator: ",").first?.trimmingCharacters(in: .whitespacesAndNewlines)
 
         VStack(alignment: .leading, spacing: 0) {
+            LogoRow()
+
             ZStack {
                 Group {
                     StickerImage(uiImage: images.first)
@@ -142,19 +164,19 @@ private struct WithMultipleSongs: View {
                         .rotationEffect(.degrees(3.28))
                         .offset(x: 48, y: 96)
                 }
-                .padding(.horizontal, 32)
+                .padding(.horizontal, 40)
             }
             .aspectRatio(1, contentMode: .fit)
-            .padding(.top, 70)
 
             Spacer()
 
             Text("\(title ?? "") 외 \(playlist.songs.count - 1)곡")
                 .font(.system(size: 24, weight: .medium))
-                .foregroundStyle(Color(.sLine))
+                .foregroundStyle(Color(.sBodyText))
+                .lineLimit(1)
                 .padding(.bottom, 6)
 
-            Text("'\(address ?? "")'에서\n수집한 기록입니다.")
+            Text("'\(address ?? "")'에서\n수집한 노래 기록입니다.")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(Color(.sWhite))
                 .multilineTextAlignment(.leading)

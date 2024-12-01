@@ -35,7 +35,7 @@ struct PlakePlaylistView: View {
             if viewModel.presentationState.isLoading {
                 ProgressView()
             }
-            
+
             if viewModel.presentationState.isShowingSongDetailView {
                 SongDetailView(detailSong: viewModel.detailSong,
                                isLoading: viewModel.presentationState.isDetailViewLoading,

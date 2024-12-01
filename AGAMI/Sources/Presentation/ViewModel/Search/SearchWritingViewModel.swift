@@ -150,19 +150,17 @@ final class SearchWritingViewModel {
     
     func processPhoto(image: UIImage) {
         isPhotoLoading = true
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self = self else { return }
-            
+        Task(priority: .userInitiated) {
             if let resizedAndCroppedImage = image.resizedAndCropped(to: CGSize(width: 1024, height: 1024))?.cropToFiveByFour() {
                 let compressedImageData = resizedAndCroppedImage.jpegData(compressionQuality: 0.6)
 
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.playlist.photoData = compressedImageData
                     self.persistenceService.updatePlaylist()
                     self.isPhotoLoading = false
                 }
             } else {
-                DispatchQueue.main.async {
+                await MainActor.run {
                     self.isPhotoLoading = false
                 }
             }

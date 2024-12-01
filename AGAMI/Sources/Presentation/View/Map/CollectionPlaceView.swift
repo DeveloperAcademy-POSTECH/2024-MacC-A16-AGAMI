@@ -71,8 +71,11 @@ private struct PlakeListCell: View {
         Button {
             viewModel.simpleHaptic()
             plakeCoord.dismissSheet()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                plakeCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
+            Task {
+                try await Task.sleep(nanoseconds: 3 * 100_000_000)
+                await MainActor.run {
+                    plakeCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
+                }
             }
         } label: {
             VStack(alignment: .leading, spacing: 0) {

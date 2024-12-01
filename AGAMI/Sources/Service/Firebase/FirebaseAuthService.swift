@@ -209,16 +209,14 @@ final class FirebaseAuthService {
         guard let user = user else {
             throw AuthServiceError.userNotFound
         }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            Task {
-                do {
-                    try await FirebaseService().deleteUserInformationDocument(userID: user.uid) {
-                        dump("Firestore document deleted successfully.")
-                    }
-                    try await user.delete()
-                    dump("Firebase user account deleted successfully.")
+        Task {
+            try await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+            do {
+                try await FirebaseService().deleteUserInformationDocument(userID: user.uid) {
+                    dump("Firestore document deleted successfully.")
                 }
+                try await user.delete()
+                dump("Firebase user account deleted successfully.")
             }
         }
     }

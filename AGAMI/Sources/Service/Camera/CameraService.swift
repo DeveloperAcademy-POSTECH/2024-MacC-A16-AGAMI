@@ -139,23 +139,19 @@ final class CameraService: NSObject {
 
         let focusPoint = CGPoint(x: point.x / view.bounds.width, y: point.y / view.bounds.height)
 
-        do {
-            try device.lockForConfiguration()
+        try? device.lockForConfiguration()
 
-            if device.isFocusPointOfInterestSupported {
-                device.focusPointOfInterest = focusPoint
-                device.focusMode = .autoFocus
-            }
-
-            if device.isExposurePointOfInterestSupported {
-                device.exposurePointOfInterest = focusPoint
-                device.exposureMode = .continuousAutoExposure
-            }
-
-            device.unlockForConfiguration()
-        } catch {
-            print("Failed to set focus: \(error.localizedDescription)")
+        if device.isFocusPointOfInterestSupported {
+            device.focusPointOfInterest = focusPoint
+            device.focusMode = .autoFocus
         }
+
+        if device.isExposurePointOfInterestSupported {
+            device.exposurePointOfInterest = focusPoint
+            device.exposureMode = .continuousAutoExposure
+        }
+
+        device.unlockForConfiguration()
     }
 }
 

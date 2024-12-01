@@ -45,8 +45,8 @@ final class CameraService: NSObject {
                     }
                     output.maxPhotoQualityPrioritization = .quality
                 }
-                
-                DispatchQueue.global(qos: .userInitiated).async {
+
+                Task(priority: .userInitiated) {
                     self.session.startRunning()
                 }
             } catch {

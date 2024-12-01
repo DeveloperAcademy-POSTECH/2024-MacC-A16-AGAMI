@@ -45,8 +45,9 @@ struct DeleteAccountView: View {
                             .foregroundStyle(Color(.sSubHead))
                             .kerning(-0.43)
                     }
-                    .onAppear {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    .task {
+                        try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+                        await MainActor.run {
                             UserDefaults.standard.removeObject(forKey: "isSignedIn")
                             coordinator.dismissSheet()
                             coordinator.popToRoot()

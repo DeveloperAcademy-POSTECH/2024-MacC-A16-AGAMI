@@ -61,7 +61,7 @@ private struct LogoRow: View {
             Spacer()
 
         }
-        .padding(EdgeInsets(top: 20, leading: -40, bottom: 24, trailing: -40))
+        .padding(EdgeInsets(top: 20, leading: -24, bottom: 24, trailing: -24))
     }
 }
 
@@ -77,6 +77,7 @@ private struct WithOneSong: View {
             LogoRow()
 
             StickerImage(uiImage: images.first)
+                .padding(.horizontal, 16)
 
             Spacer()
 
@@ -117,7 +118,7 @@ private struct WithTwoSongs: View {
                         .rotationEffect(.degrees(8.03))
                         .offset(x: 64, y: 96)
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 56)
 
             }
             .aspectRatio(1, contentMode: .fit)
@@ -156,7 +157,7 @@ private struct WithMultipleSongs: View {
                 Group {
                     StickerImage(uiImage: images.first)
                         .rotationEffect(.degrees(0.86))
-                        .offset(x: 20, y: -40)
+                        .offset(x: 20, y: -20)
                     StickerImage(uiImage: images.dropLast(1).last)
                         .rotationEffect(.degrees(-12.4))
                         .offset(x: -48, y: 64)
@@ -164,7 +165,7 @@ private struct WithMultipleSongs: View {
                         .rotationEffect(.degrees(3.28))
                         .offset(x: 48, y: 96)
                 }
-                .padding(.horizontal, 40)
+                .padding(.horizontal, 56)
             }
             .aspectRatio(1, contentMode: .fit)
 

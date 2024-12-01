@@ -71,7 +71,7 @@ extension View {
     @ViewBuilder
     func instagramStickerStyle() -> some View {
         self
-            .padding(.horizontal, 64)
+            .padding(.horizontal, 48)
             .frame(width: 480, height: 640)
             .background(.black.opacity(0.2))
             .clipShape(RoundedRectangle(cornerRadius: 10))

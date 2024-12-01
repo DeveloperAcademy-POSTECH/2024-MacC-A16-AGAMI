@@ -156,7 +156,7 @@ final class PlakePlaylistViewModel: Hashable {
             completion(true)
         case .undetermined:
             AVAudioApplication.requestRecordPermission { granted in
-                DispatchQueue.main.async {
+                Task { @MainActor in
                     completion(granted)
                 }
             }
@@ -171,10 +171,13 @@ final class PlakePlaylistViewModel: Hashable {
             if granted {
                 self.shazamStatus = .searching
                 self.shazamService.startRecognition()
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-                    if self.shazamStatus == .searching {
-                        self.shazamStatus = .moreSearching
+
+                Task {
+                    try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
+                    await MainActor.run {
+                        if self.shazamStatus == .searching {
+                            self.shazamStatus = .moreSearching
+                        }
                     }
                 }
             } else {

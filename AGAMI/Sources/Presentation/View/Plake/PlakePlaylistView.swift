@@ -59,15 +59,15 @@ struct PlakePlaylistView: View {
         .confirmationDialog("", isPresented: $viewModel.presentationState.isPhotoDialogPresented) {
             PhotoConfirmationDialogActions(viewModel: viewModel)
         }
-        .alert("플레이크 삭제", isPresented: $viewModel.presentationState.isShowingDeletePlakeAlert) {
+        .alert("기록 삭제하기", isPresented: $viewModel.presentationState.isShowingDeletePlakeAlert) {
             DeletePlakeAlertActions(viewModel: viewModel)
         } message: {
-            Text("삭제한 플레이크는 되돌릴 수 없습니다.")
+            Text("삭제한 기록은 되돌릴 수 없어요.")
         }
         .alert("계정 상태 문제", isPresented: $viewModel.presentationState.isShowingExportingAppleMusicFailedAlert) {
             ExportingFailedAlertActions(viewModel: viewModel)
         } message: {
-            Text("플레이크를 내보낼 수 없습니다.\n Apple Music의 계정 상태를 확인해주세요.")
+            Text("수집한 음악을 내보낼 수 없습니다.\n Apple Music의 계정 상태를 확인해주세요.")
         }
         .alert("기본 이미지로 변경", isPresented: $viewModel.presentationState.isShowingDeletePhotoAlert) {
             DeletePhotoAlertActions(viewModel: viewModel)
@@ -515,7 +515,7 @@ private struct MenuContents: View {
                 }
             }
         } label: {
-            Label("Apple Music로 듣기", systemImage: "music.note.list")
+            Label("Apple Music으로 듣기", systemImage: "music.note.list")
         }
         
         Button {

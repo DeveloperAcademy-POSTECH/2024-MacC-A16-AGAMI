@@ -46,6 +46,10 @@ struct PlaylistRow: View {
                     .kerning(-0.3)
                     .foregroundStyle(Color(.sBodyText))
             }
+            .lineLimit(1)
+            .truncationMode(.tail)
+            .padding(.trailing, 30)
+            
             Spacer()
         }
         .background(isHighlighted ? Color(.sListBack) : .clear)

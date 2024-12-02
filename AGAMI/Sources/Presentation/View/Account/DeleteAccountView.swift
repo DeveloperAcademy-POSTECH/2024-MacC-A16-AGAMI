@@ -46,7 +46,7 @@ struct DeleteAccountView: View {
                             .kerning(-0.43)
                     }
                     .task {
-                        try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+                        try? await Task.sleep(for: .seconds(2))
                         await MainActor.run {
                             UserDefaults.standard.removeObject(forKey: "isSignedIn")
                             coordinator.dismissSheet()

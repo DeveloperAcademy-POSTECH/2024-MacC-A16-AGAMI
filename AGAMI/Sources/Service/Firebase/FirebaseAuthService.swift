@@ -210,7 +210,7 @@ final class FirebaseAuthService {
             throw AuthServiceError.userNotFound
         }
         Task {
-            try await Task.sleep(nanoseconds: 2 * 1_000_000_000)
+            try await Task.sleep(for: .seconds(2))
             do {
                 try await FirebaseService().deleteUserInformationDocument(userID: user.uid) {
                     dump("Firestore document deleted successfully.")

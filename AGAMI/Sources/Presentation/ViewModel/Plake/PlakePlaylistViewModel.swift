@@ -173,7 +173,7 @@ final class PlakePlaylistViewModel: Hashable {
                 self.shazamService.startRecognition()
 
                 Task {
-                    try await Task.sleep(nanoseconds: 5 * 1_000_000_000)
+                   try await Task.sleep(for: .seconds(5))
                     await MainActor.run {
                         if self.shazamStatus == .searching {
                             self.shazamStatus = .moreSearching

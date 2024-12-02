@@ -186,10 +186,7 @@ private struct ImageView: View {
                 KFImage(URL(string: viewModel.playlist.photoURL))
                     .resizable()
                     .cancelOnDisappear(true)
-                    .placeholder {
-                        Image(.sologPlaceholder)
-                            .resizable()
-                    }
+                    .placeholder { EmptyView() }
                     .scaledToFill()
                     .clipShape(RoundedRectangle(cornerRadius: 4))
                     .highPriorityGesture(

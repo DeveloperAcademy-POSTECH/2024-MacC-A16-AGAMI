@@ -23,17 +23,20 @@ let fonts = [
 
 let project = Project(
     name: "AGAMI",
-    settings:
-            .settings(
-                base: [
-                    "OTHER_LDFLAGS": ["-all_load -Objc"],
-                    "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor"
-                ],
-                configurations: [
-                    .debug(name: "Debug", xcconfig: "Configurations/Debug.xcconfig"),
-                    .release(name: "Release", xcconfig: "Configurations/Release.xcconfig")
-                ]
-            ),
+    options: .options(
+        defaultKnownRegions: ["en", "ko"],
+        developmentRegion: "ko"
+    ),
+    settings: .settings(
+        base: [
+            "OTHER_LDFLAGS": ["-all_load -Objc"],
+            "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor"
+        ],
+        configurations: [
+            .debug(name: "Debug", xcconfig: "Configurations/Debug.xcconfig"),
+            .release(name: "Release", xcconfig: "Configurations/Release.xcconfig")
+        ]
+    ),
     targets: [
         .target(
             name: "AGAMI",

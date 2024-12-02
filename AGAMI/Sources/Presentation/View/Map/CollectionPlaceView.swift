@@ -72,7 +72,7 @@ private struct PlakeListCell: View {
             viewModel.simpleHaptic()
             plakeCoord.dismissSheet()
             Task {
-                try await Task.sleep(nanoseconds: 3 * 100_000_000)
+                try await Task.sleep(for: .milliseconds(300))
                 await MainActor.run {
                     plakeCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
                 }

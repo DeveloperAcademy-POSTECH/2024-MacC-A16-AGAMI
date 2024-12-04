@@ -11,7 +11,8 @@ import Kingfisher
 
 // MARK: - MKMapView 래퍼
 struct MKMapViewWrapper: UIViewRepresentable {
-    @Environment(MapCoordinator.self) var coordinator
+    @Environment(PlakeCoordinator.self) private var plakeCoordinator
+    @Environment(MapCoordinator.self) private var mapCoordinator
     var viewModel: MapViewModel
 
     func makeUIView(context: Context) -> MKMapView {
@@ -99,7 +100,7 @@ struct MKMapViewWrapper: UIViewRepresentable {
                     HapticService.shared.playSimpleHaptic()
                     clusterView.setSelected(true, animated: true)
                     let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: playlists)
-                    self.parent.coordinator.push(route: .collectionPlaceView(viewModel: collectionPlaceViewModel))
+                    self.parent.mapCoordinator.push(route: .collectionPlaceView(viewModel: collectionPlaceViewModel))
                 }
 
             } else if let playlistAnnotation = view.annotation as? PlaylistAnnotation,
@@ -110,8 +111,11 @@ struct MKMapViewWrapper: UIViewRepresentable {
                 Task { @MainActor in
                     HapticService.shared.playSimpleHaptic()
                     bubbleView.setSelected(true, animated: true)
-                    let collectionPlaceViewModel = CollectionPlaceViewModel(playlists: [playlist])
-                    self.parent.coordinator.push(route: .collectionPlaceView(viewModel: collectionPlaceViewModel))
+                    self.parent.plakeCoordinator.dismissSheet()
+
+                    try await Task.sleep(for: .milliseconds(300))
+                    let playlistViewModel = PlakePlaylistViewModel(playlist: playlist)
+                    self.parent.plakeCoordinator.push(route: .playlistView(viewModel: playlistViewModel))
                 }
 
             }

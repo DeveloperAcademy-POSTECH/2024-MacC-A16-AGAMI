@@ -20,7 +20,9 @@ class BaseCoordinator<Route: Hashable, Sheet: Identifiable, FullScreenCover: Ide
     }
 
     func pop() {
-        path.removeLast()
+        if !path.isEmpty {
+            path.removeLast()
+        }
     }
 
     func popToRoot() {

@@ -412,9 +412,7 @@ private struct PhotoConfirmationDialogActions: View {
     
     var body: some View {
         Button("카메라") {
-            coordinator.push(route: .cameraView(
-                viewModelContainer: .plakePlaylist(viewModel: viewModel)
-            ))
+            coordinator.presentFullScreenCover(.cameraView(viewModelContainer: .plakePlaylist(viewModel: viewModel)))
         }
         Button("앨범에서 가져오기") {
             viewModel.presentationState.isShowingPicker = true

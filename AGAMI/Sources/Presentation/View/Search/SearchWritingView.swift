@@ -361,7 +361,7 @@ private struct PhotoConfirmationDialogActions: View {
     
     var body: some View {
         Button("사진 찍기") {
-            coordinator.push(route: .cameraView(viewModelContainer: .searchWriting(viewModel: viewModel)))
+            coordinator.presentFullScreenCover(.cameraView(viewModelContainer: .searchWriting(viewModel: viewModel)))
         }
         Button("사진 보관함 열기") {
             viewModel.showPhotoPicker = true

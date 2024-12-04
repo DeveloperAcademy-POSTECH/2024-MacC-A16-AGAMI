@@ -151,18 +151,16 @@ final class SearchWritingViewModel {
     func processPhoto(image: UIImage) {
         isPhotoLoading = true
         Task(priority: .userInitiated) {
-            if let resizedAndCroppedImage = image.resizedAndCropped(to: CGSize(width: 1024, height: 1024))?.cropToFiveByFour() {
-                let compressedImageData = resizedAndCroppedImage.jpegData(compressionQuality: 0.6)
+            guard let resizedAndCroppedImage = image.resizedAndCropped(to: CGSize(width: 1280, height: 1024))
+            else {
+                await MainActor.run { isPhotoLoading = false }
+                return
+            }
 
-                await MainActor.run {
-                    self.playlist.photoData = compressedImageData
-                    self.persistenceService.updatePlaylist()
-                    self.isPhotoLoading = false
-                }
-            } else {
-                await MainActor.run {
-                    self.isPhotoLoading = false
-                }
+            await MainActor.run {
+                self.playlist.photoData = resizedAndCroppedImage.jpegData(compressionQuality: 0.6)
+                self.persistenceService.updatePlaylist()
+                self.isPhotoLoading = false
             }
         }
     }

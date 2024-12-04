@@ -11,20 +11,14 @@ import SwiftUI
 enum PlakeRoute: Hashable {
     case listView
     case playlistView(viewModel: PlakePlaylistViewModel)
-
     case searchWritingView
-    case cameraView(viewModelContainer: CoordinatorViewModelContainer)
-
     case placeListView(viewModel: CollectionPlaceViewModel)
 
     var id: String {
         switch self {
         case .listView: return "listView"
         case .playlistView: return "playlistView"
-
         case .searchWritingView: return "searchWritingView"
-        case .cameraView: return "cameraView"
-
         case .placeListView: return "placeListView"
         }
     }
@@ -68,10 +62,12 @@ enum PlakeFullScreenCover: Hashable, Identifiable {
     var id: String {
         switch self {
         case .imageViewerView: return "imageViewerView"
+        case .cameraView: return "cameraView"
         }
     }
     
     case imageViewerView(urlString: String)
+    case cameraView(viewModelContainer: CoordinatorViewModelContainer)
 }
 
 final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
@@ -84,8 +80,6 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
             PlakePlaylistView(viewModel: viewModel)
         case .searchWritingView:
             SearchWritingView()
-        case let .cameraView(viewModelContainer):
-            CameraView(viewModel: .init(container: viewModelContainer))
         case let .placeListView(viewModel):
             CollectionPlaceView(viewModel: viewModel)
         }
@@ -117,6 +111,8 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
         switch cover {
         case let .imageViewerView(urlString):
             ImageViewerView(urlString: urlString)
+        case let .cameraView(viewModelContainer):
+            CameraView(viewModel: .init(container: viewModelContainer))
         }
     }
 }

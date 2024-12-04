@@ -16,23 +16,24 @@ struct CameraView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
-                Spacer()
+        NavigationStack {
+            GeometryReader { geometry in
+                VStack(spacing: 0) {
+                    Spacer()
 
-                PhotoPreview(viewModel: viewModel, size: geometry.size)
+                    PhotoPreview(viewModel: viewModel, size: geometry.size)
 
-                ConfigureButtons(viewModel: viewModel)
-            }
-            .ignoresSafeArea()
-            .background(Color(.sBlack))
-            .navigationBarBackButtonHidden()
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    ToolbarLeadingItem(viewModel: viewModel)
+                    ConfigureButtons(viewModel: viewModel)
+                }
+                .ignoresSafeArea()
+                .background(Color(.sBlack))
+                .navigationBarBackButtonHidden()
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        ToolbarLeadingItem(viewModel: viewModel)
+                    }
                 }
             }
-            .disablePopGesture()
         }
     }
 }
@@ -174,7 +175,7 @@ private struct SavePhotoButton: View {
         Button {
             viewModel.savePhoto()
             viewModel.playSimpleHaptic()
-            coordinator.pop()
+            coordinator.dismissFullScreenCover()
         } label: {
             Image(.cameraButton)
                 .resizable()
@@ -189,7 +190,7 @@ private struct ToolbarLeadingItem: View {
 
     var body: some View {
         Button {
-            coordinator.pop()
+            coordinator.dismissFullScreenCover()
         } label: {
             if viewModel.photoUIImage == nil {
                 Image(systemName: "chevron.backward")

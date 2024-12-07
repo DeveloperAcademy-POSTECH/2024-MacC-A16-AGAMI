@@ -67,31 +67,8 @@ final class SearchWritingViewModel {
         SearchAddSongViewModel(playlist: playlist)
     }
     
-    func fetchCurrentLocation() async {
-        do {
-            let location = try await locationService.requestCurrentLocation()
-            playlist.latitude = location.coordinate.latitude
-            playlist.longitude = location.coordinate.longitude
-        } catch {
-            dump("현재 위치를 가져오는 데 실패했습니다: \(error)")
-        }
-    }
-    
-    func getCurrentLocation() {
-        guard let currentLocation = locationService.getCurrentLocation() else {
-            dump(#function)
-            return
-        }
-        playlist.latitude = currentLocation.coordinate.latitude
-        playlist.longitude = currentLocation.coordinate.longitude
-        persistenceService.updatePlaylist()
-        
-        locationService.coordinateToStreetAddress { [weak self] address in
-            guard let self = self else { return }
-            
-            self.playlist.streetAddress = address ?? ""
-            persistenceService.updatePlaylist()
-        }
+    func requestCurrentLocation() {
+        locationService.requestCurrentLocation()
     }
     
     func savedPlaylist() async -> Bool {
@@ -214,7 +191,14 @@ final class SearchWritingViewModel {
 }
 
 extension SearchWritingViewModel: LocationServiceDelegate {
-    func locationService(_ service: LocationService, didUpdate location: [CLLocation]) {
-        getCurrentLocation()
+    func locationService(didUpdate location: CLLocation) {
+        Task {
+            playlist.latitude = location.coordinate.latitude
+            playlist.longitude = location.coordinate.longitude
+            if let streetAddress = await locationService.coordinateToStreetAddress() {
+                playlist.streetAddress = streetAddress
+            }
+            await MainActor.run { persistenceService.updatePlaylist() }
+        }
     }
 }

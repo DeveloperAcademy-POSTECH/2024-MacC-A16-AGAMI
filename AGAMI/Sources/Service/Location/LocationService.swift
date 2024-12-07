@@ -9,7 +9,7 @@ import Foundation
 import CoreLocation
 
 protocol LocationServiceDelegate: AnyObject {
-    func locationService(_ service: LocationService, didUpdate location: [CLLocation])
+    func locationService(didUpdate location: CLLocation)
 }
 
 final class LocationService: NSObject {
@@ -24,8 +24,6 @@ final class LocationService: NSObject {
     static let shared = LocationService()
 
     weak var delegate: LocationServiceDelegate?
-
-    private var locationContinuation: CheckedContinuation<CLLocation, Error>?
 
     private override init() {
         locationManager = CLLocationManager()
@@ -47,44 +45,8 @@ final class LocationService: NSObject {
         }
     }
 
-    func requestCurrentLocation() async throws -> CLLocation {
-        return try await withCheckedThrowingContinuation { continuation in
-            self.locationManager.requestLocation()
-            self.locationContinuation = continuation
-        }
-    }
-
-    func getCurrentLocation() -> CLLocation? {
-        currentLocation
-    }
-
-    func coordinateToStreetAddress(completion: @escaping (String?) -> Void) {
-        guard let currentLocation else { return }
-
-        let geocoder = CLGeocoder()
-        let locale = Locale(identifier: "ko_KR")
-
-        geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale, completionHandler: { [weak self] (placemarks, _) in
-            if let self = self {
-                if let address: [CLPlacemark] = placemarks {
-                    var currentAddress: String = ""
-
-                    if let name: String = address.last?.name {
-                        currentAddress += name
-                        placeHolderAddress = name
-                        region = name
-                    }
-
-                    if let area: String = address.last?.locality {
-                        currentAddress += (", \(area)")
-                        locality = area
-                    }
-
-                    self.streetAddress = currentAddress
-                    completion(currentAddress)
-                }
-            }
-        })
+    func requestCurrentLocation() {
+        locationManager.requestLocation()
     }
 
     func coordinateToStreetAddress() async -> String? {
@@ -93,7 +55,7 @@ final class LocationService: NSObject {
             let geocoder = CLGeocoder()
             let locale = Locale(identifier: "ko_KR")
 
-            geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale) { [weak self] (placemarks, _) in
+            geocoder.reverseGeocodeLocation(currentLocation, preferredLocale: locale) { [weak self] placemarks, _ in
                 guard let self = self else { return }
                 if let address = placemarks?.last {
                     var currentAddress = ""
@@ -121,18 +83,13 @@ final class LocationService: NSObject {
 
 extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        if let location = locations.last {
-            currentLocation = location
-            locationContinuation?.resume(returning: location)
-            locationContinuation = nil
-        }
+        guard let location = locations.last else { return }
 
-        self.delegate?.locationService(self, didUpdate: locations)
+        currentLocation = location
+        delegate?.locationService(didUpdate: location)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        locationContinuation?.resume(throwing: error)
-        locationContinuation = nil
         dump("위치 정보 가져오기 실패: \(error.localizedDescription)")
     }
 

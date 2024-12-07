@@ -52,7 +52,7 @@ struct SearchWritingView: View {
             }
             
         }
-        .task { await viewModel.fetchCurrentLocation() }
+        .onAppear(perform: viewModel.requestCurrentLocation)
         .ignoresSafeArea(edges: .bottom)
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture(perform: hideKeyboard)

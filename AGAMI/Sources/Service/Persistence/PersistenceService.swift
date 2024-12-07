@@ -81,8 +81,12 @@ final class PersistenceService {
     func deleteAllPlaylists() {
         let playlists = fetchPlaylists()
         for playlist in playlists {
+            for song in playlist.swiftDataSongs {
+                modelContext.delete(song)
+            }
             modelContext.delete(playlist)
         }
+        updatePlaylist()
     }
     
     func appendSong(from mediaItem: SHMediaItem) {

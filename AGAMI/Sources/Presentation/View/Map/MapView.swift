@@ -23,7 +23,7 @@ struct MapView: View {
             MKMapViewWrapper(viewModel: viewModel)
                 .ignoresSafeArea(edges: .bottom)
                 .onAppearAndActiveCheckUserValued(scenePhase)
-                .onAppear(perform: viewModel.initializeView)
+                .onAppear(perform: viewModel.requestCurrentLocation)
                 .navigationTitle("기록 지도")
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {

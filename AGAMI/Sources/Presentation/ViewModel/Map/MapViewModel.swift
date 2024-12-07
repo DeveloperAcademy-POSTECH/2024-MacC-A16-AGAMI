@@ -11,12 +11,8 @@ import MapKit
 @Observable
 final class MapViewModel {
     private let locationService = LocationService.shared
-    
+
     var currentLocationCoordinate2D: CLLocationCoordinate2D?
-    var isLoaded: Bool = false
-
-    var goToDetail: Bool = false
-
     let playlists: [PlaylistModel]
 
     init(playlists: [PlaylistModel]) {

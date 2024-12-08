@@ -43,7 +43,6 @@ struct PlakePlaylistView: View {
                 .task { await viewModel.fetchAdditionalDetails() }
             }
         }
-        .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
         .task { await viewModel.refreshPlaylist() }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .toolbar {
@@ -54,9 +53,12 @@ struct PlakePlaylistView: View {
                 TopBarTrailingItems(viewModel: viewModel)
             }
         }
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarVisibilityForVersion(.visible, for: .navigationBar)
         .toolbarBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarBackButtonHidden()
+        .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
         .onTapGesture(perform: hideKeyboard)
         .refreshable { await viewModel.refreshPlaylist() }
         .confirmationDialog("", isPresented: $viewModel.presentationState.isPhotoDialogPresented) {
@@ -120,7 +122,8 @@ private struct ListView: View {
             }
             .listStyle(.plain)
             .scrollIndicators(.hidden)
-            
+            .safeAreaInset(edge: .top, spacing: 0) { Color.clear.frame(height: 0) }
+
             if viewModel.presentationState.isEditing {
                 BottomConfigurationBar(viewModel: viewModel)
             }

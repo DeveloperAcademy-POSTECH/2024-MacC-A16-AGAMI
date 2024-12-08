@@ -52,6 +52,7 @@ struct SearchWritingView: View {
             }
             
         }
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear(perform: viewModel.requestCurrentLocation)
         .ignoresSafeArea(edges: .bottom)
         .onAppearAndActiveCheckUserValued(scenePhase)

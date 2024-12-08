@@ -217,7 +217,7 @@ final class PlakePlaylistViewModel: Hashable {
         
         do {
             try await firebaseService.savePlaylistToFirebase(userID: userID, playlist: firestoreModel)
-            refreshPlaylist()
+            await refreshPlaylist()
             initialPlaylist = firestoreModel
         } catch {
             dump("Failed to save playlist to Firebase: \(error)")
@@ -264,19 +264,15 @@ final class PlakePlaylistViewModel: Hashable {
         await MainActor.run { playlist.photoURL = url }
     }
 
-    func refreshPlaylist() {
-        Task {
-            guard let userID = FirebaseAuthService.currentUID,
-                  let newPlaylist = await firebaseService.fetchPlaylist(
-                    userID: userID,
-                    playlistID: playlist.playlistID
-                  ) else { return }
-            
-            await MainActor.run { [weak self] in
-                guard let self = self else { return }
-                self.playlist = newPlaylist
-            }
-        }
+    func refreshPlaylist() async {
+        guard let userID = FirebaseAuthService.currentUID,
+              let newPlaylist = await firebaseService.fetchPlaylist(
+                userID: userID,
+                playlistID: playlist.playlistID
+              )
+        else { return }
+
+        await MainActor.run { playlist = newPlaylist }
     }
     
     func resetSpotifyURLState() {

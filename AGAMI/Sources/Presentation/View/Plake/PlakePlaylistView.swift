@@ -44,7 +44,7 @@ struct PlakePlaylistView: View {
             }
         }
         .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
-        .onAppear(perform: viewModel.refreshPlaylist)
+        .task { await viewModel.refreshPlaylist() }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -58,7 +58,7 @@ struct PlakePlaylistView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarBackButtonHidden()
         .onTapGesture(perform: hideKeyboard)
-        .refreshable { viewModel.refreshPlaylist() }
+        .refreshable { await viewModel.refreshPlaylist() }
         .confirmationDialog("", isPresented: $viewModel.presentationState.isPhotoDialogPresented) {
             PhotoConfirmationDialogActions(viewModel: viewModel)
         }

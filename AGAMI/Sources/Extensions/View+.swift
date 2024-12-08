@@ -29,6 +29,15 @@ extension View {
         }
     }
 
+    @ViewBuilder
+    func toolbarVisibilityForVersion(_ visibility: Visibility, for placement: ToolbarPlacement) -> some View {
+        if #available(iOS 18.0, *) {
+            self.toolbarVisibility(visibility, for: placement)
+        } else {
+            self.toolbar(visibility, for: placement)
+        }
+    }
+
     func onAppearAndActiveCheckUserValued(_ scenePhase: ScenePhase) -> some View {
         self
             .onAppear {

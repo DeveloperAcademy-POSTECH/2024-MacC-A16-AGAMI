@@ -53,7 +53,7 @@ struct SearchWritingView: View {
             
         }
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear(perform: viewModel.requestCurrentLocation)
+        .task { await viewModel.requestCurrentLocation() } 
         .ignoresSafeArea(edges: .bottom)
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onTapGesture(perform: hideKeyboard)

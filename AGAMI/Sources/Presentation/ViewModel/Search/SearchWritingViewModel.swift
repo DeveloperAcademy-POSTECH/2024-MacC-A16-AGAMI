@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import CoreLocation
 import PhotosUI
 import MusicKit
 
@@ -60,15 +59,25 @@ final class SearchWritingViewModel {
     
     init() {
         playlist = persistenceService.fetchPlaylist()
-        locationService.delegate = self
     }
     
     func createSearchAddSongViewModel() -> SearchAddSongViewModel {
         SearchAddSongViewModel(playlist: playlist)
     }
     
-    func requestCurrentLocation() {
-        locationService.requestCurrentLocation()
+    func requestCurrentLocation() async {
+        guard let coordinate = try? await locationService.requestCurrentLocation()
+        else { return }
+
+        playlist.latitude = coordinate.latitude
+        playlist.longitude = coordinate.longitude
+
+        guard let streetAddress = await locationService.coordinateToStreetAddress()
+        else { return }
+
+        playlist.streetAddress = streetAddress
+
+        await MainActor.run { persistenceService.updatePlaylist() }
     }
     
     func savedPlaylist() async -> Bool {
@@ -187,18 +196,5 @@ final class SearchWritingViewModel {
         selectedSong = nil
         detailSong = nil
         showSongDetailView.toggle()
-    }
-}
-
-extension SearchWritingViewModel: LocationServiceDelegate {
-    func locationService(didUpdate location: CLLocation) {
-        Task {
-            playlist.latitude = location.coordinate.latitude
-            playlist.longitude = location.coordinate.longitude
-            if let streetAddress = await locationService.coordinateToStreetAddress() {
-                playlist.streetAddress = streetAddress
-            }
-            await MainActor.run { persistenceService.updatePlaylist() }
-        }
     }
 }

@@ -8,10 +8,6 @@
 import Foundation
 import CoreLocation
 
-protocol LocationServiceDelegate: AnyObject {
-    func locationService(didUpdate location: CLLocation)
-}
-
 final class LocationService: NSObject {
     private var currentLocation: CLLocation?
     private var locationManager: CLLocationManager
@@ -23,7 +19,7 @@ final class LocationService: NSObject {
 
     static let shared = LocationService()
 
-    weak var delegate: LocationServiceDelegate?
+    private var locationContinuation: CheckedContinuation<CLLocationCoordinate2D, Error>?
 
     private override init() {
         locationManager = CLLocationManager()
@@ -45,8 +41,12 @@ final class LocationService: NSObject {
         }
     }
 
-    func requestCurrentLocation() {
-        locationManager.requestLocation()
+    func requestCurrentLocation() async throws -> CLLocationCoordinate2D {
+        return try await withCheckedThrowingContinuation { continuation in
+            self.locationContinuation = continuation
+            self.requestLocationAuthorization()
+            self.locationManager.requestLocation()
+        }
     }
 
     func coordinateToStreetAddress() async -> String? {
@@ -84,9 +84,9 @@ final class LocationService: NSObject {
 extension LocationService: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
-
         currentLocation = location
-        delegate?.locationService(didUpdate: location)
+        locationContinuation?.resume(returning: location.coordinate)
+        locationContinuation = nil
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

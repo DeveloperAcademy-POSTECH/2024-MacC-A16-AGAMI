@@ -17,16 +17,9 @@ final class MapViewModel {
 
     init(playlists: [PlaylistModel]) {
         self.playlists = playlists
-        locationService.delegate = self
     }
 
-    func requestCurrentLocation() {
-        locationService.requestCurrentLocation()
-    }
-}
-
-extension MapViewModel: LocationServiceDelegate {
-    func locationService(didUpdate location: CLLocation) {
-        currentLocationCoordinate2D = location.coordinate
+    func requestCurrentLocation() async {
+        currentLocationCoordinate2D = try? await locationService.requestCurrentLocation()
     }
 }

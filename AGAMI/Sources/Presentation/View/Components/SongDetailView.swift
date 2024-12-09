@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Kingfisher
 
 struct SongDetailView: View {
     let detailSong: DetailSong?
@@ -37,13 +38,11 @@ struct SongDetailView: View {
                     .padding(.horizontal, 0)
                     
                     if let url = URL(string: detailSong?.albumCoverURL ?? "") {
-                        AsyncImage(url: url) { image in
-                            image.resizable()
-                        } placeholder: {
-                            ProgressView()
-                        }
-                        .frame(width: 155, height: 155)
-                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                        KFImage(url)
+                            .resizable()
+                            .placeholder { ProgressView() }
+                            .frame(width: 155, height: 155)
+                            .clipShape(RoundedRectangle(cornerRadius: 4))
                     } else {
                         Image(systemName: "music.note")
                             .resizable()

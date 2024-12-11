@@ -7,7 +7,6 @@
 
 import SwiftUI
 import PhotosUI
-import MusicKit
 
 @Observable
 final class SearchWritingViewModel {

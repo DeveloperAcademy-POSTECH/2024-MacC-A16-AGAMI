@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 import PhotosUI
-import MusicKit
 import ShazamKit
 
 struct PlaylistPresentationState {
@@ -39,9 +38,9 @@ final class PlakePlaylistViewModel: Hashable {
     private var initialPlaylist: PlaylistModel
     
     private let shazamService = ShazamService.shared
-    private let firebaseService: FirebaseService = FirebaseService()
-    private let musicService: MusicService = MusicService()
-    
+    private let firebaseService = FirebaseService()
+    private let musicService = MusicService.shared
+
     var exportingState: ExportingState = .none
     var presentationState: PlaylistPresentationState = .init()
     
@@ -349,7 +348,7 @@ final class PlakePlaylistViewModel: Hashable {
         var pasteboardItems: [String: Any] = [:]
         if let stickerImageData = await stickerImage.asUIImage(size: .init(width: 480, height: 800)) {
             pasteboardItems["com.instagram.sharedSticker.stickerImage"] = stickerImageData
-            
+
             if let backgroundImageData = backgroundImage?.jpegData(compressionQuality: 0.5) {
                 pasteboardItems["com.instagram.sharedSticker.backgroundImage"] = backgroundImageData
             }

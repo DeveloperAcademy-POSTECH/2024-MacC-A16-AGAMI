@@ -11,7 +11,10 @@ import MusicKit
 final class MusicService {
     private var playlist: Playlist?
     private var songs: [Song] = []
-    
+
+    static let shared = MusicService()
+    private init() { }
+
     func requestAuthorization() async throws {
         let status = MusicAuthorization.currentStatus
         switch status {

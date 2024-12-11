@@ -8,7 +8,7 @@
 import Foundation
 
 struct DetailSong {
-    var songTItle: String?
+    var songTitle: String?
     var artist: String?
     var albumCoverURL: String?
     var albumTitle: String?

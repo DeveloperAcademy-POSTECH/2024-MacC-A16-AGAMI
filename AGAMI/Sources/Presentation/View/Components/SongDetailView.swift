@@ -53,7 +53,7 @@ struct SongDetailView: View {
                             .padding(.top, 33)
                     }
                     
-                    Text(detailSong?.songTItle ?? "")
+                    Text(detailSong?.songTitle ?? "")
                         .font(.notoSansKR(weight: .bold700, size: 24))
                         .padding(.horizontal, 18)
                         .padding(.top, 18)

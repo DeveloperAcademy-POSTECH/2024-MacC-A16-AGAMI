@@ -340,24 +340,20 @@ final class PlakePlaylistViewModel: Hashable {
         else { return nil }
         
         let songImages = await getSongImages()
-        
         let backgroundImage = try? await loadBackgroundImage(
             urlString: playlist.photoURL,
             targetSize: .init(width: 1080, height: 1920)
         )
         let stickerImage = InstagramStickerView(playlist: playlist, images: songImages)
-        
-        let pasteboardItems: [String: Any]
+
+        var pasteboardItems: [String: Any] = [:]
         if let stickerImageData = await stickerImage.asUIImage(size: .init(width: 480, height: 800)) {
+            pasteboardItems["com.instagram.sharedSticker.stickerImage"] = stickerImageData
+            
             if let backgroundImageData = backgroundImage?.jpegData(compressionQuality: 0.5) {
-                pasteboardItems = [
-                    "com.instagram.sharedSticker.stickerImage": stickerImageData,
-                    "com.instagram.sharedSticker.backgroundImage": backgroundImageData
-                ]
-            } else {
-                pasteboardItems = [ "com.instagram.sharedSticker.stickerImage": stickerImageData ]
+                pasteboardItems["com.instagram.sharedSticker.backgroundImage"] = backgroundImageData
             }
-        } else { pasteboardItems = [:] }
+        }
         
         UIPasteboard.general.setItems([pasteboardItems], options: [:])
         
@@ -385,32 +381,21 @@ final class PlakePlaylistViewModel: Hashable {
     }
     
     func fetchAdditionalDetails() async {
-        do {
-            presentationState.isDetailViewLoading = true
-            defer { presentationState.isDetailViewLoading = false }
-            
-            let status = await MusicAuthorization.request()
-            guard status == .authorized else {
-                return
-            }
-            let request = MusicCatalogResourceRequest<Song>(matching: \.id,
-                                                            equalTo: MusicItemID(selectedSong?.songID ?? ""))
-            let response = try await request.response()
-            guard let song = response.items.first else {
-                return
-            }
-            var detailSong = DetailSong()
-            detailSong.songTItle = selectedSong?.title
-            detailSong.artist = selectedSong?.artist
-            detailSong.albumCoverURL = selectedSong?.albumCoverURL
-            detailSong.albumTitle = song.albumTitle
-            detailSong.genres = song.genreNames
-            detailSong.releaseDate = song.releaseDate?.formatDate()
-            
-            self.detailSong = detailSong
-        } catch {
-            print(error)
-        }
+        presentationState.isDetailViewLoading = true
+        defer { presentationState.isDetailViewLoading = false }
+
+        guard let songID = selectedSong?.songID,
+              let song = await musicService.fetchSongInfoByID(songID)
+        else { return }
+
+        detailSong = DetailSong(
+            songTitle: selectedSong?.title,
+            artist: selectedSong?.artist,
+            albumCoverURL: selectedSong?.albumCoverURL,
+            albumTitle: song.albumTitle,
+            genres: song.genreNames,
+            releaseDate: song.releaseDate?.formatDate()
+        )
     }
     
     func dismissSongDetailView() {

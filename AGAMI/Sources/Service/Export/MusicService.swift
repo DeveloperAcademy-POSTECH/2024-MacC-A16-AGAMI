@@ -71,7 +71,18 @@ final class MusicService {
         
         return song
     }
-    
+
+    func fetchSongInfoByID(_ songId: String) async -> Song? {
+        let status = await MusicAuthorization.request()
+        guard status == .authorized else { return nil }
+        let request = MusicCatalogResourceRequest<Song>(matching: \.id,
+                                                        equalTo: MusicItemID(songId))
+        guard let response = try? await request.response(),
+              let song = response.items.first
+        else { return nil }
+        return song
+    }
+
     func addSongToSongs(song: Song) {
         songs.append(song)
     }

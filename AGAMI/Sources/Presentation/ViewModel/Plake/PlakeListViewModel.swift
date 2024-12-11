@@ -12,7 +12,7 @@ import FirebaseFirestore
 @Observable
 final class PlakeListViewModel {
     private let firebaseService = FirebaseService()
-    private let musicService = MusicService()
+    private let musicService = MusicService.shared
 
     var isFetching: Bool = false
     var isSearching: Bool = false

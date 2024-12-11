@@ -14,7 +14,8 @@ final class SearchWritingViewModel {
     private let firebaseService = FirebaseService()
     private let persistenceService = PersistenceService.shared
     private let locationService = LocationService.shared
-    
+    private let musicService = MusicService.shared
+
     var playlist: PlaylistModel {
         didSet { handleChangeOfName(oldValue: oldValue, newValue: playlist) }
     }
@@ -160,38 +161,25 @@ final class SearchWritingViewModel {
     func simpleHaptic() {
         HapticService.shared.playSimpleHaptic()
     }
-    
-    func fetchDetailSong() async {
-        do {
-            isDetailViewLoading = true
-            defer { isDetailViewLoading = false }
 
-            let status = await MusicAuthorization.request()
-            guard status == .authorized else {
-                return
-            }
-            
-            let request = MusicCatalogResourceRequest<Song>(matching: \.id,
-                                                            equalTo: MusicItemID(selectedSong?.songID ?? ""))
-            let response = try await request.response()
-            guard let song = response.items.first else {
-                return
-            }
-            
-            var detailSong = DetailSong()
-            detailSong.songTitle = selectedSong?.title
-            detailSong.artist = selectedSong?.artist
-            detailSong.albumCoverURL = selectedSong?.albumCoverURL
-            detailSong.albumTitle = song.albumTitle
-            detailSong.genres = song.genreNames
-            detailSong.releaseDate = song.releaseDate?.formatDate()
-            
-            self.detailSong = detailSong
-        } catch {
-            print(error)
-        }
+    func fetchDetailSong() async {
+        isDetailViewLoading = true
+        defer { isDetailViewLoading = false }
+
+        guard let songID = selectedSong?.songID,
+              let song = await musicService.fetchSongInfoByID(songID)
+        else { return }
+
+        detailSong = DetailSong(
+            songTitle: selectedSong?.title,
+            artist: selectedSong?.artist,
+            albumCoverURL: selectedSong?.albumCoverURL,
+            albumTitle: song.albumTitle,
+            genres: song.genreNames,
+            releaseDate: song.releaseDate?.formatDate()
+        )
     }
-    
+
     func dismissSongDetailView() {
         selectedSong = nil
         detailSong = nil

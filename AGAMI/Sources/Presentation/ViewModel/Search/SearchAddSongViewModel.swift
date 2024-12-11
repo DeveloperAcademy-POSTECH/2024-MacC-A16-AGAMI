@@ -16,7 +16,7 @@ final class SearchAddSongViewModel {
 
     var currentItem: SHMediaItem?
     var shazamStatus: ShazamStatus = .idle
-    
+
     var playlist: PlaylistModel {
         didSet { handleChangeOfNameOrDescription(oldValue: oldValue, newValue: playlist) }
     }
@@ -28,68 +28,97 @@ final class SearchAddSongViewModel {
     var currentSongId: String? {
         currentItem?.appleMusicID
     }
-    
+
     // 저장 상태 관리
     var isSaving: Bool = false
-    
+
     init(playlist: PlaylistModel) {
         self.playlist = playlist
-        shazamService.delegate = self
     }
-    
-    private func checkMicrophonePermission(completion: @escaping (Bool) -> Void) {
+
+    private func checkMicrophonePermission() async -> Bool {
         switch AVAudioApplication.shared.recordPermission {
         case .denied:
-            completion(false)
+            return false
         case .granted:
-            completion(true)
+            return true
         case .undetermined:
-            AVAudioApplication.requestRecordPermission { granted in
-                Task { @MainActor in
-                    completion(granted)
-                }
-            }
+            return await AVAudioApplication.requestRecordPermission()
         @unknown default:
-            completion(false)
+            return false
         }
     }
-    
-    func startRecognition() {
-        checkMicrophonePermission { [weak self] granted in
-            guard let self = self else { return }
-            if granted {
-                self.shazamStatus = .searching
-                self.shazamService.startRecognition()
-                
-                Task {
-                   try await Task.sleep(for: .seconds(5))
-                    await MainActor.run {
-                        if self.shazamStatus == .searching {
-                            self.shazamStatus = .moreSearching
-                        }
-                    }
-                }
-            } else {
-                self.shazamStatus = .idle
+
+    func startRecognition() async {
+        let permission = await checkMicrophonePermission()
+
+        if permission {
+            self.shazamStatus = .searching
+            changeStatusAfter5Seconds()
+
+            do {
+                let matched = try await shazamService.startRecognition()
+                handleMatchedMediaItem(matched)
+            } catch {
+                handleShazamError(error)
             }
+        } else {
+            self.shazamStatus = .idle
         }
     }
-    
+
     func stopRecognition() {
         shazamService.stopRecognition()
     }
-    
+
+    private func changeStatusAfter5Seconds() {
+        Task {
+            try? await Task.sleep(for: .seconds(5))
+            if self.shazamStatus == .searching {
+                await MainActor.run { self.shazamStatus = .moreSearching }
+            }
+        }
+    }
+
+    private func handleMatchedMediaItem(_ matched: SHMatch) {
+        guard let mediaItem = matched.mediaItems.first else { return }
+        currentItem = mediaItem
+        shazamStatus = .idle
+
+        guard let item = currentItem else { return }
+        let song = ModelAdapter.fromSHtoFirestoreSong(item)
+        if !playlist.songs.contains(where: { $0.songID == song.songID }) {
+            HapticService.shared.playLongHaptic()
+            playlist.songs.insert(song, at: 0)
+        }
+    }
+
+    private func handleShazamError(_ error: Error) {
+        guard let shazamError = error as? ShazamError else {
+            shazamStatus = .idle
+            return
+        }
+
+        switch shazamError {
+        case .isRunning, .cancelled:
+            shazamStatus = .idle
+        case .didFail, .didNotFindMatch:
+            HapticService.shared.playLongHaptic()
+            shazamStatus = .failed
+        }
+    }
+
     func searchButtonTapped() {
         currentItem = nil
-        
+
         if shazamStatus == .searching || shazamStatus == .moreSearching {
             stopRecognition()
             shazamStatus = .idle
         } else {
-            startRecognition()
+            Task { await startRecognition() }
         }
     }
-    
+
     func loadSavedSongs() {
         playlist = persistenceService.fetchPlaylist()
     }
@@ -101,7 +130,7 @@ final class SearchAddSongViewModel {
         }
         loadSavedSongs()
     }
-    
+
     func moveSong(from source: IndexSet, to destination: Int) {
         persistenceService.moveSong(from: source, to: destination)
         loadSavedSongs()
@@ -113,31 +142,8 @@ final class SearchAddSongViewModel {
             persistenceService.updatePlaylist()
         }
     }
-    
+
     func simpleHaptic() {
         HapticService.shared.playSimpleHaptic()
-    }
-}
-
-extension SearchAddSongViewModel: ShazamServiceDelegate {
-    func shazamService(_ service: ShazamService, didFind match: SHMatch) {
-        guard let mediaItem = match.mediaItems.first else { return }
-        currentItem = mediaItem
-        shazamStatus = .idle
-        
-        if let item = currentItem {
-            HapticService.shared.playLongHaptic()
-            persistenceService.appendSong(from: item)
-        }
-    }
-    
-    func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
-        HapticService.shared.playLongHaptic()
-        shazamStatus = .failed
-    }
-    
-    func shazamService(_ service: ShazamService, didFailWithError error: any Error) {
-        HapticService.shared.playLongHaptic()
-        shazamStatus = .failed
     }
 }

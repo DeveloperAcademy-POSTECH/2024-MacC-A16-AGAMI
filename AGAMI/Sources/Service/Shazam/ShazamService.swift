@@ -8,19 +8,11 @@ import Foundation
 import ShazamKit
 import AVKit
 
-protocol ShazamServiceDelegate: AnyObject {
-    @MainActor func shazamService(_ service: ShazamService, didFind match: SHMatch)
-    @MainActor func shazamService(_ service: ShazamService, didNotFindMatchFor signature: SHSignature, error: (any Error)?)
-    @MainActor func shazamService(_ service: ShazamService, didFailWithError error: Error)
-}
-
 final class ShazamService: NSObject {
-    weak var delegate: ShazamServiceDelegate?
-
     private let session = SHSession()
     private let audioEngine = AVAudioEngine()
-    private var timer: Timer?
-    
+    private var shazamContinuation: CheckedContinuation<SHMatch, Error>?
+
     static let shared: ShazamService = .init()
 
     override init() {
@@ -28,41 +20,41 @@ final class ShazamService: NSObject {
         session.delegate = self
     }
 
-    func startRecognition() {
-        dump(#function)
-        do {
+    func startRecognition() async throws -> SHMatch {
+        return try await withCheckedThrowingContinuation { continuation in
+            shazamContinuation = continuation
             if audioEngine.isRunning {
                 stopRecognition()
+                continuation.resume(throwing: ShazamError.isRunning)
                 return
             }
-
-            try prepareAudioRecording()
-            generateSignature()
-            try startAudioRecording()
-            startTimer()
-        } catch {
-            Task { @MainActor in
-                self.delegate?.shazamService(self, didFailWithError: error)
+            do {
+                try prepareAudioRecording()
+                generateSignature()
+                try startAudioRecording()
+            } catch {
+                continuation.resume(throwing: ShazamError.didFail)
+                return
             }
         }
     }
 
     func stopRecognition() {
-        dump(#function)
         audioEngine.stop()
         audioEngine.inputNode.removeTap(onBus: .zero)
-        stopTimer()
+        if let continuation = shazamContinuation {
+            shazamContinuation = nil
+            continuation.resume(throwing: ShazamError.cancelled)
+        }
     }
 
     private func prepareAudioRecording() throws {
-        dump(#function)
         let audioSession = AVAudioSession.sharedInstance()
         try audioSession.setCategory(.record)
         try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
     }
 
     private func generateSignature() {
-        dump(#function)
         let inputNode = audioEngine.inputNode
         let recordingFormat = inputNode.outputFormat(forBus: .zero)
 
@@ -72,45 +64,32 @@ final class ShazamService: NSObject {
     }
 
     private func startAudioRecording() throws {
-        dump(#function)
         try audioEngine.start()
-    }
-
-    private func startTimer() {
-        dump(#function)
-        guard timer == nil else { return } // 타이머 중복 생성 방지
-        timer = Timer.scheduledTimer(withTimeInterval: 20, repeats: true) { [weak self] _ in
-            dump("20초 경과 샤잠 종료")
-            self?.stopRecognition()
-        }
-    }
-
-    private func stopTimer() {
-        dump(#function)
-        timer?.invalidate()
-        timer = nil
     }
 }
 
 extension ShazamService: SHSessionDelegate {
     func session(_ session: SHSession, didFind match: SHMatch) {
         Task { @MainActor in
+            shazamContinuation?.resume(returning: match)
+            shazamContinuation = nil
             stopRecognition()
-            self.delegate?.shazamService(self, didFind: match)
         }
     }
 
     func session(_ session: SHSession, didNotFindMatchFor signature: SHSignature, error: (any Error)?) {
         Task { @MainActor in
+            shazamContinuation?.resume(throwing: ShazamError.didNotFindMatch)
+            shazamContinuation = nil
             stopRecognition()
-            self.delegate?.shazamService(self, didNotFindMatchFor: signature, error: error)
         }
     }
 
     func session(_ session: SHSession, didFailWithError error: Error) {
         Task { @MainActor in
+            shazamContinuation?.resume(throwing: ShazamError.didFail)
+            shazamContinuation = nil
             stopRecognition()
-            self.delegate?.shazamService(self, didFailWithError: error)
         }
     }
 }

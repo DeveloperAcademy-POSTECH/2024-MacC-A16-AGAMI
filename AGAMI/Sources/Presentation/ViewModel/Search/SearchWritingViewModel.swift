@@ -179,7 +179,7 @@ final class SearchWritingViewModel {
             }
             
             var detailSong = DetailSong()
-            detailSong.songTItle = selectedSong?.title
+            detailSong.songTitle = selectedSong?.title
             detailSong.artist = selectedSong?.artist
             detailSong.albumCoverURL = selectedSong?.albumCoverURL
             detailSong.albumTitle = song.albumTitle

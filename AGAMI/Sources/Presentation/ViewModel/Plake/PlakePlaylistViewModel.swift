@@ -8,7 +8,6 @@
 import Foundation
 import SwiftUI
 import PhotosUI
-import ShazamKit
 
 struct PlaylistPresentationState {
     var isEditing: Bool = false
@@ -26,13 +25,11 @@ struct PlaylistPresentationState {
 }
 
 @Observable
-final class PlakePlaylistViewModel: Hashable {
-    let id: UUID = .init()
-    
+final class PlakePlaylistViewModel {
     var playlist: PlaylistModel
     var selectedSong: SongModel?
     var detailSong: DetailSong?
-    var currentItem: SHMediaItem?
+    var currentSongId: String?
     var shazamStatus: ShazamStatus = .idle
     
     private var initialPlaylist: PlaylistModel
@@ -58,21 +55,9 @@ final class PlakePlaylistViewModel: Hashable {
         !playlist.photoURL.isEmpty && presentationState.isEditing
     }
     
-    var currentSongId: String? {
-        currentItem?.appleMusicID
-    }
-    
     init(playlist: PlaylistModel) {
         self.playlist = playlist
         self.initialPlaylist = playlist
-    }
-    
-    static func == (lhs: PlakePlaylistViewModel, rhs: PlakePlaylistViewModel) -> Bool {
-        return lhs.id == rhs.id
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
     }
     
     func exportPlaylistToAppleMusic() async -> URL? {
@@ -165,12 +150,7 @@ final class PlakePlaylistViewModel: Hashable {
         if permission {
             shazamStatus = .searching
             changeStatusAfter5Seconds()
-            do {
-                let matched = try await shazamService.startRecognition()
-                handleMatchedMediaItem(matched)
-            } catch {
-                handleShazamError(error)
-            }
+            await handleMatchedResult()
         } else {
             self.shazamStatus = .idle
         }
@@ -189,16 +169,20 @@ final class PlakePlaylistViewModel: Hashable {
         }
     }
 
-    private func handleMatchedMediaItem(_ matched: SHMatch) {
-        guard let mediaItem = matched.mediaItems.first else { return }
-        currentItem = mediaItem
-        shazamStatus = .idle
+    private func handleMatchedResult() async {
+        do {
+            let matched = try await shazamService.startRecognition()
+            guard let mediaItem = matched.mediaItems.first else { return }
+            currentSongId = mediaItem.appleMusicID
+            shazamStatus = .idle
 
-        guard let item = currentItem else { return }
-        let song = ModelAdapter.fromSHtoFirestoreSong(item)
-        if !playlist.songs.contains(where: { $0.songID == song.songID }) {
-            HapticService.shared.playLongHaptic()
-            playlist.songs.insert(song, at: 0)
+            let song = ModelAdapter.fromSHtoFirestoreSong(mediaItem)
+            if !playlist.songs.contains(where: { $0.songID == song.songID }) {
+                HapticService.shared.playLongHaptic()
+                playlist.songs.insert(song, at: 0)
+            }
+        } catch {
+            handleShazamError(error)
         }
     }
 
@@ -218,8 +202,8 @@ final class PlakePlaylistViewModel: Hashable {
     }
 
     func searchButtonTapped() {
-        currentItem = nil
-        
+        currentSongId = nil
+
         if shazamStatus == .searching || shazamStatus == .moreSearching {
             stopRecognition()
             shazamStatus = .idle

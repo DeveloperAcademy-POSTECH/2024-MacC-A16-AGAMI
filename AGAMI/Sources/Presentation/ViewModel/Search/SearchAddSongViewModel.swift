@@ -5,8 +5,8 @@
 //  Created by Seoyeon Choi on 10/16/24.
 //
 
-import SwiftUI
-import ShazamKit
+import Foundation
+import AVFAudio
 
 @Observable
 final class SearchAddSongViewModel {
@@ -14,7 +14,7 @@ final class SearchAddSongViewModel {
     private let shazamService = ShazamService.shared
     let persistenceService = PersistenceService.shared
 
-    var currentItem: SHMediaItem?
+    var currentSongId: String?
     var shazamStatus: ShazamStatus = .idle
 
     var playlist: PlaylistModel {
@@ -23,10 +23,6 @@ final class SearchAddSongViewModel {
 
     var diggingList: [SongModel] {
         playlist.songs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
-    }
-
-    var currentSongId: String? {
-        currentItem?.appleMusicID
     }
 
     // 저장 상태 관리
@@ -55,13 +51,7 @@ final class SearchAddSongViewModel {
         if permission {
             self.shazamStatus = .searching
             changeStatusAfter5Seconds()
-
-            do {
-                let matched = try await shazamService.startRecognition()
-                handleMatchedMediaItem(matched)
-            } catch {
-                handleShazamError(error)
-            }
+            await handleMatchedResult()
         } else {
             self.shazamStatus = .idle
         }
@@ -80,16 +70,20 @@ final class SearchAddSongViewModel {
         }
     }
 
-    private func handleMatchedMediaItem(_ matched: SHMatch) {
-        guard let mediaItem = matched.mediaItems.first else { return }
-        currentItem = mediaItem
-        shazamStatus = .idle
+    private func handleMatchedResult() async {
+        do {
+            let matched = try await shazamService.startRecognition()
+            guard let mediaItem = matched.mediaItems.first else { return }
+            currentSongId = mediaItem.appleMusicID
+            shazamStatus = .idle
 
-        guard let item = currentItem else { return }
-        let song = ModelAdapter.fromSHtoFirestoreSong(item)
-        if !playlist.songs.contains(where: { $0.songID == song.songID }) {
-            HapticService.shared.playLongHaptic()
-            playlist.songs.insert(song, at: 0)
+            let song = ModelAdapter.fromSHtoFirestoreSong(mediaItem)
+            if !playlist.songs.contains(where: { $0.songID == song.songID }) {
+                HapticService.shared.playLongHaptic()
+                playlist.songs.insert(song, at: 0)
+            }
+        } catch {
+            handleShazamError(error)
         }
     }
 
@@ -109,7 +103,7 @@ final class SearchAddSongViewModel {
     }
 
     func searchButtonTapped() {
-        currentItem = nil
+        currentSongId = nil
 
         if shazamStatus == .searching || shazamStatus == .moreSearching {
             stopRecognition()

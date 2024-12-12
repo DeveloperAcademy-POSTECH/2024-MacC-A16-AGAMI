@@ -18,15 +18,19 @@ final class SearchWritingViewModel {
     var playlist: PlaylistModel {
         didSet { handleChangeOfName(oldValue: oldValue, newValue: playlist) }
     }
-    
+
     var diggingList: [SongModel] {
         playlist.songs.sorted { $0.orderIndex ?? 0 < $1.orderIndex ?? 0 }
     }
-    
+
     var saveButtonEnabled: Bool {
         playlist.latitude != 0.0 && playlist.longitude != 0.0 && !playlist.streetAddress.isEmpty && !playlist.songs.isEmpty && !isPhotoLoading && !playlist.playlistName.isEmpty
     }
-    
+
+    var shouldPresentAlert: Bool {
+        !playlist.songs.isEmpty || !playlist.playlistName.isEmpty || !playlist.playlistDescription.isEmpty || playlist.photoData != nil
+    }
+
     // 커버 이미지
     var photoUIImage: UIImage? {
         didSet {

@@ -297,11 +297,11 @@ private struct TopBarLeadingItems: View {
     var body: some View {
         Button {
             viewModel.simpleHaptic()
-            if viewModel.diggingList.isEmpty {
+            if viewModel.shouldPresentAlert {
+                viewModel.showBackButtonAlert = true
+            } else {
                 viewModel.clearDiggingList()
                 coordinator.pop()
-            } else {
-                viewModel.showBackButtonAlert = true
             }
         } label: {
             Image(systemName: "chevron.backward")

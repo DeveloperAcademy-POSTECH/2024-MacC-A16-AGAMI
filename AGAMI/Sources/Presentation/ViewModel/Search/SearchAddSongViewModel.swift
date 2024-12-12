@@ -81,6 +81,7 @@ final class SearchAddSongViewModel {
             if !playlist.songs.contains(where: { $0.songID == song.songID }) {
                 HapticService.shared.playLongHaptic()
                 playlist.songs.insert(song, at: 0)
+                persistenceService.updatePlaylist()
             }
         } catch {
             handleShazamError(error)

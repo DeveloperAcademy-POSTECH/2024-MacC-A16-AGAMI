@@ -5,7 +5,6 @@
 //  Created by taehun on 10/14/24.
 //
 
-import SwiftUI
 import FirebaseFirestore
 
 struct FirestoreSongModel: SongModel, Codable, Identifiable {

@@ -47,7 +47,9 @@ final class SearchWritingViewModel {
     var isPhotoLoading: Bool = false
     
     // 커버 이미지 - 앨범에서 가져오기
-    var selectedItem: PhotosPickerItem?
+    var selectedItem: PhotosPickerItem? {
+        didSet { loadImageFromGallery() }
+    }
     var showPhotoPicker: Bool = false
     
     // 저장 상태 관리
@@ -132,9 +134,10 @@ final class SearchWritingViewModel {
         self.photoUIImage = photoUIImage
     }
     
-    func loadImageFromGallery() async {
-        if let data = try? await selectedItem?.loadTransferable(type: Data.self) {
-            photoUIImage = UIImage(data: data)?.cropToFiveByFour()
+    func loadImageFromGallery() {
+        Task {
+            guard let data = try? await selectedItem?.loadTransferable(type: Data.self) else { return }
+            await MainActor.run { photoUIImage = UIImage(data: data)?.cropToFiveByFour() }
         }
     }
     

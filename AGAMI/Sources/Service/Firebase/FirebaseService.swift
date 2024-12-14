@@ -5,7 +5,6 @@
 //  Created by taehun on 10/12/24.
 //
 
-import SwiftUI
 import FirebaseFirestore
 import FirebaseStorage
 

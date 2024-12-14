@@ -5,7 +5,6 @@
 //  Created by Seoyeon Choi on 11/2/24.
 //
 
-import UIKit
 import SwiftUI
 
 extension UINavigationController: @retroactive UIGestureRecognizerDelegate {

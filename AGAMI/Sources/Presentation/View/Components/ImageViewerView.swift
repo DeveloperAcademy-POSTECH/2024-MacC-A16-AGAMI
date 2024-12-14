@@ -87,8 +87,8 @@ private struct PinchableImageView: UIViewRepresentable {
         let scrollView = UIScrollView()
         scrollView.delegate = context.coordinator
         configureUIScrollView(scrollView)
-        let imageView = makeUIImageView()
 
+        let imageView = makeUIImageView()
         imageView.frame = scrollView.bounds
         imageView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 

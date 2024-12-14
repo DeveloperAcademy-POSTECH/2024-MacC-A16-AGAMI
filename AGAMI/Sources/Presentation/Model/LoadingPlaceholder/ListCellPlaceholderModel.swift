@@ -13,17 +13,17 @@ final class ListCellPlaceholderModel {
     var streetAddress: String?
     var generationTime: Date?
 
-    var showArchiveListUpLoadingCell: Bool {
+    var shouldShowUploadingCell: Bool {
         return name != nil && streetAddress != nil && generationTime != nil
     }
 
-    func resetListCellPlaceholderModel() {
+    func initializePropertyValues() {
         self.name = nil
         self.streetAddress = nil
         self.generationTime = nil
     }
     
-    func setListCellPlaceholderModel(userTitle: String, streetAddress: String, generationTime: Date) {
+    func setPropertyValues(userTitle: String, streetAddress: String, generationTime: Date) {
         self.name = userTitle
         self.streetAddress = streetAddress
         self.generationTime = generationTime

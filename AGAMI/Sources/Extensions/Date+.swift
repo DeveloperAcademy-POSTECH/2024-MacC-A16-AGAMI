@@ -5,7 +5,7 @@
 //  Created by taehun on 11/1/24.
 //
 
-import SwiftUI
+import Foundation
 
 extension Date {
     func isWithinPast(minutes: Int) -> Bool {

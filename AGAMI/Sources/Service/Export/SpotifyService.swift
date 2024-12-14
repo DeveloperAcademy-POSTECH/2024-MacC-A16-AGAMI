@@ -31,9 +31,8 @@ final class SpotifyService {
               let clientSecret = Bundle.main.object(forInfoDictionaryKey: "CLIENT_SECRET") as? String,
               let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
               let decodedRedirectURL = redirectURL.removingPercentEncoding,
-              let url = URL(string: decodedRedirectURL) else {
-            fatalError("Invalid configuration values in Info.plist.")
-        }
+              let url = URL(string: decodedRedirectURL)
+        else { fatalError("Invalid configuration values in Info.plist.") }
 
         self.spotifyAPI = SpotifyAPI(
             authorizationManager: AuthorizationCodeFlowManager(

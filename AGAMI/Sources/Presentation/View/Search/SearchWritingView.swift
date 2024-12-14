@@ -64,11 +64,6 @@ struct SearchWritingView: View {
         .photosPicker(isPresented: $viewModel.showPhotoPicker,
                       selection: $viewModel.selectedItem,
                       matching: .images)
-        .onChange(of: viewModel.selectedItem) {
-            Task {
-                await viewModel.loadImageFromGallery()
-            }
-        }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 TopBarLeadingItems(viewModel: viewModel)
@@ -320,7 +315,7 @@ private struct TopbarTrailingItems: View {
         Button {
             Task {
                 viewModel.simpleHaptic()
-                placeholderData.setListCellPlaceholderModel(
+                placeholderData.setPropertyValues(
                     userTitle: viewModel.playlist.playlistName,
                     streetAddress: viewModel.playlist.streetAddress,
                     generationTime: Date()
@@ -328,7 +323,7 @@ private struct TopbarTrailingItems: View {
                 coordinator.popToRoot()
 
                 if await viewModel.savedPlaylist() {
-                    placeholderData.resetListCellPlaceholderModel()
+                    placeholderData.initializePropertyValues()
                     viewModel.clearDiggingList()
                 } else {
                     dump("Failed to save playlist. Please try again.")

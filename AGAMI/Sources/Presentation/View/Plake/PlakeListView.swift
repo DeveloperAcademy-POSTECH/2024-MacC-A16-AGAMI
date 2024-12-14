@@ -48,7 +48,7 @@ struct PlakeListView: View {
         .onOpenURL { viewModel.handleURL($0) }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onAppear(perform: viewModel.fetchPlaylists)
-        .onChange(of: listCellPlaceholder.showArchiveListUpLoadingCell) { oldValue, newValue in
+        .onChange(of: listCellPlaceholder.shouldShowUploadingCell) { oldValue, newValue in
             if oldValue == true, newValue == false {
                 viewModel.fetchPlaylists()
             }
@@ -168,7 +168,7 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 Group {
-                    if listCellPlaceholder.showArchiveListUpLoadingCell {
+                    if listCellPlaceholder.shouldShowUploadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
                     } else if viewModel.isShowingNewPlake {
                         MakeNewPlakeCell(size: size)

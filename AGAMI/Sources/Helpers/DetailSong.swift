@@ -5,8 +5,6 @@
 //  Created by Seoyeon Choi on 11/25/24.
 //
 
-import Foundation
-
 struct DetailSong {
     var songTitle: String?
     var artist: String?

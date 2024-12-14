@@ -11,7 +11,7 @@ import Kingfisher
 
 // MARK: - MKMapView 래퍼
 struct MKMapViewWrapper: UIViewRepresentable {
-    @Environment(PlakeCoordinator.self) private var plakeCoordinator
+    @Environment(SologCoordinator.self) private var sologCoordinator
     @Environment(MapCoordinator.self) private var mapCoordinator
     var viewModel: MapViewModel
 
@@ -111,11 +111,11 @@ struct MKMapViewWrapper: UIViewRepresentable {
                 Task { @MainActor in
                     HapticService.shared.playSimpleHaptic()
                     bubbleView.setSelected(true, animated: true)
-                    self.parent.plakeCoordinator.dismissSheet()
+                    self.parent.sologCoordinator.dismissSheet()
 
                     try await Task.sleep(for: .milliseconds(300))
-                    let playlistViewModel = PlakePlaylistViewModel(playlist: playlist)
-                    self.parent.plakeCoordinator.push(route: .playlistView(viewModel: playlistViewModel))
+                    let playlistViewModel = SologPlaylistViewModel(playlist: playlist)
+                    self.parent.sologCoordinator.push(route: .playlistView(viewModel: playlistViewModel))
                 }
 
             }

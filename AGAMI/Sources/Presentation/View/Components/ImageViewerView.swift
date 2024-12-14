@@ -9,7 +9,7 @@ import SwiftUI
 import PhotosUI
 
 struct ImageViewerView: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     @State private var image: UIImage?
     @State private var isDownloading = false
     let urlString: String

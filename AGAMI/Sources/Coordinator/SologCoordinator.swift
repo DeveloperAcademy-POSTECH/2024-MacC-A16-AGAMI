@@ -1,5 +1,5 @@
 //
-//  PlakeCoordinator.swift
+//  SologCoordinator.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/15/24.
@@ -8,9 +8,9 @@
 import Foundation
 import SwiftUI
 
-enum PlakeRoute: Hashable {
+enum SologRoute: Hashable {
     case listView
-    case playlistView(viewModel: PlakePlaylistViewModel)
+    case playlistView(viewModel: SologPlaylistViewModel)
     case searchWritingView
     case placeListView(viewModel: CollectionPlaceViewModel)
 
@@ -27,14 +27,14 @@ enum PlakeRoute: Hashable {
         hasher.combine(id)
     }
     
-    static func == (lhs: PlakeRoute, rhs: PlakeRoute) -> Bool {
+    static func == (lhs: SologRoute, rhs: SologRoute) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-enum PlakeSheet: Hashable, Identifiable {
+enum SologSheet: Hashable, Identifiable {
     case searchAddSongView(viewModel: SearchAddSongViewModel)
-    case plakeAddSongView(viewModel: PlakePlaylistViewModel)
+    case sologAddSongView(viewModel: SologPlaylistViewModel)
 	case accountView
     case mapView(viewModel: MapViewModel)
     case playlistMapView(playlist: PlaylistModel)
@@ -42,7 +42,7 @@ enum PlakeSheet: Hashable, Identifiable {
     var id: String {
         switch self {
         case .searchAddSongView: return "searchAddSongView"
-        case .plakeAddSongView: return "plakeAddSongView"
+        case .sologAddSongView: return "sologAddSongView"
         case .accountView: return "accountView"
         case .mapView: return "mapView"
         case .playlistMapView: return "playlistMapView"
@@ -53,12 +53,12 @@ enum PlakeSheet: Hashable, Identifiable {
         hasher.combine(id)
     }
     
-    static func == (lhs: PlakeSheet, rhs: PlakeSheet) -> Bool {
+    static func == (lhs: SologSheet, rhs: SologSheet) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-enum PlakeFullScreenCover: Hashable, Identifiable {
+enum SologFullScreenCover: Hashable, Identifiable {
     var id: String {
         switch self {
         case .imageViewerView: return "imageViewerView"
@@ -70,14 +70,14 @@ enum PlakeFullScreenCover: Hashable, Identifiable {
     case cameraView(viewModelContainer: CoordinatorViewModelContainer)
 }
 
-final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullScreenCover> {
+final class SologCoordinator: BaseCoordinator<SologRoute, SologSheet, SologFullScreenCover> {
     @ViewBuilder
-    func build(route: PlakeRoute) -> some View {
+    func build(route: SologRoute) -> some View {
         switch route {
         case .listView:
-            PlakeListView()
+            SologListView()
         case let .playlistView(viewModel):
-            PlakePlaylistView(viewModel: viewModel)
+            SologPlaylistView(viewModel: viewModel)
         case .searchWritingView:
             SearchWritingView()
         case let .placeListView(viewModel):
@@ -86,13 +86,13 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
     }
     
     @ViewBuilder
-    func buildSheet(sheet: PlakeSheet) -> some View {
+    func buildSheet(sheet: SologSheet) -> some View {
         switch sheet {
         case let .searchAddSongView(viewModel):
             SearchAddSongView(viewModel: viewModel)
                 .interactiveDismissDisabled()
-        case let .plakeAddSongView(viewModel):
-            PlakeAddSongView(viewModel: viewModel)
+        case let .sologAddSongView(viewModel):
+            SologAddSongView(viewModel: viewModel)
                 .interactiveDismissDisabled()
         case .accountView:
             AccountView()
@@ -107,7 +107,7 @@ final class PlakeCoordinator: BaseCoordinator<PlakeRoute, PlakeSheet, PlakeFullS
     }
     
     @ViewBuilder
-    func buildFullScreenCover(cover: PlakeFullScreenCover) -> some View {
+    func buildFullScreenCover(cover: SologFullScreenCover) -> some View {
         switch cover {
         case let .imageViewerView(urlString):
             ImageViewerView(urlString: urlString)

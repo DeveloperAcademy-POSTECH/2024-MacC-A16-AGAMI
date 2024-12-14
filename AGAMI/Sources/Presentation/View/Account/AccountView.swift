@@ -10,7 +10,7 @@ import SwiftUI
 struct AccountView: View {
     @State private var viewModel: AccountViewModel = .init()
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     
     var body: some View {
         NavigationStack {
@@ -117,7 +117,7 @@ private struct ButtonLabel: View {
 }
 
 private struct SignOutAlertActions: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     
     var body: some View {
@@ -143,7 +143,7 @@ private struct SignOutAlertActions: View {
 }
 
 private struct DeleteAccountAlertActions: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     
     var body: some View {

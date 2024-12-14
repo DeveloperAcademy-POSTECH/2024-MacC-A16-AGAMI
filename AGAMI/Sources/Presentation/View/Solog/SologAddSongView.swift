@@ -1,5 +1,5 @@
 //
-//  PlakeAddSongView.swift
+//  SologAddSongView.swift
 //  AGAMI
 //
 //  Created by 박현수 on 11/25/24.
@@ -8,9 +8,9 @@
 import SwiftUI
 import PhotosUI
 
-struct PlakeAddSongView: View {
+struct SologAddSongView: View {
     @Environment(\.scenePhase) private var scenePhase
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -41,7 +41,7 @@ struct PlakeAddSongView: View {
 }
 
 private struct SongStatusView: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
 
     var body: some View {
         VStack {
@@ -102,7 +102,7 @@ private struct SongListHeader: View {
 }
 
 private struct SongList: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
 
     var body: some View {
         ForEach(viewModel.playlist.songs, id: \.songID) { song in
@@ -121,8 +121,8 @@ private struct SongList: View {
 }
 
 private struct TopbarItem: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakePlaylistViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologPlaylistViewModel
 
     var body: some View {
         HStack(spacing: 0) {

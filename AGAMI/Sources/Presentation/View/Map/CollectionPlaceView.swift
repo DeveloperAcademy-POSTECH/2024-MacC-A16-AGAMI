@@ -11,7 +11,7 @@ import Kingfisher
 struct CollectionPlaceView: View {
     @State var viewModel: CollectionPlaceViewModel
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(PlakeCoordinator.self) private var plakeCoord
+    @Environment(SologCoordinator.self) private var sologCoord
     @Environment(MapCoordinator.self) private var mapCoord
 
     init(viewModel: CollectionPlaceViewModel) {
@@ -29,7 +29,7 @@ struct CollectionPlaceView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button("닫기") {
-                    plakeCoord.dismissSheet()
+                    sologCoord.dismissSheet()
                 }
                 .foregroundStyle(Color(.sButton))
             }
@@ -46,7 +46,7 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 ForEach(viewModel.playlists, id: \.playlistID) { playlist in
-                    PlakeListCell(viewModel: viewModel, playlist: playlist, size: size)
+                    SologListCell(viewModel: viewModel, playlist: playlist, size: size)
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in
                     content
@@ -60,8 +60,8 @@ private struct ListView: View {
     }
 }
 
-private struct PlakeListCell: View {
-    @Environment(PlakeCoordinator.self) private var plakeCoord
+private struct SologListCell: View {
+    @Environment(SologCoordinator.self) private var sologCoord
     let viewModel: CollectionPlaceViewModel
     let playlist: PlaylistModel
     let size: CGSize
@@ -70,11 +70,11 @@ private struct PlakeListCell: View {
     var body: some View {
         Button {
             viewModel.simpleHaptic()
-            plakeCoord.dismissSheet()
+            sologCoord.dismissSheet()
             Task {
                 try await Task.sleep(for: .milliseconds(300))
                 await MainActor.run {
-                    plakeCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
+                    sologCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
                 }
             }
         } label: {

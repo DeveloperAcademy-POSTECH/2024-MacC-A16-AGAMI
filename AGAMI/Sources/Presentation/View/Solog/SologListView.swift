@@ -1,7 +1,7 @@
 // swiftlint:disable file_length
 
 //
-//  PlakeListView.swift
+//  SologListView.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/14/24.
@@ -10,8 +10,8 @@
 import SwiftUI
 import Kingfisher
 
-struct PlakeListView: View {
-    @State var viewModel: PlakeListViewModel = PlakeListViewModel()
+struct SologListView: View {
+    @State var viewModel: SologListViewModel = SologListViewModel()
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
     @Environment(\.scenePhase) private var scenePhase
 
@@ -26,7 +26,7 @@ struct PlakeListView: View {
             }
             .safeAreaPadding(.horizontal, 16)
 
-            NewPlakeButton(viewModel: viewModel)
+            NewSologButton(viewModel: viewModel)
 
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
@@ -57,8 +57,8 @@ struct PlakeListView: View {
 }
 
 private struct TopBarView: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakeListViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologListViewModel
 
     var body: some View {
         HStack(spacing: 8) {
@@ -110,7 +110,7 @@ private struct TopBarView: View {
 }
 
 private struct CountingHeaderView: View {
-    let viewModel: PlakeListViewModel
+    let viewModel: SologListViewModel
 
     var body: some View {
         HStack(spacing: 16) {
@@ -160,7 +160,7 @@ private struct CountingHeaderView: View {
 
 private struct ListView: View {
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-    let viewModel: PlakeListViewModel
+    let viewModel: SologListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
 
@@ -170,12 +170,12 @@ private struct ListView: View {
                 Group {
                     if listCellPlaceholder.shouldShowUploadingCell {
                         ArchiveListUpLoadingCell(viewModel: viewModel, size: size)
-                    } else if viewModel.isShowingNewPlake {
-                        MakeNewPlakeCell(size: size)
+                    } else if viewModel.isShowingNewSolog {
+                        MakeNewSologCell(size: size)
                     }
 
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in
-                        PlakeListCell(viewModel: viewModel, playlist: playlist, size: size)
+                        SologListCell(viewModel: viewModel, playlist: playlist, size: size)
                     }
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in
@@ -190,9 +190,9 @@ private struct ListView: View {
     }
 }
 
-private struct PlakeListCell: View {
-    @Environment(PlakeCoordinator.self) private var coord
-    let viewModel: PlakeListViewModel
+private struct SologListCell: View {
+    @Environment(SologCoordinator.self) private var coord
+    let viewModel: SologListViewModel
     let playlist: PlaylistModel
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
@@ -257,9 +257,9 @@ private struct PlakeListCell: View {
     }
 }
 
-private struct NewPlakeButton: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakeListViewModel
+private struct NewSologButton: View {
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologListViewModel
     var body: some View {
         VStack {
             Spacer()
@@ -289,7 +289,7 @@ private struct NewPlakeButton: View {
 
 private struct ArchiveListUpLoadingCell: View {
     @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
-    let viewModel: PlakeListViewModel
+    let viewModel: SologListViewModel
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
 
@@ -334,8 +334,8 @@ private struct ArchiveListUpLoadingCell: View {
     }
 }
 
-private struct MakeNewPlakeCell: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+private struct MakeNewSologCell: View {
+    @Environment(SologCoordinator.self) private var coordinator
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
 
@@ -384,7 +384,7 @@ private struct MakeNewPlakeCell: View {
 
 private struct ContextMenuItems: View {
     @Environment(\.openURL) private var openURL
-    let viewModel: PlakeListViewModel
+    let viewModel: SologListViewModel
     let playlist: PlaylistModel
 
     var body: some View {
@@ -418,7 +418,7 @@ private struct ContextMenuItems: View {
 }
 
 private struct SearchView: View {
-    let viewModel: PlakeListViewModel
+    let viewModel: SologListViewModel
     @FocusState private var isFocused
     var body: some View {
         ZStack(alignment: .top) {
@@ -435,8 +435,8 @@ private struct SearchView: View {
 }
 
 private struct SearchBar: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    @Bindable var viewModel: PlakeListViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    @Bindable var viewModel: SologListViewModel
     var isFocused: FocusState<Bool>.Binding
 
     var body: some View {
@@ -490,7 +490,7 @@ private struct SearchBar: View {
 
 private struct SearchResultView: View {
     @Environment(\.scenePhase) private var scenePhase
-    let viewModel: PlakeListViewModel
+    let viewModel: SologListViewModel
 
     var body: some View {
         VStack(spacing: 0) {
@@ -511,7 +511,7 @@ private struct SearchResultView: View {
 }
 
 private struct SearchResultListView: View {
-    let viewModel: PlakeListViewModel
+    let viewModel: SologListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
 
@@ -519,7 +519,7 @@ private struct SearchResultListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 ForEach(viewModel.filteredplaylists, id: \.playlistID) { playlist in
-                    PlakeListCell(viewModel: viewModel, playlist: playlist, size: size)
+                    SologListCell(viewModel: viewModel, playlist: playlist, size: size)
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in
                     content

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CameraView: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     @State private var viewModel: CameraViewModel
 
     init(viewModel: CameraViewModel) {
@@ -168,7 +168,7 @@ private struct CaptureButton: View {
 }
 
 private struct SavePhotoButton: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: CameraViewModel
 
     var body: some View {
@@ -185,7 +185,7 @@ private struct SavePhotoButton: View {
 }
 
 private struct ToolbarLeadingItem: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     var viewModel: CameraViewModel
 
     var body: some View {

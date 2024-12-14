@@ -11,7 +11,7 @@ import MapKit
 struct MapView: View {
     @State private var viewModel: MapViewModel
     @State private var mapCoord: MapCoordinator = MapCoordinator()
-    @Environment(PlakeCoordinator.self) private var plakeCoord
+    @Environment(SologCoordinator.self) private var sologCoord
     @Environment(\.scenePhase) private var scenePhase
 
     init(viewModel: MapViewModel) {
@@ -29,7 +29,7 @@ struct MapView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         Button {
-                            plakeCoord.dismissSheet()
+                            sologCoord.dismissSheet()
                         } label: {
                             Text("닫기")
                                 .font(.notoSansKR(weight: .regular400, size: 17))

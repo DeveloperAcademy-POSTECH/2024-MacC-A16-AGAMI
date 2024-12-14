@@ -1,5 +1,5 @@
 //
-//  ArchiveListViewModel.swift
+//  SologListViewModel.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/14/24.
@@ -10,7 +10,7 @@ import AuthenticationServices
 import FirebaseFirestore
 
 @Observable
-final class PlakeListViewModel {
+final class SologListViewModel {
     private let firebaseService = FirebaseService()
     private let musicService = MusicService.shared
 
@@ -18,7 +18,7 @@ final class PlakeListViewModel {
     var isSearching: Bool = false
     var isSearchBarPresented: Bool = false
 
-    var isShowingNewPlake: Bool {
+    var isShowingNewSolog: Bool {
         playlists.isEmpty && !isFetching
     }
 

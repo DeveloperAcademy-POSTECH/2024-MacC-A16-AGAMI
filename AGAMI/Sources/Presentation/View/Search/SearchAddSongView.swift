@@ -125,7 +125,7 @@ private struct SearchSongList: View {
 }
 
 private struct TopbarItem: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: SearchAddSongViewModel
     
     var body: some View {

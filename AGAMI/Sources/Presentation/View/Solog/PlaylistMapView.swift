@@ -9,7 +9,7 @@ import SwiftUI
 import MapKit
 
 struct PlaylistMapView: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let coordinate: CLLocationCoordinate2D
     let playlist: PlaylistModel
 

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SearchWritingView: View {
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     @State private var viewModel: SearchWritingViewModel = SearchWritingViewModel()
     
     var body: some View {
@@ -190,7 +190,7 @@ private struct SearchDescriptionTextField: View {
 }
 
 private struct SearchAddButton: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: SearchWritingViewModel
     
     var body: some View {
@@ -286,7 +286,7 @@ private struct SearchSongList: View {
 }
 
 private struct TopBarLeadingItems: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     var viewModel: SearchWritingViewModel
     
     var body: some View {
@@ -308,7 +308,7 @@ private struct TopBarLeadingItems: View {
 
 private struct TopbarTrailingItems: View {
     @Environment(ListCellPlaceholderModel.self) private var placeholderData
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     var viewModel: SearchWritingViewModel
     
     var body: some View {
@@ -339,7 +339,7 @@ private struct TopbarTrailingItems: View {
 }
 
 private struct BackButtonAlertActions: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: SearchWritingViewModel
 
     var body: some View {
@@ -352,7 +352,7 @@ private struct BackButtonAlertActions: View {
 }
 
 private struct PhotoConfirmationDialogActions: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: SearchWritingViewModel
     
     var body: some View {

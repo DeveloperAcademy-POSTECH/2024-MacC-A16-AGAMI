@@ -1,5 +1,5 @@
 //
-//  ArchivePlaylistViewModel.swift
+//  SologPlaylistViewModel.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/15/24.
@@ -13,7 +13,7 @@ struct PlaylistPresentationState {
     var isEditing: Bool = false
     var isPhotoDialogPresented: Bool = false
     var isShowingDeletePhotoAlert: Bool = false
-    var isShowingDeletePlakeAlert: Bool = false
+    var isShowingDeleteSologAlert: Bool = false
     var isShowingPicker: Bool = false
     var isUpdating: Bool = false
     var isLoading: Bool = false
@@ -25,7 +25,7 @@ struct PlaylistPresentationState {
 }
 
 @Observable
-final class PlakePlaylistViewModel {
+final class SologPlaylistViewModel {
     var playlist: PlaylistModel
     var selectedSong: SongModel?
     var detailSong: DetailSong?

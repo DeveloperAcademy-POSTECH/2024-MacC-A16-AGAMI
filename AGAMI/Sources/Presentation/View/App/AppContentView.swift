@@ -9,28 +9,28 @@ import SwiftUI
 
 struct AppContentView: View {
     @AppStorage("isSignedIn") var isSignedIn: Bool = false
-    @State private var plakeCoordinator: PlakeCoordinator = .init()
+    @State private var sologCoordinator: SologCoordinator = .init()
     @State private var listCellPlaceholder: ListCellPlaceholderModel = ListCellPlaceholderModel()
     
     var body: some View {
         if isSignedIn {
-            NavigationStack(path: $plakeCoordinator.path) {
-                plakeCoordinator.build(route: .listView)
+            NavigationStack(path: $sologCoordinator.path) {
+                sologCoordinator.build(route: .listView)
                     .onOpenURL { url in
                         handleURL(url)
                     }
-                    .navigationDestination(for: PlakeRoute.self) { view in
-                        plakeCoordinator.build(route: view)
+                    .navigationDestination(for: SologRoute.self) { view in
+                        sologCoordinator.build(route: view)
                     }
-                    .sheet(item: $plakeCoordinator.sheet) { sheet in
-                        plakeCoordinator.buildSheet(sheet: sheet)
+                    .sheet(item: $sologCoordinator.sheet) { sheet in
+                        sologCoordinator.buildSheet(sheet: sheet)
                     }
-                    .fullScreenCover(item: $plakeCoordinator.fullScreenCover) { cover in
-                        plakeCoordinator.buildFullScreenCover(cover: cover)
+                    .fullScreenCover(item: $sologCoordinator.fullScreenCover) { cover in
+                        sologCoordinator.buildFullScreenCover(cover: cover)
                     }
             }
             .environment(listCellPlaceholder)
-            .environment(plakeCoordinator)
+            .environment(sologCoordinator)
         } else {
             SignInView()
         }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct DeleteAccountView: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
+    @Environment(SologCoordinator.self) private var coordinator
     let viewModel: AccountViewModel
     
     var body: some View {

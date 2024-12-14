@@ -62,7 +62,7 @@ final class CameraViewModel {
         switch viewModelContainer {
         case let .searchWriting(injectedViewModel):
             injectedViewModel.savePhotoUIImage(photoUIImage: croppedImage)
-        case let .plakePlaylist(injectedViewModel):
+        case let .sologPlaylist(injectedViewModel):
             injectedViewModel.setPhotoFromCamera(photo: croppedImage)
         case nil:
             return

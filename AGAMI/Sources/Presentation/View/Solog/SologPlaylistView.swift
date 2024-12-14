@@ -1,7 +1,7 @@
 // swiftlint:disable file_length
 
 //
-//  ArchivePlaylistView.swift
+//  SologPlaylistView.swift
 //  AGAMI
 //
 //  Created by 박현수 on 10/15/24.
@@ -9,13 +9,12 @@
 
 import SwiftUI
 import Kingfisher
-//import PhotosUI
 
-struct PlakePlaylistView: View {
-    @State var viewModel: PlakePlaylistViewModel
+struct SologPlaylistView: View {
+    @State var viewModel: SologPlaylistViewModel
     @Environment(\.scenePhase) private var scenePhase
     
-    init(viewModel: PlakePlaylistViewModel) {
+    init(viewModel: SologPlaylistViewModel) {
         _viewModel = State(wrappedValue: viewModel)
     }
     
@@ -64,8 +63,8 @@ struct PlakePlaylistView: View {
         .confirmationDialog("", isPresented: $viewModel.presentationState.isPhotoDialogPresented) {
             PhotoConfirmationDialogActions(viewModel: viewModel)
         }
-        .alert("기록 삭제하기", isPresented: $viewModel.presentationState.isShowingDeletePlakeAlert) {
-            DeletePlakeAlertActions(viewModel: viewModel)
+        .alert("기록 삭제하기", isPresented: $viewModel.presentationState.isShowingDeleteSologAlert) {
+            DeleteSologAlertActions(viewModel: viewModel)
         } message: {
             Text("삭제한 기록은 되돌릴 수 없어요.")
         }
@@ -94,7 +93,7 @@ struct PlakePlaylistView: View {
 }
 
 private struct ListView: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -132,7 +131,7 @@ private struct ListView: View {
 }
 
 private struct ListRow: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     let song: SongModel
     
     var body: some View {
@@ -180,8 +179,8 @@ private struct ListRow: View {
 }
 
 private struct ImageView: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    @Bindable var viewModel: PlakePlaylistViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    @Bindable var viewModel: SologPlaylistViewModel
 
     var body: some View {
         ZStack {
@@ -209,7 +208,7 @@ private struct ImageView: View {
 }
 
 private struct TitleAndDescriptionView: View {
-    @Bindable var viewModel: PlakePlaylistViewModel
+    @Bindable var viewModel: SologPlaylistViewModel
     
     var body: some View {
         switch viewModel.presentationState.isEditing {
@@ -292,7 +291,7 @@ private struct TitleAndDescriptionView: View {
 }
 
 private struct PlaylistView: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         HStack(spacing: 8) {
@@ -325,7 +324,7 @@ private struct PlaylistView: View {
 }
 
 private struct DeletePhotoButton: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         VStack {
@@ -349,8 +348,8 @@ private struct DeletePhotoButton: View {
 }
 
 private struct BottomConfigurationBar: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakePlaylistViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         VStack(spacing: 0) {
@@ -365,7 +364,7 @@ private struct BottomConfigurationBar: View {
                 AddMusicButton(viewModel: viewModel)
                     .highPriorityGesture(
                         TapGesture().onEnded {
-                            coordinator.presentSheet(.plakeAddSongView(viewModel: viewModel))
+                            coordinator.presentSheet(.sologAddSongView(viewModel: viewModel))
                         }
                     )
             }
@@ -380,7 +379,7 @@ private struct BottomConfigurationBar: View {
 }
 
 private struct AddPhotoButton: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Spacer()
@@ -395,7 +394,7 @@ private struct AddPhotoButton: View {
 }
 
 private struct AddMusicButton: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Spacer()
@@ -410,12 +409,12 @@ private struct AddMusicButton: View {
 }
 
 private struct PhotoConfirmationDialogActions: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakePlaylistViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Button("카메라") {
-            coordinator.presentFullScreenCover(.cameraView(viewModelContainer: .plakePlaylist(viewModel: viewModel)))
+            coordinator.presentFullScreenCover(.cameraView(viewModelContainer: .sologPlaylist(viewModel: viewModel)))
         }
         Button("앨범에서 가져오기") {
             viewModel.presentationState.isShowingPicker = true
@@ -424,8 +423,8 @@ private struct PhotoConfirmationDialogActions: View {
 }
 
 private struct TopBarLeadingItems: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakePlaylistViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Button {
@@ -440,8 +439,8 @@ private struct TopBarLeadingItems: View {
 }
 
 private struct TopBarTrailingItems: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakePlaylistViewModel
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         HStack {
@@ -505,7 +504,7 @@ private struct TopBarTrailingItems: View {
 
 private struct MenuContents: View {
     @Environment(\.openURL) private var openURL
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Button {
@@ -546,7 +545,7 @@ private struct MenuContents: View {
         
         Button(role: .destructive) {
             viewModel.simpleHaptic()
-            viewModel.presentationState.isShowingDeletePlakeAlert = true
+            viewModel.presentationState.isShowingDeleteSologAlert = true
         } label: {
             Label("삭제하기", systemImage: "trash")
         }
@@ -554,7 +553,7 @@ private struct MenuContents: View {
 }
 
 private struct DeletePhotoAlertActions: View {
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Button("취소", role: .cancel) {
@@ -567,13 +566,13 @@ private struct DeletePhotoAlertActions: View {
     }
 }
 
-private struct DeletePlakeAlertActions: View {
-    @Environment(PlakeCoordinator.self) private var coordinator
-    let viewModel: PlakePlaylistViewModel
+private struct DeleteSologAlertActions: View {
+    @Environment(SologCoordinator.self) private var coordinator
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.presentationState.isShowingDeletePlakeAlert = false
+            viewModel.presentationState.isShowingDeleteSologAlert = false
         }
         
         Button("삭제", role: .destructive) {
@@ -587,15 +586,15 @@ private struct DeletePlakeAlertActions: View {
 
 private struct ExportingFailedAlertActions: View {
     @Environment(\.openURL) private var openURL
-    let viewModel: PlakePlaylistViewModel
+    let viewModel: SologPlaylistViewModel
     
     var body: some View {
         Button("취소", role: .cancel) {
-            viewModel.presentationState.isShowingDeletePlakeAlert = false
+            viewModel.presentationState.isShowingDeleteSologAlert = false
         }
         
         Button("확인", role: .destructive) {
-            viewModel.presentationState.isShowingDeletePlakeAlert = false
+            viewModel.presentationState.isShowingDeleteSologAlert = false
             if let url = URL(string: viewModel.exportAppleMusicURLString) {
                 openURL(url)
             }

@@ -11,7 +11,6 @@ import Combine
 import SpotifyWebAPI
 import KeychainAccess
 
-@Observable
 final class SpotifyService {
     static let shared = SpotifyService()
     private let spotifyAPI: SpotifyAPI<AuthorizationCodeFlowManager>
@@ -22,6 +21,7 @@ final class SpotifyService {
 
     private var isAuthorized = false
     private var isRetrievingTokens = false
+    private var pendingAddPlaylist: (() -> Void)?
     var currentUser: SpotifyUser?
 
     private var cancellables: Set<AnyCancellable> = []
@@ -55,6 +55,7 @@ final class SpotifyService {
             .store(in: &cancellables)
 
         getAuthorizationManager()
+        retrieveCurrentUser()
     }
 
     private func getAuthorizationManager() {
@@ -99,6 +100,9 @@ final class SpotifyService {
 
         if self.isAuthorized {
             dump("Authorization successful: isAuthorized is true.")
+            guard let pending = pendingAddPlaylist else { return }
+            pending()
+            pendingAddPlaylist = nil
         } else {
             dump("Authorization failed: isAuthorized is false.")
         }
@@ -152,7 +156,7 @@ final class SpotifyService {
             .store(in: &cancellables)
     }
 
-    public func handleURL(_ url: URL) {
+    func handleURL(_ url: URL) {
         guard url.scheme == self.loginCallbackURL.scheme else {
             dump("not handling URL: unexpected scheme: '\(url)'")
             return
@@ -167,20 +171,20 @@ final class SpotifyService {
             state: self.authorizationState
         )
         .receive(on: RunLoop.main)
-        .sink(receiveCompletion: { completion in
+        .sink(receiveCompletion: { [weak self] completion in
+            guard let self = self else { return }
             self.isRetrievingTokens = false
 
-            if case .failure(let error) = completion {
+            switch completion {
+            case .finished:
+                self.authorizationState = String.randomURLSafe(length: 128)
+                authorizationManagerDidChange()
+            case .failure(let error):
                 dump("couldn't retrieve access and refresh tokens:\n\(error)")
-                if let authError = error as? SpotifyAuthorizationError,
-                   authError.accessWasDenied {
-                }
+                return
             }
         })
         .store(in: &cancellables)
-
-        self.authorizationState = String.randomURLSafe(length: 128)
-        authorizationManagerDidChange()
     }
 
     func addPlayList(name: String,
@@ -188,11 +192,21 @@ final class SpotifyService {
                      description: String?,
                      _ completionHandler: @escaping (String?) -> Void) {
         if currentUser == nil {
+            pendingAddPlaylist = { [weak self] in
+                guard let self = self else { return }
+                self.performPlaylistCreation(
+                    name: name,
+                    musicList: musicList,
+                    description: description
+                ) { completionHandler($0) }
+            }
             authorize()
         } else {
-            performPlaylistCreation(name: name, musicList: musicList, description: description) { playlistUri in
-                completionHandler(playlistUri)
-            }
+            performPlaylistCreation(
+                name: name,
+                musicList: musicList,
+                description: description
+            ) { completionHandler($0) }
         }
     }
 

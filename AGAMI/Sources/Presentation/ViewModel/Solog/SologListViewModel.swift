@@ -23,20 +23,12 @@ final class SologListViewModel {
     }
 
     var searchText: String = "" {
-        didSet {
-            keyboardHaptic()
-        }
+        didSet { keyboardHaptic() }
     }
 
     var playlists: [PlaylistModel] = []
     var filteredplaylists: [PlaylistModel] {
-        if searchText.isEmpty {
-            playlists
-        } else {
-            playlists.filter {
-                $0.playlistName.lowercased().contains(searchText.lowercased())
-            }
-        }
+        searchText.isEmpty ? playlists : playlists.filter { $0.playlistName.lowercased().contains(searchText.lowercased()) }
     }
 
     var hasNoResult: Bool {
@@ -100,19 +92,19 @@ final class SologListViewModel {
     func exportPlaylistToAppleMusic(playlist: PlaylistModel) async -> URL? {
         exportingState = .isAppleMusicExporting
         defer { exportingState = .none }
+
         do {
             musicService.clearSongs()
             for song in playlist.songs {
                 let appleMusicSong = try await musicService.searchSongById(songId: song.songID)
                 musicService.addSongToSongs(song: appleMusicSong)
             }
-            try await musicService.createPlaylist(name: playlist.playlistName, description: playlist.playlistDescription)
+            try? await musicService.createPlaylist(name: playlist.playlistName, description: playlist.playlistDescription)
         } catch {
             dump("Apple Music 플레이리스트 생성 실패: \(error.localizedDescription)")
         }
-        guard let urlString = musicService.getCurrentPlaylistUrl() else {
-            return nil
-        }
+
+        guard let urlString = musicService.getCurrentPlaylistUrl() else { return nil }
         return URL(string: urlString)
     }
 
@@ -146,11 +138,10 @@ final class SologListViewModel {
     }
 
     func handleURL(_ url: URL) {
-        if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
-           let decodedRedirectURL = redirectURL.removingPercentEncoding,
-           url.absoluteString.contains(decodedRedirectURL) {
-            exportingState = .none
-        }
+        guard let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
+              let decodedRedirectURL = redirectURL.removingPercentEncoding,
+              url.absoluteString.contains(decodedRedirectURL) else { return }
+        exportingState = .none
     }
 
     func simpleHaptic() {

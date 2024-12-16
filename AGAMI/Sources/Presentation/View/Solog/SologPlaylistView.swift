@@ -83,7 +83,7 @@ struct SologPlaylistView: View {
             selection: $viewModel.selectedItem,
             matching: .images
         )
-        .onOpenURL { viewModel.handleURL($0) }
+//        .onOpenURL { viewModel.handleURL($0) }
         .onChange(of: scenePhase) { _, newScene in
             if newScene == .active && viewModel.presentationState.didOpenSpotifyURL {
                 viewModel.resetSpotifyURLState()

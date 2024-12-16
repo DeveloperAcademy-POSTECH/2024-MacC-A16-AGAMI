@@ -45,7 +45,7 @@ struct SologListView: View {
         .toolbarBackground(.visible, for: .tabBar)
         .refreshable { viewModel.fetchPlaylists() }
         .onTapGesture(perform: hideKeyboard)
-        .onOpenURL { viewModel.handleURL($0) }
+//        .onOpenURL { viewModel.handleURL($0) }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onAppear(perform: viewModel.fetchPlaylists)
         .onChange(of: listCellPlaceholder.shouldShowUploadingCell) { oldValue, newValue in
@@ -401,6 +401,8 @@ private struct ContextMenuItems: View {
             viewModel.exportPlaylistToSpotify(playlist: playlist) { result in
                 switch result {
                 case .success(let url):
+                    dump("ContextMenuItems")
+                    dump(url)
                     openURL(url)
                 case .failure(let err):
                     dump(err.localizedDescription)

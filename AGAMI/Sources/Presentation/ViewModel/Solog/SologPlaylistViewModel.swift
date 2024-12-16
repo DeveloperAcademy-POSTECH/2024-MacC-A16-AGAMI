@@ -234,13 +234,6 @@ final class SologPlaylistViewModel {
         }
     }
     
-    func handleURL(_ url: URL) {
-        guard let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
-              let decodedRedirectURL = redirectURL.removingPercentEncoding,
-              url.absoluteString.contains(decodedRedirectURL) else { return }
-        exportingState = .none
-    }
-    
     func setPhotoFromCamera(photo: UIImage) {
         photoFromCamera = photo
     }

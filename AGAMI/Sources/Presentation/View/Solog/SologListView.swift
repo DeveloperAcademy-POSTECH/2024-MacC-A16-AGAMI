@@ -45,7 +45,6 @@ struct SologListView: View {
         .toolbarBackground(.visible, for: .tabBar)
         .refreshable { viewModel.fetchPlaylists() }
         .onTapGesture(perform: hideKeyboard)
-//        .onOpenURL { viewModel.handleURL($0) }
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onAppear(perform: viewModel.fetchPlaylists)
         .onChange(of: listCellPlaceholder.shouldShowUploadingCell) { oldValue, newValue in

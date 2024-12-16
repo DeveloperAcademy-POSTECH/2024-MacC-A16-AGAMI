@@ -137,13 +137,6 @@ final class SologListViewModel {
         return dateFormatter.string(from: date)
     }
 
-    func handleURL(_ url: URL) {
-        guard let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
-              let decodedRedirectURL = redirectURL.removingPercentEncoding,
-              url.absoluteString.contains(decodedRedirectURL) else { return }
-        exportingState = .none
-    }
-
     func simpleHaptic() {
         HapticService.shared.playSimpleHaptic()
     }

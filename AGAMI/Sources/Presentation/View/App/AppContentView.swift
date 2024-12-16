@@ -16,9 +16,7 @@ struct AppContentView: View {
         if isSignedIn {
             NavigationStack(path: $sologCoordinator.path) {
                 sologCoordinator.build(route: .listView)
-                    .onOpenURL { url in
-                        handleURL(url)
-                    }
+                    .onOpenURL { handleURL($0) }
                     .navigationDestination(for: SologRoute.self) { view in
                         sologCoordinator.build(route: view)
                     }
@@ -31,6 +29,8 @@ struct AppContentView: View {
             }
             .environment(listCellPlaceholder)
             .environment(sologCoordinator)
+            .onAppear(perform: initializeSpotifyService)
+
         } else {
             SignInView()
         }
@@ -43,6 +43,10 @@ struct AppContentView: View {
                 SpotifyService.shared.handleURL(url)
             }
         }
+    }
+
+    private func initializeSpotifyService() {
+        _ = SpotifyService.shared
     }
 }
 

@@ -400,8 +400,6 @@ private struct ContextMenuItems: View {
             viewModel.exportPlaylistToSpotify(playlist: playlist) { result in
                 switch result {
                 case .success(let url):
-                    dump("ContextMenuItems")
-                    dump(url)
                     openURL(url)
                 case .failure(let err):
                     dump(err.localizedDescription)

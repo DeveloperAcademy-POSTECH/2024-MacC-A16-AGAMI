@@ -55,6 +55,7 @@ final class SpotifyService {
             .store(in: &cancellables)
 
         getAuthorizationManager()
+        refreshIfNeeded()
         retrieveCurrentUser()
     }
 
@@ -136,6 +137,22 @@ final class SpotifyService {
         }
     }
 
+    private func refreshIfNeeded() {
+        guard !spotifyAPI.authorizationManager.isAuthorized() else { return }
+
+        spotifyAPI.authorizationManager.refreshTokens(onlyIfExpired: true)
+            .receive(on: RunLoop.main)
+            .sink { result in
+                switch result {
+                case .finished:
+                    dump("토큰 갱신 성공")
+                case .failure(let error):
+                    dump("토큰 갱신 실패: \(error)")
+                }
+            }
+            .store(in: &cancellables)
+    }
+
     private func retrieveCurrentUser(onlyIfNil: Bool = true) {
         if onlyIfNil && self.currentUser != nil {
             return
@@ -178,7 +195,6 @@ final class SpotifyService {
             switch completion {
             case .finished:
                 self.authorizationState = String.randomURLSafe(length: 128)
-                authorizationManagerDidChange()
             case .failure(let error):
                 dump("couldn't retrieve access and refresh tokens:\n\(error)")
                 return

@@ -11,7 +11,9 @@ struct AppContentView: View {
     @AppStorage("isSignedIn") var isSignedIn: Bool = false
     @State private var sologCoordinator: SologCoordinator = .init()
     @State private var listCellPlaceholder: ListCellPlaceholderModel = ListCellPlaceholderModel()
-    
+
+    init() { initializeSpotifyService() }
+
     var body: some View {
         if isSignedIn {
             NavigationStack(path: $sologCoordinator.path) {
@@ -29,7 +31,6 @@ struct AppContentView: View {
             }
             .environment(listCellPlaceholder)
             .environment(sologCoordinator)
-            .onAppear(perform: initializeSpotifyService)
 
         } else {
             SignInView()
@@ -37,12 +38,12 @@ struct AppContentView: View {
     }
 
     private func handleURL(_ url: URL) {
-        if let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
-           let decodedRedirectURL = redirectURL.removingPercentEncoding {
-            if url.absoluteString.contains(decodedRedirectURL) {
-                SpotifyService.shared.handleURL(url)
-            }
-        }
+        guard let redirectURL = Bundle.main.object(forInfoDictionaryKey: "REDIRECT_URL") as? String,
+              let decodedRedirectURL = redirectURL.removingPercentEncoding,
+              url.absoluteString.contains(decodedRedirectURL)
+        else { return }
+        
+        SpotifyService.shared.handleURL(url)
     }
 
     private func initializeSpotifyService() {

@@ -31,9 +31,7 @@ struct SologPlaylistView: View {
                 EmptyView()
             }
 
-            if viewModel.presentationState.isLoading {
-                ProgressView()
-            }
+            if viewModel.presentationState.isLoading { ProgressView() }
 
             if viewModel.presentationState.isShowingSongDetailView {
                 SongDetailView(detailSong: viewModel.detailSong,

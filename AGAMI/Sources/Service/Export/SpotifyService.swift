@@ -182,7 +182,7 @@ extension SpotifyService {
             state: self.authorizationState
         )
         .receive(on: RunLoop.main)
-        .sink(receiveCompletion: { [weak self] completion in
+        .sink { [weak self] completion in
             guard let self = self else { return }
             self.isRetrievingTokens = false
 
@@ -193,7 +193,7 @@ extension SpotifyService {
                 dump("Spotify: 토큰 갱신 실패\n\(error)")
                 return
             }
-        })
+        }
         .store(in: &cancellables)
     }
 }

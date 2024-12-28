@@ -10,7 +10,7 @@ import SwiftUI
 struct AppContentView: View {
     @AppStorage("isSignedIn") var isSignedIn: Bool = false
     @State private var sologCoordinator: SologCoordinator = .init()
-    @State private var listCellPlaceholder: ListCellPlaceholderModel = ListCellPlaceholderModel()
+    @State private var uploadingData: UploadingDataModel = UploadingDataModel()
 
     init() { initializeSpotifyService() }
 
@@ -29,7 +29,7 @@ struct AppContentView: View {
                         sologCoordinator.buildFullScreenCover(cover: cover)
                     }
             }
-            .environment(listCellPlaceholder)
+            .environment(uploadingData)
             .environment(sologCoordinator)
 
         } else {

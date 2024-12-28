@@ -307,7 +307,7 @@ private struct TopBarLeadingItems: View {
 }
 
 private struct TopbarTrailingItems: View {
-    @Environment(ListCellPlaceholderModel.self) private var placeholderData
+    @Environment(UploadingDataModel.self) private var uploadingData
     @Environment(SologCoordinator.self) private var coordinator
     var viewModel: SearchWritingViewModel
     
@@ -315,7 +315,7 @@ private struct TopbarTrailingItems: View {
         Button {
             Task {
                 viewModel.simpleHaptic()
-                placeholderData.setPropertyValues(
+                uploadingData.setPropertyValues(
                     userTitle: viewModel.playlist.playlistName,
                     streetAddress: viewModel.playlist.streetAddress,
                     generationTime: Date()
@@ -323,7 +323,7 @@ private struct TopbarTrailingItems: View {
                 coordinator.popToRoot()
 
                 if await viewModel.savedPlaylist() {
-                    placeholderData.initializePropertyValues()
+                    uploadingData.initializePropertyValues()
                     viewModel.clearDiggingList()
                 } else {
                     dump("Failed to save playlist. Please try again.")

@@ -507,8 +507,8 @@ private struct MenuContents: View {
         Button {
             viewModel.simpleHaptic()
             Task {
-                if let url = await viewModel.exportPlaylistToAppleMusic() {
-                    openURL(url)
+                if let appleMusicURL = await viewModel.exportPlaylistToAppleMusic() {
+                    openURL(appleMusicURL)
                 }
             }
         } label: {
@@ -517,12 +517,9 @@ private struct MenuContents: View {
         
         Button {
             viewModel.simpleHaptic()
-            viewModel.exportPlaylistToSpotify { result in
-                switch result {
-                case .success(let url):
-                    openURL(url)
-                case .failure(let err):
-                    dump(err)
+            Task {
+                if let spotifyURL = await viewModel.exportPlaylistToSpotify() {
+                    openURL(spotifyURL)
                 }
             }
         } label: {

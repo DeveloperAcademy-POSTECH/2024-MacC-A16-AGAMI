@@ -12,7 +12,7 @@ import Kingfisher
 
 struct SologListView: View {
     @State var viewModel: SologListViewModel = SologListViewModel()
-    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
+    @Environment(UploadingDataModel.self) private var uploadingData
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
@@ -47,7 +47,7 @@ struct SologListView: View {
         .onTapGesture(perform: hideKeyboard)
         .onAppearAndActiveCheckUserValued(scenePhase)
         .onAppear(perform: viewModel.fetchPlaylists)
-        .onChange(of: listCellPlaceholder.shouldShowUploadingCell) { oldValue, newValue in
+        .onChange(of: uploadingData.shouldShowUploadingCell) { oldValue, newValue in
             if oldValue == true, newValue == false {
                 viewModel.fetchPlaylists()
             }
@@ -158,7 +158,7 @@ private struct CountingHeaderView: View {
 }
 
 private struct ListView: View {
-    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
+    @Environment(UploadingDataModel.self) private var listCellPlaceholder
     let viewModel: SologListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
@@ -287,7 +287,7 @@ private struct NewSologButton: View {
 }
 
 private struct ArchiveListUpLoadingCell: View {
-    @Environment(ListCellPlaceholderModel.self) private var listCellPlaceholder
+    @Environment(UploadingDataModel.self) private var listCellPlaceholder
     let viewModel: SologListViewModel
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
@@ -397,12 +397,9 @@ private struct ContextMenuItems: View {
             Label("Apple Music에서 열기", systemImage: "square.and.arrow.up")
         }
         Button {
-            viewModel.exportPlaylistToSpotify(playlist: playlist) { result in
-                switch result {
-                case .success(let url):
-                    openURL(url)
-                case .failure(let err):
-                    dump(err.localizedDescription)
+            Task {
+                if let spotifyURL = await viewModel.exportPlaylistToSpotify(playlist: playlist) {
+                    openURL(spotifyURL)
                 }
             }
         } label: {

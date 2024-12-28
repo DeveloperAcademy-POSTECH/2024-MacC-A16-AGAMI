@@ -58,7 +58,7 @@
 
 ### **Rebase and Merge**
 - 모든 Pull Request(PR)는 **Rebase and Merge**를 통해 머지합니다.  
-    - 이는 모든 커밋 히스토리를 Default Branch에 남기며, 선형으로 유지하기 위함입니다.
+    - 모든 커밋 히스토리를 Default Branch에 남기며, 선형으로 유지하기 위함입니다.
 
 ### **Labels**
 |📌 Type|🖌️ Mean|

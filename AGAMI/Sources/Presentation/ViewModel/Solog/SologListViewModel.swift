@@ -42,16 +42,16 @@ final class SologListViewModel {
 
     var isDialogPresented: Bool = false
     var exportingState: ExportingState = .none
-    
+
     func fetchPlaylists() {
         isFetching = true
-        
+
         guard let uid = FirebaseAuthService.currentUID else {
             dump("UID를 가져오는 데 실패했습니다.")
             isFetching = false
             return
         }
-        
+
         Task {
             if let playlistModels = try? await firebaseService.fetchPlaylistsByUserID(userID: uid) {
                 await updatePlaylists(sortPlaylistsByDate(playlistModels))
@@ -108,27 +108,28 @@ final class SologListViewModel {
         return URL(string: urlString)
     }
 
-    func exportPlaylistToSpotify(playlist: PlaylistModel, completion: @escaping (Result<URL, Error>) -> Void) {
+    func exportPlaylistToSpotify(playlist: PlaylistModel) async -> URL? {
         exportingState = .isSpotifyExporting
+        defer { exportingState = .none }
+
         let musicList = playlist.songs.map { ($0.title, $0.artist) }
-        SpotifyService.shared.addPlayList(name: playlist.playlistName,
-                                          musicList: musicList,
-                                          description: playlist.playlistDescription) { [weak self] playlistUri in
-            guard let playlistUri = playlistUri else {
-                self?.exportingState = .none
-                let error = SpotifyError.invalidURI
-                completion(.failure(error))
-                return
-            }
-            guard let playlistURL = URL(string: playlistUri.replacingOccurrences(of: "spotify:playlist:", with: "spotify://playlist/")) else {
-                self?.exportingState = .none
-                let error = SpotifyError.invalidURL
-                completion(.failure(error))
-                return
-            }
-            self?.exportingState = .none
-            completion(.success(playlistURL))
+
+        guard let uri = await SpotifyService.shared.addPlayList(
+            name: playlist.playlistName,
+            musicList: musicList,
+            description: playlist.playlistDescription
+        ) else {
+            dump(SpotifyError.invalidURI)
+            return nil
         }
+
+        guard let url = URL(string: uri.replacingOccurrences(of: "spotify:playlist:", with: "spotify://playlist/"))
+        else {
+            dump(SpotifyError.invalidURL)
+            return nil
+        }
+
+        return url
     }
 
     func formatDateToString(_ date: Date) -> String {
@@ -148,78 +149,78 @@ final class SologListViewModel {
     func clearSearchText() {
         searchText.removeAll()
     }
-// MARK: - FirebaseListner 코드
-//    private let listenerService = FirebaseListenerService()
+    // MARK: - FirebaseListner 코드
+    //    private let listenerService = FirebaseListenerService()
 
-//    private var isInitialFetchCompleted = false
-    
-//    func observePlaylistChanges() {
-//        guard let userID = FirebaseAuthService.currentUID else {
-//            dump("UID를 가져오는 데 실패했습니다.")
-//            return
-//        }
-//
-//        dump("observing playlist changes")
-//
-//        listenerService.startListeningPlaylist(userID: userID) { [weak self] changes in
-//            changes.forEach { diff in
-//                switch diff.type {
-//                case .added:
-////                    if !(self?.isInitialFetchCompleted ?? false) {
-//                        dump("added")
-//                        if let playlist = self?.createPlaylist(from: diff.document) {
-//                            self?.playlists.insert(playlist, at: 0)
-//                        }
-////                    }
-//                case .modified:
-//                    dump("modified")
-//                    if let updatedPlaylist = self?.createPlaylist(from: diff.document),
-//                       let index = self?.playlists.firstIndex(where: { $0.playlistID == updatedPlaylist.id }) {
-//                        self?.playlists[index] = updatedPlaylist
-//                    }
-//                case .removed:
-//                    dump("removed")
-//                    let removedID = diff.document.documentID
-//                    if let index = self?.playlists.firstIndex(where: { $0.playlistID == removedID }) {
-//                        self?.playlists.remove(at: index)
-//                    }
-//                }
-//            }
-////            self?.isInitialFetchCompleted = true
-//            self?.stopObservingPlaylistChanges()
-//            self?.isUploading = false
-//        }
-//    }
-//
-//    func fetchAndSetInitialPlaylists() async throws {
-//        guard !isInitialFetchCompleted else {
-//            dump("Initial fetch already completed, skipping fetch.")
-//            return
-//        }
-//        
-//        guard let userID = FirebaseAuthService.currentUID else {
-//            dump("User ID is not available")
-//            throw NSError(domain: "UserIDError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User ID is not available"])
-//        }
-//        
-//        let initialSnapshots = try await listenerService.fetchInitialPlaylistSnapshot(userID: userID)
-//        
-//        for document in initialSnapshots {
-//            if let playlist = createPlaylist(from: document) {
-//                playlists.append(playlist)
-//            }
-//        }
-//        
-//        dump("Initial fetch completed with \(initialSnapshots.count) playlists")
-//        isInitialFetchCompleted = true
-//    }
-//
-//    func stopObservingPlaylistChanges() {
-//        listenerService.stopListeningPlaylist()
-//    }
-//    
-//    private func createPlaylist(from document: DocumentSnapshot) -> FirestorePlaylistModel? {
-//        guard let data = document.data() else { return nil }
-//        return FirestorePlaylistModel(dictionary: data)
-//    }
+    //    private var isInitialFetchCompleted = false
+
+    //    func observePlaylistChanges() {
+    //        guard let userID = FirebaseAuthService.currentUID else {
+    //            dump("UID를 가져오는 데 실패했습니다.")
+    //            return
+    //        }
+    //
+    //        dump("observing playlist changes")
+    //
+    //        listenerService.startListeningPlaylist(userID: userID) { [weak self] changes in
+    //            changes.forEach { diff in
+    //                switch diff.type {
+    //                case .added:
+    ////                    if !(self?.isInitialFetchCompleted ?? false) {
+    //                        dump("added")
+    //                        if let playlist = self?.createPlaylist(from: diff.document) {
+    //                            self?.playlists.insert(playlist, at: 0)
+    //                        }
+    ////                    }
+    //                case .modified:
+    //                    dump("modified")
+    //                    if let updatedPlaylist = self?.createPlaylist(from: diff.document),
+    //                       let index = self?.playlists.firstIndex(where: { $0.playlistID == updatedPlaylist.id }) {
+    //                        self?.playlists[index] = updatedPlaylist
+    //                    }
+    //                case .removed:
+    //                    dump("removed")
+    //                    let removedID = diff.document.documentID
+    //                    if let index = self?.playlists.firstIndex(where: { $0.playlistID == removedID }) {
+    //                        self?.playlists.remove(at: index)
+    //                    }
+    //                }
+    //            }
+    ////            self?.isInitialFetchCompleted = true
+    //            self?.stopObservingPlaylistChanges()
+    //            self?.isUploading = false
+    //        }
+    //    }
+    //
+    //    func fetchAndSetInitialPlaylists() async throws {
+    //        guard !isInitialFetchCompleted else {
+    //            dump("Initial fetch already completed, skipping fetch.")
+    //            return
+    //        }
+    //
+    //        guard let userID = FirebaseAuthService.currentUID else {
+    //            dump("User ID is not available")
+    //            throw NSError(domain: "UserIDError", code: -1, userInfo: [NSLocalizedDescriptionKey: "User ID is not available"])
+    //        }
+    //
+    //        let initialSnapshots = try await listenerService.fetchInitialPlaylistSnapshot(userID: userID)
+    //
+    //        for document in initialSnapshots {
+    //            if let playlist = createPlaylist(from: document) {
+    //                playlists.append(playlist)
+    //            }
+    //        }
+    //
+    //        dump("Initial fetch completed with \(initialSnapshots.count) playlists")
+    //        isInitialFetchCompleted = true
+    //    }
+    //
+    //    func stopObservingPlaylistChanges() {
+    //        listenerService.stopListeningPlaylist()
+    //    }
+    //
+    //    private func createPlaylist(from document: DocumentSnapshot) -> FirestorePlaylistModel? {
+    //        guard let data = document.data() else { return nil }
+    //        return FirestorePlaylistModel(dictionary: data)
+    //    }
 }

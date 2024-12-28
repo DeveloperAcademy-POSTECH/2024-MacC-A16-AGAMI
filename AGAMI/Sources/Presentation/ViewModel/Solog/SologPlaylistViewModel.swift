@@ -85,25 +85,31 @@ final class SologPlaylistViewModel {
             musicService.addSongToSongs(song: appleMusicSong)
         }
     }
-    
-    func exportPlaylistToSpotify(completion: @escaping (Result<URL, Error>) -> Void) {
+
+    func exportPlaylistToSpotify() async -> URL? {
         exportingState = .isSpotifyExporting
+        defer { exportingState = .none }
+
         let musicList = playlist.songs.map { ($0.title, $0.artist) }
-        presentationState.didOpenSpotifyURL = true
-        SpotifyService.shared.addPlayList(name: playlist.playlistName,
-                                          musicList: musicList,
-                                          description: playlist.playlistDescription) { [weak self] playlistUri in
-            guard let self = self else { return }
-            self.exportingState = .none
-            
-            if let playlistUri = playlistUri, let playlistURL = URL(string: playlistUri.replacingOccurrences(of: "spotify:playlist:", with: "spotify://playlist/")) {
-                completion(.success(playlistURL))
-            } else {
-                completion(.failure(SpotifyError.invalidURI))
-            }
+
+        guard let uri = await SpotifyService.shared.addPlayList(
+            name: playlist.playlistName,
+            musicList: musicList,
+            description: playlist.playlistDescription
+        ) else {
+            dump(SpotifyError.invalidURI)
+            return nil
         }
+
+        guard let url = URL(string: uri.replacingOccurrences(of: "spotify:playlist:", with: "spotify://playlist/"))
+        else {
+            dump(SpotifyError.invalidURL)
+            return nil
+        }
+
+        return url
     }
-    
+
     func deletePlaylist() async {
         guard let userID = FirebaseAuthService.currentUID else { return }
         await deletePhoto(userID: userID)

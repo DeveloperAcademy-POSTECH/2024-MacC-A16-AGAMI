@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-final class ListCellPlaceholderModel {
+final class UploadingDataModel {
     var name: String?
     var streetAddress: String?
     var generationTime: Date?

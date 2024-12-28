@@ -41,8 +41,8 @@ enum LottieAnimationType: String {
             "shazamLottie"
         case .export:
             "exportLottie"
-		case .deleting:
-			"deleteLottie"
+        case .deleting:
+            "deleteLottie"
         }
     }
 }

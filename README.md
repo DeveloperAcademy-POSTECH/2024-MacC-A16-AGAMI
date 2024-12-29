@@ -44,6 +44,7 @@
 <img src="https://img.shields.io/badge/ShazamKit-0087D1?style=flat&logo=shazam&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/MusicKit-FF3366?style=flat&logo=applemusic&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/Spotify%20SDK-1DB954?style=flat&logo=spotify&logoColor=white" height="30"/>
+<img src="https://img.shields.io/badge/Sign%20in%20with%20Apple-000000?style=flat&logo=apple&logoColor=white" height="30"/>
 <img src="https://img.shields.io/badge/Firebase Authentication-FFCA28?style=flat&logo=firebase&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/Firestore-DD2C00?style=flat&logo=firebase&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/SwiftData-FA7343?style=flat&logo=swift&logoColor=white" height="30"/>

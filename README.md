@@ -40,6 +40,7 @@
 <img src="https://img.shields.io/badge/Swift-FA7343?style=flat&logo=Swift&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/SwiftUI-FF9E0F?style=flat&logo=Swift&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/SwiftLint-2179EE?style=flat&logo=swift&logoColor=white" height="30"/>
+<img src="https://img.shields.io/badge/MapKit-007AFF?style=flat&logo=apple&logoColor=white" height="30"/>
 <img src="https://img.shields.io/badge/ShazamKit-0087D1?style=flat&logo=shazam&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/MusicKit-FF3366?style=flat&logo=applemusic&logoColor=white" height="30"/> 
 <img src="https://img.shields.io/badge/Spotify%20SDK-1DB954?style=flat&logo=spotify&logoColor=white" height="30"/>
@@ -50,7 +51,7 @@
 
 <br>
 
-## 🏷 Commit Convention
+## :label: Commit Convention
 
 ### Github Flow
 - **label/<#Issue Number>** 브랜치에서 기능 개발이 이루어지고, 작업이 완료되면 **develop** 브랜치로 머지합니다.

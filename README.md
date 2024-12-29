@@ -27,10 +27,10 @@
 
 ## :people_hugging: Contributors
 
-|정온유|홍지흔|우태훈|박현수|허예강|최서연|
+|정온유|홍지흔|박현수|우태훈|최서연|허예강|
 |:---:|:---:|:---:|:---:|:---:|:---:|
-|(나인 - Nain)|(이블린 - Evelyn)|(션 - Sean)|(수박 - Soopark)|(라프 - Raf)|(구리스 - Guryss)|
-|<img src="https://github.com/user-attachments/assets/40130ed1-a3cf-4614-ad73-a09def7919a2" width="130" >|<img src="https://github.com/user-attachments/assets/8cd9e191-7c12-40d7-a999-bdffe2a68ca3" width="130">|<img src="https://github.com/user-attachments/assets/013ba835-a72e-4c16-aba6-d6e68f83335d" width="130">|<img src="https://github.com/user-attachments/assets/5dcc4366-924d-4ef5-a96b-f82a8066bc3d" width="130">|<img src="https://github.com/user-attachments/assets/31c568b9-028d-4fa2-900a-3135a8cfd746" width="130">|<img src="https://github.com/user-attachments/assets/e0883004-7389-4d72-b060-6ef5c78d593e" width="130">|
+|(나인 - Nain)|(이블린 - Evelyn)|(수박 - Soopark)|(션 - Sean)|(구리스 - Guryss)|(라프 - Raf)|
+|<img src="https://github.com/user-attachments/assets/40130ed1-a3cf-4614-ad73-a09def7919a2" width="130">|<img src="https://github.com/user-attachments/assets/8cd9e191-7c12-40d7-a999-bdffe2a68ca3" width="130">|<img src="https://github.com/user-attachments/assets/5dcc4366-924d-4ef5-a96b-f82a8066bc3d" width="130">|<img src="https://github.com/user-attachments/assets/013ba835-a72e-4c16-aba6-d6e68f83335d" width="130">|<img src="https://github.com/user-attachments/assets/e0883004-7389-4d72-b060-6ef5c78d593e" width="130">|<img src="https://github.com/user-attachments/assets/31c568b9-028d-4fa2-900a-3135a8cfd746" width="130">|
 |🎨 Designer|🎨 Designer|🛠️ Developer|🛠️ Developer|🛠️ Developer|🛠️ Developer|
 
 <br>

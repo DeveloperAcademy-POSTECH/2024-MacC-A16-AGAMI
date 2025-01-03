@@ -22,14 +22,7 @@ struct SologPlaylistView: View {
         ZStack {
             ListView(viewModel: viewModel)
 
-            switch viewModel.exportingState {
-            case .isAppleMusicExporting:
-                AppleMusicLottieView()
-            case .isSpotifyExporting:
-                SpotifyLottieView()
-            case .none:
-                EmptyView()
-            }
+            ExportingView(exportingState: viewModel.exportingState)
 
             if viewModel.presentationState.isLoading { ProgressView() }
 
@@ -85,6 +78,21 @@ struct SologPlaylistView: View {
             if newScene == .active && viewModel.presentationState.didOpenSpotifyURL {
                 viewModel.resetSpotifyURLState()
             }
+        }
+    }
+}
+
+private struct ExportingView: View {
+    var exportingState: ExportingState
+    
+    var body: some View {
+        switch exportingState {
+        case .isAppleMusicExporting:
+            AppleMusicLottieView()
+        case .isSpotifyExporting:
+            SpotifyLottieView()
+        case .none:
+            EmptyView()
         }
     }
 }

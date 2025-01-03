@@ -60,7 +60,65 @@ final class SologPlaylistViewModel {
         self.playlist = playlist
         self.initialPlaylist = playlist
     }
+
+    func deletePhotoURL() {
+        playlist.photoURL.removeAll()
+    }
     
+    func deleteSong(at indexSet: IndexSet) {
+        playlist.songs.remove(atOffsets: indexSet)
+    }
+    
+    func moveSong(from source: IndexSet, to destination: Int) {
+        playlist.songs.move(fromOffsets: source, toOffset: destination)
+    }
+    
+    func formatDateToString(_ date: Date) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+        return dateFormatter.string(from: date)
+    }
+    
+    func resetSpotifyURLState() {
+        exportingState = .none
+        presentationState.didOpenSpotifyURL = false
+    }
+    
+    func resetPlaylist() {
+        playlist = initialPlaylist
+    }
+    
+    func simpleHaptic() {
+        HapticService.shared.playSimpleHaptic()
+    }
+    
+    func fetchAdditionalDetails() async {
+        presentationState.isDetailViewLoading = true
+        defer { presentationState.isDetailViewLoading = false }
+
+        guard let songID = selectedSong?.songID,
+              let song = await musicService.fetchSongInfoByID(songID)
+        else { return }
+
+        detailSong = DetailSong(
+            songTitle: selectedSong?.title,
+            artist: selectedSong?.artist,
+            albumCoverURL: selectedSong?.albumCoverURL,
+            albumTitle: song.albumTitle,
+            genres: song.genreNames,
+            releaseDate: song.releaseDate?.formatDate()
+        )
+    }
+    
+    func dismissSongDetailView() {
+        selectedSong = nil
+        detailSong = nil
+        presentationState.isShowingSongDetailView.toggle()
+    }
+}
+
+// Apple Music & Spotify
+extension SologPlaylistViewModel {
     func exportPlaylistToAppleMusic() async -> URL? {
         guard await musicService.checkAppleMusicSubscriptionStatus() else {
             self.presentationState.isShowingExportingAppleMusicFailedAlert = true
@@ -111,33 +169,10 @@ final class SologPlaylistViewModel {
 
         return url
     }
+}
 
-    func deletePlaylist() async {
-        guard let userID = FirebaseAuthService.currentUID else { return }
-        await deletePhoto(userID: userID)
-        try? await firebaseService.deletePlaylist(userID: userID, playlistID: playlist.playlistID)
-    }
-    
-    func deletePhoto(userID: String) async {
-        if !playlist.photoURL.isEmpty {
-            let pastURL = playlist.photoURL
-            try? await firebaseService.deleteImageInFirebase(userID: userID, photoURL: pastURL)
-            deletePhotoURL()
-        }
-    }
-    
-    func deletePhotoURL() {
-        playlist.photoURL.removeAll()
-    }
-    
-    func deleteSong(at indexSet: IndexSet) {
-        playlist.songs.remove(atOffsets: indexSet)
-    }
-    
-    func moveSong(from source: IndexSet, to destination: Int) {
-        playlist.songs.move(fromOffsets: source, toOffset: destination)
-    }
-    
+// Shazam
+extension SologPlaylistViewModel {
     private func checkMicrophonePermission() async -> Bool {
         switch AVAudioApplication.shared.recordPermission {
         case .denied:
@@ -218,11 +253,22 @@ final class SologPlaylistViewModel {
             Task { await startRecognition() }
         }
     }
+}
+
+// Firebase
+extension SologPlaylistViewModel {
+    func deletePlaylist() async {
+        guard let userID = FirebaseAuthService.currentUID else { return }
+        await deletePhoto(userID: userID)
+        try? await firebaseService.deletePlaylist(userID: userID, playlistID: playlist.playlistID)
+    }
     
-    func formatDateToString(_ date: Date) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
-        return dateFormatter.string(from: date)
+    func deletePhoto(userID: String) async {
+        if !playlist.photoURL.isEmpty {
+            let pastURL = playlist.photoURL
+            try? await firebaseService.deleteImageInFirebase(userID: userID, photoURL: pastURL)
+            deletePhotoURL()
+        }
     }
     
     func applyChangesToFirestore() async {
@@ -241,7 +287,21 @@ final class SologPlaylistViewModel {
             dump("Failed to save playlist to Firebase: \(error)")
         }
     }
-    
+
+    func refreshPlaylist() async {
+        guard let userID = FirebaseAuthService.currentUID,
+              let newPlaylist = await firebaseService.fetchPlaylist(
+                userID: userID,
+                playlistID: playlist.playlistID
+              )
+        else { return }
+
+        await MainActor.run { playlist = newPlaylist }
+    }
+}
+
+// Image Handling
+extension SologPlaylistViewModel {
     func setPhotoFromCamera(photo: UIImage) {
         photoFromCamera = photo
     }
@@ -274,49 +334,10 @@ final class SologPlaylistViewModel {
         
         await MainActor.run { playlist.photoURL = url }
     }
+}
 
-    func refreshPlaylist() async {
-        guard let userID = FirebaseAuthService.currentUID,
-              let newPlaylist = await firebaseService.fetchPlaylist(
-                userID: userID,
-                playlistID: playlist.playlistID
-              )
-        else { return }
-
-        await MainActor.run { playlist = newPlaylist }
-    }
-    
-    func resetSpotifyURLState() {
-        exportingState = .none
-        presentationState.didOpenSpotifyURL = false
-    }
-    
-    func resetPlaylist() {
-        playlist = initialPlaylist
-    }
-    
-    func loadImage(urlString: String) async throws -> UIImage {
-        guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
-        }
-        let (data, _) = try await URLSession.shared.data(from: url)
-        guard let image = UIImage(data: data) else {
-            throw URLError(.cannotDecodeContentData)
-        }
-        return image
-    }
-    
-    func loadBackgroundImage(urlString: String, targetSize: CGSize) async throws -> UIImage? {
-        if let image = try? await loadImage(urlString: urlString),
-           let resized = image.resizedAndCropped(to: targetSize),
-           let blurred = resized.applyBlur() {
-            return blurred
-        } else {
-            let defaultBackImage = UIImage(resource: .instagramBackGround)
-            return defaultBackImage
-        }
-    }
-    
+// Instagram
+extension SologPlaylistViewModel {
     func getInstagramStoryURL() async -> URL? {
         guard let instaAppID = Bundle.main.object(forInfoDictionaryKey: "INSTA_APP_ID") as? String,
               let instagramURL = URL(string: "instagram-stories://share?source_application=\(instaAppID)")
@@ -348,6 +369,28 @@ final class SologPlaylistViewModel {
         return nil
     }
     
+    func loadImage(urlString: String) async throws -> UIImage {
+        guard let url = URL(string: urlString) else {
+            throw URLError(.badURL)
+        }
+        let (data, _) = try await URLSession.shared.data(from: url)
+        guard let image = UIImage(data: data) else {
+            throw URLError(.cannotDecodeContentData)
+        }
+        return image
+    }
+    
+    func loadBackgroundImage(urlString: String, targetSize: CGSize) async throws -> UIImage? {
+        if let image = try? await loadImage(urlString: urlString),
+           let resized = image.resizedAndCropped(to: targetSize),
+           let blurred = resized.applyBlur() {
+            return blurred
+        } else {
+            let defaultBackImage = UIImage(resource: .instagramBackGround)
+            return defaultBackImage
+        }
+    }
+    
     private func getSongImages() async -> [UIImage] {
         let suffix = playlist.songs.suffix(3)
         var songImages: [UIImage] = []
@@ -357,33 +400,5 @@ final class SologPlaylistViewModel {
             }
         }
         return songImages
-    }
-    
-    func simpleHaptic() {
-        HapticService.shared.playSimpleHaptic()
-    }
-    
-    func fetchAdditionalDetails() async {
-        presentationState.isDetailViewLoading = true
-        defer { presentationState.isDetailViewLoading = false }
-
-        guard let songID = selectedSong?.songID,
-              let song = await musicService.fetchSongInfoByID(songID)
-        else { return }
-
-        detailSong = DetailSong(
-            songTitle: selectedSong?.title,
-            artist: selectedSong?.artist,
-            albumCoverURL: selectedSong?.albumCoverURL,
-            albumTitle: song.albumTitle,
-            genres: song.genreNames,
-            releaseDate: song.releaseDate?.formatDate()
-        )
-    }
-    
-    func dismissSongDetailView() {
-        selectedSong = nil
-        detailSong = nil
-        presentationState.isShowingSongDetailView.toggle()
     }
 }

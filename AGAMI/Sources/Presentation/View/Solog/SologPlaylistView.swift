@@ -468,7 +468,7 @@ private struct TopBarTrailingItems: View {
                             .foregroundStyle(Color(.sMain))
                     }
                 }
-                .disabled(viewModel.presentationState.isUpdating)
+                .disabled(viewModel.presentationState.isSaveButtonDisabled)
             } else if viewModel.exportingState == .none {
                 Button {
                     viewModel.simpleHaptic()

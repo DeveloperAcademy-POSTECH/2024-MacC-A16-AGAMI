@@ -21,6 +21,8 @@ struct PlaylistPresentationState {
     var isShowingExportingAppleMusicFailedAlert: Bool = false
     var isShowingExportingSpotifyFailedAlert: Bool = false
     var didOpenSpotifyURL = false // 백그라운드에서 포그라운드로 돌아왔을 때의 확인 변수
+    
+    var isSaveButtonDisabled: Bool { isUpdating || isLoading }
 }
 
 @Observable

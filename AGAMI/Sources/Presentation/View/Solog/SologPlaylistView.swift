@@ -82,21 +82,6 @@ struct SologPlaylistView: View {
     }
 }
 
-private struct ExportingView: View {
-    var exportingState: ExportingState
-    
-    var body: some View {
-        switch exportingState {
-        case .isAppleMusicExporting:
-            AppleMusicLottieView()
-        case .isSpotifyExporting:
-            SpotifyLottieView()
-        case .none:
-            EmptyView()
-        }
-    }
-}
-
 private struct ListView: View {
     let viewModel: SologPlaylistViewModel
     

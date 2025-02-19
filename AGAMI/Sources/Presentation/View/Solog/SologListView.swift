@@ -24,7 +24,7 @@ struct SologListView: View {
                     ListView(viewModel: viewModel, size: proxy.size)
                 }
             }
-            .safeAreaPadding(.horizontal, 16)
+            .safeAreaPadding(.horizontal, 20)
 
             NewSologButton(viewModel: viewModel)
 
@@ -60,14 +60,8 @@ private struct TopBarView: View {
     let viewModel: SologListViewModel
 
     var body: some View {
-        HStack(spacing: 8) {
-            HStack(spacing: 5) {
-                Image(.sologListIcon)
-                Text("소록")
-                    .font(.sCoreDream(weight: .dream6, size: 27))
-                    .foregroundStyle(Color(.sTitleText))
-                    .kerning(-0.22)
-            }
+        HStack(spacing: 12) {
+            Image(.sologListIcon)
 
             Spacer()
 
@@ -76,9 +70,9 @@ private struct TopBarView: View {
                 withAnimation(.easeIn(duration: 0.2)) { viewModel.isSearchBarPresented = true }
                 viewModel.simpleHaptic()
             } label: {
-                Image(systemName: "magnifyingglass.circle")
-                    .font(.system(size: 26)
-                        .weight(.light))
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 22)
+                    .weight(.regular))
                     .foregroundStyle(Color(.sButton))
             }
 
@@ -88,9 +82,9 @@ private struct TopBarView: View {
                 ))
                 viewModel.simpleHaptic()
             } label: {
-                Image(systemName: "map.circle")
-                    .font(.system(size: 26)
-                        .weight(.light))
+                Image(systemName: "map.fill")
+                    .font(.system(size: 22)
+                    .weight(.medium))
                     .foregroundStyle(Color(.sButton))
             }
 
@@ -98,9 +92,9 @@ private struct TopBarView: View {
                 coordinator.presentSheet(.accountView)
                 viewModel.simpleHaptic()
             } label: {
-                Image(systemName: "person.circle")
-                    .font(.system(size: 26)
-                        .weight(.light))
+                Image(systemName: "person.fill")
+                    .font(.system(size: 22)
+                    .weight(.medium))
                     .foregroundStyle(Color(.sButton))
             }
         }
@@ -117,43 +111,25 @@ private struct CountingHeaderView: View {
                 Image(systemName: "calendar")
                     .font(.notoSansKR(weight: .regular400, size: 15))
                     .foregroundStyle(Color(.sSubHead))
-                    .padding(.horizontal, 4)
 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("순간의 소록")
-                        .font(.notoSansKR(weight: .regular400, size: 15))
-                        .foregroundStyle(Color(.sSubHead))
-                    Text("\(viewModel.itemsCount)개")
-                        .font(.notoSansKR(weight: .semiBold600, size: 17))
-                        .foregroundStyle(Color(.sTitleText))
-                }
+                Text("\(viewModel.itemsCount)개")
+                    .font(.notoSansKR(weight: .semiBold600, size: 17))
+                    .foregroundStyle(Color(.sTitleText))
             }
-
-            Divider()
-                .frame(width: 0.5, height: 40)
-                .background(Color(.sLine))
 
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Image(systemName: "music.note")
                     .font(.system(size: 15))
-                    .foregroundStyle(Color(.sSubHead))
-                    .padding(.horizontal, 4)
+                    .foregroundStyle(Color(.sFootNote))
 
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("수집한 음악")
-                        .font(.notoSansKR(weight: .regular400, size: 15))
-                        .foregroundStyle(Color(.sSubHead))
-                    Text("\(viewModel.songsCount)곡")
-                        .font(.notoSansKR(weight: .semiBold600, size: 17))
-                        .foregroundStyle(Color(.sTitleText))
-                }
+                Text("\(viewModel.songsCount)곡")
+                    .font(.notoSansKR(weight: .semiBold600, size: 17))
+                    .foregroundStyle(Color(.sFootNote))
             }
 
             Spacer()
         }
-        .fixedSize(horizontal: false, vertical: true)
-        .frame(height: 40)
-        .padding(EdgeInsets(top: 24, leading: 0, bottom: 16, trailing: 0))
+        .padding(EdgeInsets(top: 24, leading: 9, bottom: 16, trailing: 9))
     }
 }
 

@@ -45,10 +45,10 @@ struct SologPlaylistView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbarVisibilityForVersion(.visible, for: .navigationBar)
-        .toolbarBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain), for: .navigationBar)
+        .toolbarBackground(Color(.sMain), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
         .navigationBarBackButtonHidden()
-        .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
+        .background(Color(.sMain))
         .onTapGesture(perform: hideKeyboard)
         .refreshable { await viewModel.refreshPlaylist() }
         .confirmationDialog("", isPresented: $viewModel.presentationState.isPhotoDialogPresented) {
@@ -91,7 +91,7 @@ private struct ListView: View {
                 Group {
                     if !viewModel.playlist.photoURL.isEmpty {
                         ImageView(viewModel: viewModel)
-                            .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
+                            .listRowBackground(Color(.sMain))
                             .listRowSeparator(.hidden)
                     }
                     
@@ -100,10 +100,10 @@ private struct ListView: View {
                         .listRowSeparator(.hidden)
                     
                     PlaylistView(viewModel: viewModel)
-                        .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
-                    
+                        .listRowBackground(Color(.sMain))
+
                     Spacer().frame(height: 60)
-                        .listRowBackground(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
+                        .listRowBackground(Color(.sMain))
                         .listRowSeparator(.hidden, edges: .bottom)
                     
                 }
@@ -143,9 +143,9 @@ private struct ListRow: View {
             
             VStack(alignment: .leading) {
                 Text(song.title)
-                    .font(.notoSansKR(weight: .semiBold600, size: 16))
+                    .font(.notoSansKR(weight: .medium500, size: 16))
                     .kerning(-0.3)
-                    .foregroundStyle(viewModel.presentationState.isEditing ? Color(.sMain) : Color(.sTitleText))
+                    .foregroundStyle(Color(.sTitleText))
                     .lineLimit(1)
                 
                 Text(song.artist)
@@ -164,7 +164,7 @@ private struct ListRow: View {
                 Spacer().frame(width: 16)
             }
         }
-        .background(viewModel.presentationState.isEditing ? Color(.sTitleText) : Color(.sMain))
+        .background(Color(.sMain))
     }
 }
 
@@ -208,29 +208,32 @@ private struct TitleAndDescriptionView: View {
                     TextField(viewModel.playlist.playlistName, text: $viewModel.playlist.playlistName)
                         .font(.sCoreDream(weight: .dream5, size: 24))
                         .multilineTextAlignment(.leading)
-                        .foregroundStyle(Color(.sTitleText))
+                        .foregroundStyle(Color(.sSubHead))
                         .onChange(of: viewModel.playlist.playlistName) { _, newValue in
                             if newValue.count > 15 {
                                 viewModel.playlist.playlistName = String(newValue.prefix(15))
                             }
                         }
-                        .padding(EdgeInsets(top: 22, leading: 0, bottom: 0, trailing: 0))
                     Spacer()
                     Text("\(viewModel.playlist.playlistName.count)/15")
                         .font(.notoSansKR(weight: .regular400, size: 13))
                         .foregroundStyle(Color(.sTextCaption))
                 }
-                
+                .padding(EdgeInsets(top: 22, leading: 4, bottom: 0, trailing: 4))
+
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
                 
-                TextField("기록하고 싶은 내용을 작성해보세요", text: $viewModel.playlist.playlistDescription, axis: .vertical)
-                    .font(.notoSansKR(weight: .regular400, size: 15))
-                    .foregroundStyle(Color(.sBodyText))
-                    .lineSpacing(3)
-                    .padding(.top, 12)
-                    .padding(.bottom, 32)
+                TextField(
+                    "기록하고 싶은 내용을 작성해보세요",
+                    text: $viewModel.playlist.playlistDescription,
+                    axis: .vertical
+                )
+                .font(.notoSansKR(weight: .regular400, size: 15))
+                .foregroundStyle(Color(.sFootNote))
+                .lineSpacing(3)
+                .padding(EdgeInsets(top: 12, leading: 4, bottom: 32, trailing: 4))
             }
         case false:
             VStack(alignment: .leading, spacing: 0) {
@@ -238,8 +241,8 @@ private struct TitleAndDescriptionView: View {
                     .font(.sCoreDream(weight: .dream5, size: 24))
                     .multilineTextAlignment(.leading)
                     .foregroundStyle(Color(.sTitleText))
-                    .padding(EdgeInsets(top: 22, leading: 0, bottom: 0, trailing: 0))
-                
+                    .padding(EdgeInsets(top: 22, leading: 4, bottom: 0, trailing: 4))
+
                 Divider().frame(height: 0.5)
                     .background(Color(.sLine))
                     .padding(.vertical, 12)
@@ -258,6 +261,7 @@ private struct TitleAndDescriptionView: View {
                         .lineLimit(1)
                     Spacer()
                 }
+                .padding(.horizontal, 4)
                 .fixedSize(horizontal: false, vertical: true)
                 
                 Divider().frame(height: 0.5)
@@ -269,6 +273,7 @@ private struct TitleAndDescriptionView: View {
                         .font(.notoSansKR(weight: .regular400, size: 15))
                         .foregroundStyle(Color(.sBodyText))
                         .lineSpacing(3)
+                        .padding(.horizontal, 4)
                         .lineLimit(nil)
 
                     Divider().frame(height: 0.5)
@@ -285,12 +290,12 @@ private struct PlaylistView: View {
     
     var body: some View {
         HStack(spacing: 8) {
-            Text("수집한 음악")
+            Text("수집한 노래")
                 .font(.notoSansKR(weight: .medium500, size: 17))
-                .foregroundStyle(viewModel.presentationState.isEditing ? Color(.sMain) : Color(.sTitleText))
+                .foregroundStyle(Color(.sTitleText))
             Text("\(viewModel.playlist.songs.count)곡")
                 .font(.notoSansKR(weight: .medium500, size: 17))
-                .foregroundStyle(Color(.sBodyText))
+                .foregroundStyle(Color(.sFootNote))
         }
         .padding(.vertical, 14)
         .listRowSeparator(.hidden)
@@ -422,8 +427,8 @@ private struct TopBarLeadingItems: View {
             coordinator.pop()
         } label: {
             Image(systemName: "chevron.backward")
-                .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(viewModel.presentationState.isEditing ? Color(.sMain) : Color(.sButton))
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(Color(.sButton))
         }
     }
 }
@@ -442,7 +447,7 @@ private struct TopBarTrailingItems: View {
                 } label: {
                     Text("취소")
                         .font(.notoSansKR(weight: .regular400, size: 16))
-                        .foregroundStyle(Color(.sMain))
+                        .foregroundStyle(Color(.sButton))
                 }
                 
                 Button(role: .cancel) {
@@ -454,11 +459,11 @@ private struct TopBarTrailingItems: View {
                 } label: {
                     if viewModel.presentationState.isUpdating {
                         ProgressView()
-                            .tint(Color(.sMain))
+                            .tint(Color(.sButton))
                     } else {
                         Text("저장")
                             .font(.notoSansKR(weight: .semiBold600, size: 16))
-                            .foregroundStyle(Color(.sMain))
+                            .foregroundStyle(Color(.sButton))
                     }
                 }
                 .disabled(viewModel.presentationState.isSaveButtonDisabled)
@@ -467,23 +472,23 @@ private struct TopBarTrailingItems: View {
                     viewModel.simpleHaptic()
                     viewModel.presentationState.isEditing = true
                 } label: {
-                    Image(systemName: "pencil.circle")
-                        .font(.system(size: 16, weight: .regular))
+                    Image(systemName: "pencil.line")
+                        .font(.system(size: 17, weight: .regular))
                         .foregroundStyle(Color(.sButton))
                 }
                 Button {
                     viewModel.simpleHaptic()
                     coordinator.presentSheet(.playlistMapView(playlist: viewModel.playlist))
                 } label: {
-                    Image(systemName: "location.circle")
-                        .font(.system(size: 16, weight: .regular))
+                    Image(systemName: "location.fill")
+                        .font(.system(size: 17, weight: .regular))
                         .foregroundStyle(Color(.sButton))
                 }
                 Menu {
                     MenuContents(viewModel: viewModel)
                 } label: {
-                    Image(systemName: "ellipsis.circle")
-                        .font(.system(size: 16, weight: .regular))
+                    Image(systemName: "ellipsis")
+                        .font(.system(size: 17, weight: .regular))
                         .foregroundStyle(Color(.sButton))
                 }
             }

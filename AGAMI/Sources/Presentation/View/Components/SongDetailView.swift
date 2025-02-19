@@ -66,7 +66,7 @@ struct SongDetailView: View {
                     DetailInformationRow(title: "장르", value: detailSong?.genres?.joined(separator: ", "))
                     DetailInformationRow(title: "발매일", value: detailSong?.releaseDate)
                 }
-                .background(Color.white)
+                .background(Color(.sCard))
                 .clipShape(RoundedRectangle(cornerRadius: 4))
                 .padding(.horizontal, 10)
             }

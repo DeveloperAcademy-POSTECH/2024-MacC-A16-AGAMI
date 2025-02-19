@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "signInLogo.png",
+      "filename" : "signinLogo.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "signInLogo@2x.png",
+      "filename" : "signinLogo@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "signInLogo@3x.png",
+      "filename" : "signinLogo@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

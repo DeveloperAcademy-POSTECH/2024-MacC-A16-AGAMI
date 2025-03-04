@@ -14,7 +14,7 @@ struct SologListView: View {
     @State var viewModel: SologListViewModel = SologListViewModel()
     @Environment(UploadingDataModel.self) private var uploadingData
     @Environment(\.scenePhase) private var scenePhase
-
+    
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
@@ -25,9 +25,9 @@ struct SologListView: View {
                 }
             }
             .safeAreaPadding(.horizontal, 20)
-
+            
             NewSologButton(viewModel: viewModel)
-
+            
             switch viewModel.exportingState {
             case .isAppleMusicExporting:
                 AppleMusicLottieView()
@@ -36,9 +36,9 @@ struct SologListView: View {
             case .none:
                 EmptyView()
             }
-
+            
             if viewModel.isFetching { ProgressView() }
-
+            
             SearchView(viewModel: viewModel)
         }
         .background(Color(.sMain))
@@ -58,13 +58,13 @@ struct SologListView: View {
 private struct TopBarView: View {
     @Environment(SologCoordinator.self) private var coordinator
     let viewModel: SologListViewModel
-
+    
     var body: some View {
         HStack(spacing: 12) {
             Image(.sologListIcon)
-
+            
             Spacer()
-
+            
             Button {
                 viewModel.isSearching.toggle()
                 withAnimation(.easeIn(duration: 0.2)) { viewModel.isSearchBarPresented = true }
@@ -72,10 +72,10 @@ private struct TopBarView: View {
             } label: {
                 Image(systemName: "magnifyingglass")
                     .font(.system(size: 22)
-                    .weight(.regular))
+                        .weight(.regular))
                     .foregroundStyle(Color(.sButton))
             }
-
+            
             Button {
                 coordinator.presentSheet(.mapView(
                     viewModel: MapViewModel(playlists: viewModel.playlists)
@@ -84,17 +84,17 @@ private struct TopBarView: View {
             } label: {
                 Image(systemName: "map.fill")
                     .font(.system(size: 22)
-                    .weight(.medium))
+                        .weight(.medium))
                     .foregroundStyle(Color(.sButton))
             }
-
+            
             Button {
                 coordinator.presentSheet(.accountView)
                 viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "person.fill")
                     .font(.system(size: 22)
-                    .weight(.medium))
+                        .weight(.medium))
                     .foregroundStyle(Color(.sButton))
             }
         }
@@ -104,29 +104,29 @@ private struct TopBarView: View {
 
 private struct CountingHeaderView: View {
     let viewModel: SologListViewModel
-
+    
     var body: some View {
         HStack(spacing: 16) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Image(systemName: "calendar")
                     .font(.notoSansKR(weight: .regular400, size: 15))
                     .foregroundStyle(Color(.sSubHead))
-
+                
                 Text("\(viewModel.itemsCount)개")
                     .font(.notoSansKR(weight: .semiBold600, size: 17))
                     .foregroundStyle(Color(.sTitleText))
             }
-
+            
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Image(systemName: "music.note")
                     .font(.system(size: 15))
                     .foregroundStyle(Color(.sFootNote))
-
+                
                 Text("\(viewModel.songsCount)곡")
                     .font(.notoSansKR(weight: .semiBold600, size: 17))
                     .foregroundStyle(Color(.sFootNote))
             }
-
+            
             Spacer()
         }
         .padding(EdgeInsets(top: 24, leading: 9, bottom: 16, trailing: 9))
@@ -138,7 +138,7 @@ private struct ListView: View {
     let viewModel: SologListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
-
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
@@ -148,7 +148,7 @@ private struct ListView: View {
                     } else if viewModel.isShowingNewSolog {
                         MakeNewSologCell(size: size)
                     }
-
+                    
                     ForEach(viewModel.playlists, id: \.playlistID) { playlist in
                         SologListCell(viewModel: viewModel, playlist: playlist, size: size)
                     }
@@ -171,7 +171,7 @@ private struct SologListCell: View {
     let playlist: PlaylistModel
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
-
+    
     var body: some View {
         Button {
             viewModel.simpleHaptic()
@@ -189,16 +189,16 @@ private struct SologListCell: View {
                     .frame(height: imageHeight)
                     .clipped()
                     .padding(.vertical, 15)
-
+                
                 Text(playlist.playlistName)
                     .font(.sCoreDream(weight: .dream5, size: 20))
                     .foregroundStyle(Color(.sTitleText))
-
+                
                 Divider()
                     .frame(height: 0.5)
                     .foregroundStyle(Color(.sLine))
                     .padding(.bottom, 6)
-
+                
                 HStack(spacing: 0) {
                     Text(Image(systemName: "music.note"))
                         .font(.system(size: 15))
@@ -212,12 +212,12 @@ private struct SologListCell: View {
                         .font(.notoSansKR(weight: .medium500, size: 15))
                         .foregroundStyle(Color(.sTitleText))
                 }
-
+                
                 Divider()
                     .frame(height: 0.5)
                     .foregroundStyle(Color(.sLine))
                     .padding(.vertical, 6)
-
+                
                 Text("\(viewModel.formatDateToString(playlist.generationTime))")
                     .font(.notoSansKR(weight: .regular400, size: 12))
                     .foregroundStyle(Color(.sFootNote))
@@ -267,7 +267,7 @@ private struct ArchiveListUpLoadingCell: View {
     let viewModel: SologListViewModel
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             Image(.sologPlaceholder)
@@ -275,28 +275,28 @@ private struct ArchiveListUpLoadingCell: View {
                 .scaledToFill()
                 .frame(height: imageHeight)
                 .padding(.vertical, 15)
-
+            
             Text(listCellPlaceholder.name ?? "")
                 .font(.sCoreDream(weight: .dream5, size: 20))
                 .foregroundStyle(Color(.sTitleText))
-
+            
             Divider()
                 .frame(height: 0.5)
                 .foregroundStyle(Color(.sLine))
                 .padding(.bottom, 6)
-
+            
             HStack(spacing: 10) {
                 Text("업로드 중")
                     .font(.notoSansKR(weight: .regular400, size: 15))
                     .foregroundStyle(Color(.sSubHead))
                 CircleAnimationView()
             }
-
+            
             Divider()
                 .frame(height: 0.5)
                 .foregroundStyle(Color(.sLine))
                 .padding(.vertical, 6)
-
+            
             Text("\(viewModel.formatDateToString(listCellPlaceholder.generationTime ?? Date()))")
                 .font(.notoSansKR(weight: .regular400, size: 12))
                 .foregroundStyle(Color(.sFootNote))
@@ -313,7 +313,7 @@ private struct MakeNewSologCell: View {
     @Environment(SologCoordinator.self) private var coordinator
     let size: CGSize
     private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
-
+    
     var body: some View {
         Button {
             coordinator.push(route: .searchWritingView)
@@ -325,25 +325,25 @@ private struct MakeNewSologCell: View {
                     .clipped()
                     .frame(height: imageHeight)
                     .padding(.vertical, 15)
-
+                
                 Text("지금 들려오는 음악과 함께,")
                     .font(.sCoreDream(weight: .dream5, size: 20))
                     .foregroundStyle(Color(.sTitleText))
-
+                
                 Divider()
                     .frame(height: 0.5)
                     .foregroundStyle(Color(.sLine))
                     .padding(.bottom, 6)
-
+                
                 Text("순간의 소록을 시작해보세요.")
                     .font(.sCoreDream(weight: .dream5, size: 17))
                     .foregroundStyle(Color(.sTitleText))
-
+                
                 Divider()
                     .frame(height: 0.5)
                     .foregroundStyle(Color(.sLine))
                     .padding(.vertical, 6)
-
+                
                 Text("언제, 어디서나 소록.")
                     .font(.notoSansKR(weight: .regular400, size: 12))
                     .foregroundStyle(Color(.sFootNote))
@@ -361,7 +361,7 @@ private struct ContextMenuItems: View {
     @Environment(\.openURL) private var openURL
     let viewModel: SologListViewModel
     let playlist: PlaylistModel
-
+    
     var body: some View {
         Button {
             Task {
@@ -397,7 +397,7 @@ private struct SearchView: View {
             if viewModel.isSearching {
                 SearchResultView(viewModel: viewModel)
             }
-
+            
             if viewModel.isSearchBarPresented {
                 SearchBar(viewModel: viewModel, isFocused: $isFocused)
                     .transition(.move(edge: .top))
@@ -410,14 +410,14 @@ private struct SearchBar: View {
     @Environment(SologCoordinator.self) private var coordinator
     @Bindable var viewModel: SologListViewModel
     var isFocused: FocusState<Bool>.Binding
-
+    
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
             HStack(alignment: .firstTextBaseline, spacing: 0) {
                 Text("\(Image(systemName: "magnifyingglass")) ")
                     .font(.system(size: 17, weight: .regular))
                     .foregroundStyle(Color(.sTitleText))
-
+                
                 TextField(
                     "",
                     text: $viewModel.searchText,
@@ -426,7 +426,7 @@ private struct SearchBar: View {
                 .font(.system(size: 17, weight: .regular))
                 .focused(isFocused)
                 .foregroundStyle(Color(.sTitleText))
-
+                
                 Button {
                     viewModel.clearSearchText()
                     isFocused.wrappedValue = false
@@ -438,7 +438,7 @@ private struct SearchBar: View {
             .padding(7)
             .background(Color(.sSearchbar))
             .clipShape(RoundedRectangle(cornerRadius: 10))
-
+            
             Button {
                 withAnimation(.easeIn(duration: 0.2)) { viewModel.isSearchBarPresented = false }
                 isFocused.wrappedValue = false
@@ -463,11 +463,13 @@ private struct SearchBar: View {
 private struct SearchResultView: View {
     @Environment(\.scenePhase) private var scenePhase
     let viewModel: SologListViewModel
-
+    
     var body: some View {
         VStack(spacing: 0) {
             Spacer().frame(height: 64.5)
-            if viewModel.hasNoResult {
+            if viewModel.searchText.isEmpty {
+                EmptySearchView()
+            } else if viewModel.hasNoResult {
                 HasNoResultPlaceholder()
             } else {
                 GeometryReader { proxy in
@@ -486,7 +488,7 @@ private struct SearchResultListView: View {
     let viewModel: SologListViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
-
+    
     var body: some View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
@@ -513,9 +515,18 @@ private struct HasNoResultPlaceholder: View {
             Text("결과 없음")
                 .font(.notoSansKR(weight: .semiBold600, size: 24))
                 .foregroundStyle(Color(.sTitleText))
+            
             Text("검색어를 확인해보세요.")
                 .font(.notoSansKR(weight: .regular400, size: 17))
                 .foregroundStyle(Color(.sSubHead))
+            Spacer()
+        }
+    }
+}
+
+private struct EmptySearchView: View {
+    var body: some View {
+        VStack(spacing: 0) {
             Spacer()
         }
     }

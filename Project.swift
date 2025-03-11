@@ -22,7 +22,7 @@ let fonts = [
 ]
 
 let project = Project(
-    name: "AGAMI",
+    name: "Solog",
     options: .options(
         defaultKnownRegions: ["en", "ko"],
         developmentRegion: "ko"
@@ -39,15 +39,15 @@ let project = Project(
     ),
     targets: [
         .target(
-            name: "AGAMI",
+            name: "Solog",
             destinations: [.iPhone],
             product: .app,
             bundleId: "io.tuist.AGAMI",
             deploymentTargets: .iOS("17.0"),
             infoPlist: .extendingProperties,
-            sources: ["AGAMI/Sources/**"],
-            resources: ["AGAMI/Resources/**"],
-            entitlements: "Entitlements/AGAMI.entitlements",
+            sources: ["Solog/Sources/**"],
+            resources: ["Solog/Resources/**"],
+            entitlements: "Entitlements/Solog.entitlements",
             scripts: [.swiftLintShell],
             dependencies: [
                 .external(name: "FirebaseAuth"),

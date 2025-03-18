@@ -13,6 +13,7 @@ struct PlaylistRow: View {
     let song: SongModel
     let isHighlighted: Bool
     
+
     var body: some View {
         HStack(spacing: 0) {
             if !song.albumCoverURL.isEmpty {

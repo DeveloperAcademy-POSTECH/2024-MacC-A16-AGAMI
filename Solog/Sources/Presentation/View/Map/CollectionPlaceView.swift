@@ -38,6 +38,7 @@ struct CollectionPlaceView: View {
 }
 
 private struct ListView: View {
+    @Environment(SologCoordinator.self) private var sologCoord
     let viewModel: CollectionPlaceViewModel
     let size: CGSize
     private var verticalSpacingValue: CGFloat { size.width / 377 * 15 }
@@ -46,7 +47,16 @@ private struct ListView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: verticalSpacingValue) {
                 ForEach(viewModel.playlists, id: \.playlistID) { playlist in
-                    SologListCell(viewModel: viewModel, playlist: playlist, size: size)
+                    SologListCell(playlist: playlist, size: size) {
+                        viewModel.simpleHaptic()
+                        sologCoord.dismissSheet()
+                        Task {
+                            try await Task.sleep(for: .milliseconds(300))
+                            await MainActor.run {
+                                sologCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
+                            }
+                        }
+                    }
                 }
                 .scrollTransition(.animated, axis: .vertical) { content, phase in
                     content
@@ -57,76 +67,5 @@ private struct ListView: View {
             .scrollTargetLayout()
         }
         .scrollTargetBehavior(.viewAligned(limitBehavior: getAlwaysByOneIfAvailableElseAlways()))
-    }
-}
-
-private struct SologListCell: View {
-    @Environment(SologCoordinator.self) private var sologCoord
-    let viewModel: CollectionPlaceViewModel
-    let playlist: PlaylistModel
-    let size: CGSize
-    private var imageHeight: CGFloat { (size.width - 20) * 157 / 341 }
-
-    var body: some View {
-        Button {
-            viewModel.simpleHaptic()
-            sologCoord.dismissSheet()
-            Task {
-                try await Task.sleep(for: .milliseconds(300))
-                await MainActor.run {
-                    sologCoord.push(route: .playlistView(viewModel: .init(playlist: playlist)))
-                }
-            }
-        } label: {
-            VStack(alignment: .leading, spacing: 0) {
-                KFImage(URL(string: playlist.photoURL))
-                    .resizable()
-                    .cancelOnDisappear(true)
-                    .placeholder {
-                        Image(.sologPlaceholder)
-                    }
-                    .scaledToFill()
-                    .frame(height: imageHeight)
-                    .clipped()
-                    .padding(.vertical, 15)
-
-                Text(playlist.playlistName)
-                    .font(.sCoreDream(weight: .dream5, size: 20))
-                    .foregroundStyle(Color(.sTitleText))
-
-                Divider()
-                    .frame(height: 0.5)
-                    .foregroundStyle(Color(.sLine))
-                    .padding(.bottom, 6)
-
-                HStack(spacing: 0) {
-                    Text(Image(systemName: "music.note"))
-                        .font(.system(size: 15))
-                        .foregroundStyle(Color(.sSubHead))
-                        .padding(.trailing, 2)
-                    Text("수집한 음악")
-                        .font(.notoSansKR(weight: .regular400, size: 15))
-                        .foregroundStyle(Color(.sSubHead))
-                        .padding(.trailing, 8)
-                    Text("\(playlist.songs.count)곡")
-                        .font(.notoSansKR(weight: .medium500, size: 15))
-                        .foregroundStyle(Color(.sTitleText))
-                }
-
-                Divider()
-                    .frame(height: 0.5)
-                    .foregroundStyle(Color(.sLine))
-                    .padding(.vertical, 6)
-
-                Text("\(viewModel.formatDateToString(playlist.generationTime))")
-                    .font(.notoSansKR(weight: .regular400, size: 12))
-                    .foregroundStyle(Color(.sFootNote))
-                    .padding(.bottom, 10)
-            }
-            .padding(.horizontal, 10)
-            .background(Color(.sWhite))
-            .clipShape(RoundedRectangle(cornerRadius: 4))
-            .shadow(color: Color(.sBlack).opacity(0.15), radius: 3, x: 0, y: 1)
-        }
     }
 }

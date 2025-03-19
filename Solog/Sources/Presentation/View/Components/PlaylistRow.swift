@@ -10,9 +10,15 @@ import SwiftUI
 import Kingfisher
 
 struct PlaylistRow: View {
-    let song: SongModel
-    let isHighlighted: Bool
-    
+    private let song: SongModel
+    private let isHighlighted: Bool
+    private let isEditing: Bool
+
+    init(song: SongModel, isHighlighted: Bool = false, isEditing: Bool = false) {
+        self.song = song
+        self.isHighlighted = isHighlighted
+        self.isEditing = isEditing
+    }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -20,38 +26,39 @@ struct PlaylistRow: View {
                 KFImage(URL(string: song.albumCoverURL))
                     .resizable()
                     .cancelOnDisappear(true)
-                    .placeholder {
-                        ProgressView()
-                            .frame(width: 54, height: 54)
-                    }
-                    .frame(width: 54, height: 54)
-                    .padding(.trailing, 20)
-                    .padding(.vertical, 3)
+                    .placeholder { ProgressView() }
+                    .frame(width: 60, height: 60)
+                    .padding(.trailing, 12)
             } else {
                 Image(.songEmpty)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 54, height: 54)
-                    .padding(.trailing, 20)
-                    .padding(.vertical, 3)
+                    .frame(width: 60, height: 60)
+                    .padding(.trailing, 12)
             }
-            
-            VStack(alignment: .leading, spacing: 0) {
+
+            VStack(alignment: .leading) {
                 Text(song.title)
-                    .font(.notoSansKR(weight: .semiBold600, size: 16))
+                    .font(.notoSansKR(weight: .medium500, size: 16))
                     .kerning(-0.3)
                     .foregroundStyle(Color(.sTitleText))
-                
+                    .lineLimit(1)
+
                 Text(song.artist)
                     .font(.notoSansKR(weight: .regular400, size: 14))
-                    .kerning(-0.3)
                     .foregroundStyle(Color(.sBodyText))
+                    .kerning(-0.3)
+                    .lineLimit(1)
             }
-            .lineLimit(1)
-            .truncationMode(.tail)
-            .padding(.trailing, 30)
-            
+
             Spacer()
+
+            if isEditing {
+                Image(systemName: "line.3.horizontal")
+                    .foregroundStyle(.gray)
+                    .font(.system(size: 16, weight: .regular))
+                Spacer().frame(width: 16)
+            }
         }
         .background(isHighlighted ? Color(.sListBack) : .clear)
     }

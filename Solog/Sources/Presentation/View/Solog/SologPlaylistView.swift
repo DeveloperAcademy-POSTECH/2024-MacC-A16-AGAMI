@@ -120,54 +120,6 @@ private struct ListView: View {
     }
 }
 
-private struct ListRow: View {
-    let viewModel: SologPlaylistViewModel
-    let song: SongModel
-    
-    var body: some View {
-        HStack(spacing: 0) {
-            if !song.albumCoverURL.isEmpty {
-                KFImage(URL(string: song.albumCoverURL))
-                    .resizable()
-                    .cancelOnDisappear(true)
-                    .placeholder { ProgressView() }
-                    .frame(width: 60, height: 60)
-                    .padding(.trailing, 12)
-            } else {
-                Image(.songEmpty)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 60, height: 60)
-                    .padding(.trailing, 12)
-            }
-            
-            VStack(alignment: .leading) {
-                Text(song.title)
-                    .font(.notoSansKR(weight: .medium500, size: 16))
-                    .kerning(-0.3)
-                    .foregroundStyle(Color(.sTitleText))
-                    .lineLimit(1)
-                
-                Text(song.artist)
-                    .font(.notoSansKR(weight: .regular400, size: 14))
-                    .foregroundStyle(Color(.sBodyText))
-                    .kerning(-0.3)
-                    .lineLimit(1)
-            }
-            
-            Spacer()
-            
-            if viewModel.presentationState.isEditing {
-                Image(systemName: "line.3.horizontal")
-                    .foregroundStyle(.gray)
-                    .font(.system(size: 16, weight: .regular))
-                Spacer().frame(width: 16)
-            }
-        }
-        .background(Color(.sMain))
-    }
-}
-
 private struct ImageView: View {
     @Environment(SologCoordinator.self) private var coordinator
     @Bindable var viewModel: SologPlaylistViewModel
@@ -301,7 +253,7 @@ private struct PlaylistView: View {
         .listRowSeparator(.hidden)
         
         ForEach(viewModel.playlist.songs, id: \.songID) { song in
-            ListRow(viewModel: viewModel, song: song)
+            PlaylistRow(song: song, isEditing: viewModel.presentationState.isEditing)
                 .highPriorityGesture(
                     TapGesture().onEnded {
                         viewModel.presentationState.isShowingSongDetailView.toggle()

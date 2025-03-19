@@ -38,6 +38,7 @@ struct SearchWritingView: View {
                     SearchSongList(viewModel: viewModel)
                         .listRowInsets(.zero)
                         .listRowBackground(Color(.sMain))
+                        .padding(.horizontal, 20)
                 }
                 .listStyle(.plain)
                 .scrollIndicators(.hidden)
@@ -273,7 +274,7 @@ private struct SearchSongList: View {
     
     var body: some View {
         ForEach(viewModel.diggingList, id: \.songID) { song in
-            PlaylistRow(song: song, isHighlighted: true)
+            PlaylistRow(song: song, isEditing: true)
                 .highPriorityGesture(
                     TapGesture().onEnded {
                         viewModel.showSongDetailView.toggle()
@@ -281,7 +282,8 @@ private struct SearchSongList: View {
                     }
                 )
         }
-        .padding(.horizontal, 20)
+        .onDelete(perform: viewModel.deleteSong)
+        .onMove(perform: viewModel.moveSong)
     }
 }
 

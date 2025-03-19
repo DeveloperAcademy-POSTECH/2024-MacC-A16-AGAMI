@@ -191,4 +191,21 @@ final class SearchWritingViewModel {
         detailSong = nil
         showSongDetailView.toggle()
     }
+
+    func loadSavedSongs() {
+        playlist = persistenceService.fetchPlaylist()
+    }
+
+    func deleteSong(indexSet: IndexSet) {
+        for index in indexSet {
+            let song = diggingList[index]
+            persistenceService.deleteSong(item: song)
+        }
+        loadSavedSongs()
+    }
+
+    func moveSong(from source: IndexSet, to destination: Int) {
+        persistenceService.moveSong(from: source, to: destination)
+        loadSavedSongs()
+    }
 }

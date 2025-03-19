@@ -106,7 +106,7 @@ private struct SongList: View {
 
     var body: some View {
         ForEach(viewModel.playlist.songs, id: \.songID) { song in
-            PlaylistRow(song: song, isHighlighted: viewModel.currentSongId == song.songID)
+            PlaylistRow(song: song, isHighlighted: viewModel.currentSongId == song.songID, isEditing: viewModel.presentationState.isEditing)
                 .overlay(alignment: .trailing) {
                     Image(systemName: "line.3.horizontal")
                         .foregroundStyle(Color(.sSubHead))

@@ -13,6 +13,7 @@ enum SologRoute: Hashable {
     case playlistView(viewModel: SologPlaylistViewModel)
     case searchWritingView
     case placeListView(viewModel: CollectionPlaceViewModel)
+    case accountView
 
     var id: String {
         switch self {
@@ -20,6 +21,7 @@ enum SologRoute: Hashable {
         case .playlistView: return "playlistView"
         case .searchWritingView: return "searchWritingView"
         case .placeListView: return "placeListView"
+        case .accountView: return "accountView"
         }
     }
     
@@ -35,7 +37,6 @@ enum SologRoute: Hashable {
 enum SologSheet: Hashable, Identifiable {
     case searchAddSongView(viewModel: SearchAddSongViewModel)
     case sologAddSongView(viewModel: SologPlaylistViewModel)
-	case accountView
     case mapView(viewModel: MapViewModel)
     case playlistMapView(playlist: PlaylistModel)
 
@@ -43,7 +44,6 @@ enum SologSheet: Hashable, Identifiable {
         switch self {
         case .searchAddSongView: return "searchAddSongView"
         case .sologAddSongView: return "sologAddSongView"
-        case .accountView: return "accountView"
         case .mapView: return "mapView"
         case .playlistMapView: return "playlistMapView"
         }
@@ -82,6 +82,8 @@ final class SologCoordinator: BaseCoordinator<SologRoute, SologSheet, SologFullS
             SearchWritingView()
         case let .placeListView(viewModel):
             CollectionPlaceView(viewModel: viewModel)
+        case .accountView:
+            AccountView()
         }
     }
     
@@ -93,9 +95,6 @@ final class SologCoordinator: BaseCoordinator<SologRoute, SologSheet, SologFullS
                 .interactiveDismissDisabled()
         case let .sologAddSongView(viewModel):
             SologAddSongView(viewModel: viewModel)
-                .interactiveDismissDisabled()
-        case .accountView:
-            AccountView()
                 .interactiveDismissDisabled()
         case let .mapView(viewModel):
             MapView(viewModel: viewModel)

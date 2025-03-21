@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MarkdownUI
 
 struct AccountView: View {
     @State private var viewModel: AccountViewModel = .init()
@@ -13,46 +14,34 @@ struct AccountView: View {
     @Environment(SologCoordinator.self) private var coordinator
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                if case .none = viewModel.deleteAccountProcess {
-                    ContentView(viewModel: viewModel)
-                } else {
-                    DeleteAccountView(viewModel: viewModel)
-                }
+        VStack(spacing: 0) {
+            if case .none = viewModel.deleteAccountProcess {
+                ContentView(viewModel: viewModel)
+            } else {
+                DeleteAccountView(viewModel: viewModel)
             }
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        coordinator.dismissSheet()
-                    } label: {
-                        if viewModel.deleteAccountProcess == .none {
-                            Text("닫기")
-                                .font(.notoSansKR(weight: .regular400, size: 17))
-                                .foregroundStyle(Color(.sButton))
-                        }
-                    }
-                }
-            }
-            .navigationTitle("계정 관리")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.visible, for: .navigationBar)
-            .toolbarBackground(Color(.sWhiteBack), for: .navigationBar)
-            .ignoresSafeArea(edges: .bottom)
-            .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
-                SignOutAlertActions(viewModel: viewModel)
-            } message: {
-                Text("로그아웃을 진행하시겠어요?\n이전에 기록한 데이터는 유지됩니다.")
-                    .font(.notoSansKR(weight: .regular400, size: 14))
-                    .foregroundStyle(Color(.sBodyText))
-            }
-            .alert("회원 탈퇴", isPresented: $viewModel.isShowingDeleteAccountAlert) {
-                DeleteAccountAlertActions(viewModel: viewModel)
-            } message: {
-                Text("회원 탈퇴 시 모든 기록이 삭제되고\n복구할 수 없습니다.")
-                    .font(.notoSansKR(weight: .regular400, size: 14))
-                    .foregroundStyle(Color(.sBodyText))
-            }
+        }
+        .navigationTitle("계정 관리")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarBackground(Color(.sWhiteBack), for: .navigationBar)
+        .ignoresSafeArea(edges: .bottom)
+        .alert("로그아웃", isPresented: $viewModel.isShowingSignOutAlert) {
+            SignOutAlertActions(viewModel: viewModel)
+        } message: {
+            Text("로그아웃을 진행하시겠어요?\n이전에 기록한 데이터는 유지됩니다.")
+                .font(.notoSansKR(weight: .regular400, size: 14))
+                .foregroundStyle(Color(.sBodyText))
+        }
+        .alert("회원 탈퇴", isPresented: $viewModel.isShowingDeleteAccountAlert) {
+            DeleteAccountAlertActions(viewModel: viewModel)
+        } message: {
+            Text("회원 탈퇴 시 모든 기록이 삭제되고\n복구할 수 없습니다.")
+                .font(.notoSansKR(weight: .regular400, size: 14))
+                .foregroundStyle(Color(.sBodyText))
+        }
+        .onAppear {
+            print("에러")
         }
     }
 }
@@ -66,16 +55,21 @@ private struct ContentView: View {
             Color(.sMain)
                 .ignoresSafeArea()
             
-            VStack(spacing: 32) {
-                VStack(spacing: 14) {
+            VStack(spacing: 0) {
+                ScrollView {
+                    Markdown {
+                        viewModel.termsText
+                    }
+                    .padding(EdgeInsets(top: 10, leading: 16, bottom: 0, trailing: 16))
+                }
+                
+                Spacer()
+                
+                HStack(spacing: 0) {
                     Button {
-                        if let url = viewModel.termsOfServiceURL {
-                            openURL(url)
-                        } else {
-                            dump("잘못된 URL입니다.")
-                        }
+                        viewModel.isShowingSignOutAlert.toggle()
                     } label: {
-                        ButtonLabel(type: .termsOfService)
+                        ButtonLabel(type: .signOut)
                     }
                     
                     Button {
@@ -84,16 +78,8 @@ private struct ContentView: View {
                         ButtonLabel(type: .deleteAccount)
                     }
                 }
-                
-                Button {
-                    viewModel.isShowingSignOutAlert.toggle()
-                } label: {
-                    ButtonLabel(type: .signOut)
-                }
-                
-                Spacer()
+                .padding(.bottom, 33)
             }
-            .padding(EdgeInsets(top: 24, leading: 16, bottom: 0, trailing: 16))
         }
     }
 }
@@ -109,10 +95,6 @@ private struct ButtonLabel: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: 4)
-                .fill(type.backgroundColor)
-        )
     }
 }
 
@@ -132,7 +114,6 @@ private struct SignOutAlertActions: View {
         
         Button(role: .destructive) {
             viewModel.confirmSignOut()
-            coordinator.dismissSheet()
             coordinator.popToRoot()
         } label: {
             Text("로그아웃")
@@ -189,7 +170,7 @@ enum AccountButtonType {
     var fontColor: Color {
         switch self {
         case .termsOfService: return Color(.sButton)
-        case .signOut: return Color(.sWhite)
+        case .signOut: return Color(.sButton)
         case .deleteAccount: return Color(.sButton)
         }
     }
@@ -197,7 +178,7 @@ enum AccountButtonType {
     var backgroundColor: Color {
         switch self {
         case .termsOfService: return Color(.sWhite)
-        case .signOut: return Color(.sTitleText)
+        case .signOut: return Color(.sWhite)
         case .deleteAccount: return Color(.sWhite)
         }
     }

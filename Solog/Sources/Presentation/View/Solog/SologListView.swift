@@ -89,7 +89,7 @@ private struct TopBarView: View {
             }
             
             Button {
-                coordinator.presentSheet(.accountView)
+                coordinator.push(route: .accountView)
                 viewModel.simpleHaptic()
             } label: {
                 Image(systemName: "person.fill")

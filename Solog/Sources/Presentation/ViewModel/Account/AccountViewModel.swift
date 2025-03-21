@@ -13,11 +13,9 @@ final class AccountViewModel {
     private let firebaseAuthService: FirebaseAuthService = FirebaseAuthService()
     private let firebaseService: FirebaseService = FirebaseService()
     
-    var termsOfServiceURL: URL? {
-        URL(string: "https://posacademy.notion.site/Plake-1302b843d5af81969d94daddfac63fde?pvs=4")
-    }
     var isShowingSignOutAlert: Bool = false
     var isShowingDeleteAccountAlert: Bool = false
+    
     // 계정 삭제에 대한 상태
     enum DeleteAccountProcess {
         case none
@@ -26,6 +24,21 @@ final class AccountViewModel {
     }
     
     var deleteAccountProcess: DeleteAccountProcess = .none
+    
+    var termsText: String = ""
+    
+    init() {
+        loadTermsText()
+    }
+    
+    private func loadTermsText() {
+        if let fileURL = Bundle.main.url(forResource: "TermsOfService", withExtension: "txt"),
+           let fileContents = try? String(contentsOf: fileURL, encoding: .utf8) {
+            termsText = fileContents
+        } else {
+            termsText = "이용 약관을 불러올 수 없습니다."
+        }
+    }
 }
 // MARK: - 로그아웃, 회원 탈퇴
 extension AccountViewModel {

@@ -106,8 +106,8 @@ extension InfoPlist {
             "REDIRECT_URL": .string("$(REDIRECT_URL)"),
             "INSTA_APP_ID": .string("$(INSTA_APP_ID)"),
             "CFBundleDisplayName": "소록",
-            "CFBundleShortVersionString": "2.1.4",
-            "CFBundleVersion": "10"
+            "CFBundleShortVersionString": "2.2",
+            "CFBundleVersion": "11"
         ]
     )
 }

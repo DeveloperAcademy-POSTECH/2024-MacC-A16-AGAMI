@@ -56,7 +56,8 @@ let project = Project(
                 .external(name: "SpotifyAPI"),
                 .external(name: "KeychainAccess"),
                 .external(name: "Lottie"),
-                .external(name: "Kingfisher")
+                .external(name: "Kingfisher"),
+                .external(name: "MarkdownUI")
             ]
         )
     ]
